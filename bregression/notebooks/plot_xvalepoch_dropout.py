@@ -11,6 +11,7 @@ import plotting_utils as plotting
 import pprint
 import matplotlib.offsetbox as offsetbox 
 import numpy as np
+import datetime
 
 parser = OptionParser(option_list=[
     make_option("--training",type='string',dest="training",default='HybridLossRaw'),
@@ -21,12 +22,16 @@ parser = OptionParser(option_list=[
     make_option("--nxval",type='int',dest="nxval",default=1),
 ])
 
+
+
 colors=['r','b','g','k','c','y']
 ## parse options
 (options, args) = parser.parse_args()
 input_trainings = options.training.split(',')
 input_metrics = options.metrics.split(',')
 
+now = str(datetime.datetime.now()).split(' ')[0]
+options.out_dir = scratch_plots ='/scratch/snx3000/nchernya/bregression/plots/quantiles/%s/'%now
 nxval=options.nxval
 
 #for each metric we plot it for train and validation sample vs epoch 
@@ -61,8 +66,8 @@ for idx,met in enumerate(input_metrics):
       #  plt.fill_between(mean[:,dictVar['epoch']],mean[:,dictVar['val_%s'%met]]-std[:,dictVar['val_%s'%met]],mean[:,dictVar['val_%s'%met]]+std[:,dictVar['val_%s'%met]],alpha=0.2,color=colors[idx_nn])
         dataframe = pd.DataFrame()
         dataframe['mean_%i'%idx_nn] = mean[:,dictVar['val_%s'%met]]
-        rolling_mean = dataframe['mean_%i'%idx_nn].rolling(window=5).mean()
-        rolling_std = dataframe['mean_%i'%idx_nn].rolling(window=5).std()
+        rolling_mean = dataframe['mean_%i'%idx_nn].rolling(window=2).mean()
+        rolling_std = dataframe['mean_%i'%idx_nn].rolling(window=2).std()
         plt.plot(rolling_mean.index,rolling_mean,linestyle='--',label='',color=colors[idx_nn])
         plt.fill_between(rolling_std.index, rolling_mean-rolling_std, rolling_mean+rolling_std, color=colors[idx_nn], alpha=0.2)
     plt.xlabel('# epochs')

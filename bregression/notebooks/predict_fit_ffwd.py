@@ -38,7 +38,8 @@ for idx,name in enumerate(input_trainings):
 #    target='/users/nchernya/HHbbgg_ETH/bregression/notebooks/'+input_trainings[idx]
     target=options.target_dir+input_trainings[idx]
   #  target=options.target_dir
-    models = get_ipython().getoutput('ls -t $target/*.hdf5')
+  #  models = get_ipython().getoutput('ls -t $target/*.hdf5')  !!!!!!!!!!!!!Important, change this, because otherwise since I touch scram it takes the first one!
+    models = get_ipython().getoutput('ls -1r $target/model*.hdf5')  
     models
   
     # read training configuration
@@ -51,8 +52,9 @@ for idx,name in enumerate(input_trainings):
     features = config['options']['features'].split(',')
     for i,f in enumerate(features): 
         if f == 'Jet_pt' or f == 'Jet_mt'  : features[i] = features[i]+'_raw'
+        if f == 'Jet_withPtd' : features[i] ='Jet_ptd_breg'
     X = data[features].values
-    print(X)
+  #  print(X[0])
     
     model = keras.models.load_model(models[0],compile=False)
     y_pred = model.predict(X)
@@ -70,6 +72,8 @@ for idx,name in enumerate(input_trainings):
         corr = y_pred[:,0]
         res = 0.5*(y_pred[:,2] - y_pred[:,1])
 
+  #  print(y_pred[0],res[0], corr[0])
+
     # normalize back to energy scale
     if config['options']['normalize_target']:
         corr *= config['y_std']
@@ -77,6 +81,7 @@ for idx,name in enumerate(input_trainings):
     
         if res is not None:
             res *= config['y_std']
+  #  print(res[0], corr[0])
   
     # Add new prediction to data frame
     data = data.assign(newNNreg=y_pred[:,0])

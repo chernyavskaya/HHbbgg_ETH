@@ -47,7 +47,8 @@ markers=['s','o','^','h','>','<','s','o','o','o','o']
 labels=options.labels.split(',')
 bins_same = []
 
-for i in range(0,3):
+#for i in range(0,3):
+for i in range(0,1):
  sigma_mu_array = []
  sigma_array = []
  mu_array = []
@@ -114,7 +115,8 @@ for i in range(0,3):
   #  print(binc.shape,bins.shape,sigma_mu_jec.shape,err_corr_iqr2.shape,y_corr_median_pt.shape) 
  
     ## Draw profile of sigma (0.72-0.25)/2 vs eta and pt
-    if (ifile==0) :  plt.scatter(binc,sigma_mu_jec,color='black',marker='*',label='JEC only')
+   # if (ifile==0) :  plt.scatter(binc,sigma_mu_jec,color='black',marker='*',label='JEC only')
+    plt.scatter(binc,sigma_mu_jec,color=colors[ifile+2],marker='*',label='JEC %s'%labels[ifile])
     plt.scatter(binc,sigma_mu_corr,color=colors[ifile],marker=markers[ifile],label='NN %s'%labels[ifile])
  plt.grid(alpha=0.2,linestyle='--',markevery=2)
  axes = plt.gca()

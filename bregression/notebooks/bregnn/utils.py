@@ -44,4 +44,3 @@ def profile(target,xvar,bins=10,range=None,uniform=False,moments=True,
             ## print(values)
         ret.append( np.concatenate(values,axis=-1) )
     return tuple(ret)
-
