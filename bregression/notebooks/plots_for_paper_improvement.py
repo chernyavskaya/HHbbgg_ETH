@@ -8,6 +8,9 @@ from optparse import OptionParser, make_option
 sys.path.insert(0, '/users/nchernya/HHbbgg_ETH/bregression/python/')
 import datetime
 import math
+from matplotlib import gridspec
+
+
 
 parser = OptionParser(option_list=[
     make_option("--training",type='string',dest="training",default='HybridLoss'),
@@ -35,12 +38,12 @@ for i in range(len(dirs)):
     os.mkdir(scratch_plots)
 
 print(options.where)
-whats = ['p_T','\eta','\\rho']
+whats = ['p_T (GeV)','\eta','\\rho']
 #ranges = [[30,400],[-2.5,2.5],[0,50]]
 #binning =[50,10,20] #[50,20]
 #ranges = [[30,400],[0,2.5],[0,50]]
 #binning =[10,10,10] #[50,20]
-ranges = [[0,500],[0,2.5],[0,50]]
+ranges = [[0,400],[0,2.5],[0,50]]
 binning =[7,10,20] #[50,20]
 linestyles = ['-.', '--','-', ':','-']
 colors=['green','red','blue','cyan','magenta','blueviolet','orange','lime','brown','blue','blue']
@@ -48,8 +51,8 @@ markers=['s','o','^','h','>','<','s','o','o','o','o']
 labels=options.labels.split(',')
 bins_same = []
 
-#for i in range(0,3):
-for i in range(1,3):
+for i in range(0,1):
+#for i in range(1,3):
  sigma_mu_array = []
  sigma_array = []
  mu_array = []
@@ -78,7 +81,7 @@ for i in range(1,3):
     if i==0 : X = X_pt
     elif i==1 : X = X_eta
     elif i==2 : X = X_rho
-    print(i,X)
+
  
     if (ifile==0) : bins=np.linspace(ranges[i][0],ranges[i][1],binning[i])
     if ifile==0 and i==0 :  bins = np.array([0,20,40,60,80,100,150,200,250,300,400,500]) #ttbar
@@ -115,27 +118,45 @@ for i in range(1,3):
   #  print(binc.shape,bins.shape,sigma_mu_jec.shape,err_corr_iqr2.shape,y_corr_median_pt.shape) 
  
     ## Draw profile of sigma (0.72-0.25)/2 vs eta and pt
-    if (ifile==0) :  plt.scatter(binc,sigma_mu_jec,color='black',marker='*',label='baseline')
-    plt.scatter(binc,sigma_mu_corr,color=colors[ifile],marker=markers[ifile],label='%s'%labels[ifile])
- plt.grid(alpha=0.2,linestyle='--',markevery=2)
+    fig = plt.figure(figsize=(12,15)) 
+    gs = gridspec.GridSpec(2, 1, height_ratios=[3,1]) 
+    ax0 = plt.subplot(gs[0])
+
+
+    if (ifile==0) :  ax0.scatter(binc,sigma_mu_jec,color='black',marker='*',label='baseline')
+    ax0.scatter(binc,sigma_mu_corr,color=colors[ifile],marker=markers[ifile],label='%s'%labels[ifile])
+
+ ax0.grid(alpha=0.2,linestyle='--',markevery=2)
  axes = plt.gca()
- if (i==0) : axes.set_ylim(0.02,0.20)
+ if (i==0) : axes.set_ylim(0.02,0.3)
  if (i==1) : axes.set_ylim(0.06,0.15)
  if (i==2) : axes.set_ylim(0.08,0.15)
  axes.set_xlim(ranges[i][0],ranges[i][1])
  if (i==0) : axes.set_xlim(0,ranges[i][1])
- ymin, ymax = (plt.gca()).get_ylim()
- xmin, xmax = (plt.gca()).get_xlim()
+ ymin, ymax = (axes).get_ylim()
+ xmin, xmax = (axes).get_xlim()
  samplename=options.samplename
  if options.samplename=='ttbar' : samplename='$t\\bar{t}$'
  if options.samplename=='ZHbbll' : samplename='$Z(\\to{b\\bar{b}})H(\\to{l^+l^-})$'
  if options.samplename=="HHbbgg700" : samplename='$H(\\to{b\\bar{b}})H(\\to{\gamma\gamma})'
- plt.text(xmax*0.8,ymax*0.95,r'%s'%samplename, fontsize=30)
- lgd = plt.legend(loc="upper left",fontsize=30)
- plt.xlabel(r'$%s$'%whats[i],fontsize=30)
+ lgd = ax0.legend(loc="upper left",fontsize=30)
  plt.ylabel(r'$\bar{\sigma}$',fontsize=30)
+ if 'p_T' not in whats[i] :
+    plt.xlabel(r'$%s$'%whats[i],fontsize=30)
+    ax0.text(xmax*0.8,ymax*0.95,r'%s'%samplename, fontsize=30)
+ else :
+    ax0.text(xmax*0.8,ymax*0.90,r'%s'%samplename, fontsize=30)
+    ax1 = plt.subplot(gs[1])
+    improvement = (np.array(sigma_mu_array[ifile])-np.array(sigma_mu_jec))/(np.array(sigma_mu_jec))
+    ax1.scatter(binc,improvement,color=colors[ifile],marker=markers[ifile],label='%s'%labels[ifile])
+    plt.xlabel(r'$%s$'%whats[i],fontsize=30)
+    plt.ylabel(r'$\frac{(\bar{\sigma}_{DNN}-\bar{\sigma}_{baseline})}{\bar{\sigma}_{baseline}}$',fontsize=30)
+    axes = plt.gca()
+    axes.set_ylim(-0.12,0.)
+    axes.set_xlim(0,ranges[i][1])
+    ax1.grid(alpha=0.2,linestyle='--',markevery=1)
  where = (options.where).replace(' ','').replace('<','_').replace('>','_').replace('(','').replace(')','')
- savename='/IQR_compare_%s_%s%s'%(whats[i].replace('\\',''),options.samplename,where)
+ savename='/IQR_compare_%s_%s%s'%(whats[i].replace('\\','').replace(' ','').replace('~',''),options.samplename,where)
  plt.savefig(scratch_plots+savename+'.pdf',bbox_extra_artists=(lgd,), bbox_inches='tight')
  plt.savefig(scratch_plots+savename+'.png',bbox_extra_artists=(lgd,), bbox_inches='tight')
  plt.clf()
