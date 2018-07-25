@@ -35,7 +35,7 @@ for i in range(len(dirs)):
     os.mkdir(scratch_plots)
 
 print(options.where)
-whats = ['p_T','\eta','rho']
+whats = ['p_T','\eta','\\rho']
 #ranges = [[30,400],[-2.5,2.5],[0,50]]
 #binning =[50,10,20] #[50,20]
 #ranges = [[30,400],[0,2.5],[0,50]]
@@ -127,13 +127,13 @@ for i in range(1,3):
  ymin, ymax = (plt.gca()).get_ylim()
  xmin, xmax = (plt.gca()).get_xlim()
  samplename=options.samplename
-# if options.samplename=='ttbar' : samplename='$t \bar t$'
-# if options.samplename=='ZHbbll' : samplename='$Z(\to b\bar b)H(\to l^+l^-)$'
-# if options.samplename=="HHbbgg700" : samplename='$H(\to b\bar b)H(\to \gamma\gamma)'
+ if options.samplename=='ttbar' : samplename='$t\\bar{t}$'
+ if options.samplename=='ZHbbll' : samplename='$Z(\\to{b\\bar{b}})H(\\to{l^+l^-})$'
+ if options.samplename=="HHbbgg700" : samplename='$H(\\to{b\\bar{b}})H(\\to{\gamma\gamma})'
  plt.text(xmax*0.8,ymax*0.95,r'%s'%samplename, fontsize=30)
  lgd = plt.legend(loc="upper left",fontsize=30)
- plt.xlabel('$%s$'%whats[i],fontsize=30)
- plt.ylabel('$\sigma/\mu$',fontsize=30)
+ plt.xlabel(r'$%s$'%whats[i],fontsize=30)
+ plt.ylabel(r'$\bar{\sigma}$',fontsize=30)
  where = (options.where).replace(' ','').replace('<','_').replace('>','_').replace('(','').replace(')','')
  savename='/IQR_compare_%s_%s%s'%(whats[i].replace('\\',''),options.samplename,where)
  plt.savefig(scratch_plots+savename+'.pdf',bbox_extra_artists=(lgd,), bbox_inches='tight')

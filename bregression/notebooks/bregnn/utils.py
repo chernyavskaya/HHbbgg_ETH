@@ -30,6 +30,7 @@ def profile(target,xvar,bins=10,range=None,uniform=False,moments=True,
     categories = to_categorical( ibins )
 
     ret = [bins]
+    #ret = [ np.average(xvar,weights=categories,axis=0) ]
     if moments:
         mtarget = target.reshape(-1,1) * categories
         weights = categories

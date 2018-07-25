@@ -9,7 +9,6 @@ import json
 import datetime
 from optparse import OptionParser, make_option
 sys.path.insert(0, '/users/nchernya/HHbbgg_ETH/bregression/python/')
-import plotting_utils as plotting
 
 
 parser = OptionParser(option_list=[
@@ -39,7 +38,7 @@ for idx,name in enumerate(input_trainings):
     target=options.target_dir+input_trainings[idx]
   #  target=options.target_dir
   #  models = get_ipython().getoutput('ls -t $target/*.hdf5')  !!!!!!!!!!!!!Important, change this, because otherwise since I touch scram it takes the first one!
-    models = get_ipython().getoutput('ls -1r $target/model*.hdf5')  
+    models = get_ipython().getoutput('ls -1r $target/model*.hdf5') ## model with the last number in the name is chosen 
     models
   
     # read training configuration
@@ -52,7 +51,7 @@ for idx,name in enumerate(input_trainings):
     features = config['options']['features'].split(',')
     for i,f in enumerate(features): 
         if f == 'Jet_pt' or f == 'Jet_mt'  : features[i] = features[i]+'_raw'
-        if f == 'Jet_withPtd' : features[i] ='Jet_ptd_breg'
+    ###    if f == 'Jet_withPtd' : features[i] ='Jet_ptd_breg' #for new training
     X = data[features].values
   #  print(X[0])
     
