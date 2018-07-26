@@ -27,6 +27,7 @@ for i in range(len(dirs)):
   scratch_plots=scratch_plots+'/'+dirs[i]+'/'
   if not os.path.exists(scratch_plots):
     os.mkdir(scratch_plots)
+savetag='average'
  
 
 # ## Read test data and model
@@ -48,11 +49,11 @@ X_pt_jec = (data['Jet_pt_raw']*data['Jet_corr_JEC']).values.reshape(-1,1)
 X_pt_gen = (data['Jet_mcPt']).values.reshape(-1,1)
 X_eta = (data['Jet_eta']).values.reshape(-1,1)
 X_rho = (data['rho']).values.reshape(-1,1)
-res = (data['Jet_resolution_NN_%s'%input_trainings[0]])
+res = (data['Jet_resolution_NN_%s'%input_trainings[0]]).values.reshape(-1,1)
 y_pred = (data['Jet_pt_reg_NN_%s'%input_trainings[0]]) #bad name because it is actually a correction
 y_corr = (y[:,0]/y_pred).values.reshape(-1,1)
 # errors vector
-err = y[:,0]-y_pred
+err = (y[:,0]-y_pred).values.reshape(-1,1)
 
 linestyles = ['-.', '--','-', ':']
 
@@ -108,15 +109,16 @@ for i in range(0,3):
  plt.ylabel('$p_{T,jet}^{gen} / p_{T,jet}^{reco}$', fontsize=30)
  plt.legend(loc='upper right',fontsize=30)
  savename='/quantiles_col_%s_%s_%s'%(input_trainings[0],whats[i].replace('\\',''),options.samplename)
- plt.savefig(scratch_plots+savename+'.png')
- plt.savefig(scratch_plots+savename+'.pdf')
+ plt.savefig(scratch_plots+savename+savetag+'.png')
+ plt.savefig(scratch_plots+savename+savetag+'.pdf')
  plt.clf()
  
 ##########################################################
 ##Draw IQR/2 vs resolution estimator
-res_bins_incl, err_qt_res_incl = utils.profile(err,res,bins=30,range=[0,0.3],moments=False,average=False) 
+res_bins_incl, err_qt_res_incl = utils.profile(err,res,bins=30,range=[0,0.3],moments=False,average=True) 
 err_iqr2_incl =  0.5*(err_qt_res_incl[2]-err_qt_res_incl[0])
-plt.scatter(0.5*(res_bins_incl[1:]+res_bins_incl[:-1]),err_iqr2_incl,label='inclusive')
+#plt.scatter(0.5*(res_bins_incl[1:]+res_bins_incl[:-1]),err_iqr2_incl,label='inclusive')
+plt.scatter(res_bins_incl,err_iqr2_incl,label='inclusive')
 plt.grid(alpha=0.2,linestyle='--',markevery=2)
 axes = plt.gca()
 axes.set_ylim(0,0.30)
@@ -127,6 +129,6 @@ plt.text(0.01,ymax*0.85,r'%s'%samplename,fontsize=30)
 plt.ylabel(r'$\bar{\sigma}$',fontsize=30)
 plt.xlabel(r'$<\hat{\sigma}>$',fontsize=30)
 savename='/IQR_sigma_pt_%s_%s'%(input_trainings[0],options.samplename)
-plt.savefig(scratch_plots+savename+'.pdf')
-plt.savefig(scratch_plots+savename+'.png')
+plt.savefig(scratch_plots+savename+savetag+'.pdf')
+plt.savefig(scratch_plots+savename+savetag+'.png')
 plt.clf()

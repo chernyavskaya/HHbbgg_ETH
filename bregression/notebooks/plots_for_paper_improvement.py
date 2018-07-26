@@ -36,6 +36,7 @@ for i in range(len(dirs)):
   scratch_plots=scratch_plots+'/'+dirs[i]+'/'
   if not os.path.exists(scratch_plots):
     os.mkdir(scratch_plots)
+savetag='_unweighting'
 
 print(options.where)
 whats = ['p_T (GeV)','\eta','\\rho']
@@ -68,9 +69,10 @@ for i in range(0,1):
     regions_summary = json.loads(file_regions.read())
     region_names = regions_summary['pt_regions']+regions_summary['eta_region_names']
 
- #   y = (data['Jet_mcPt']/data['Jet_pt']).values.reshape(-1,1)
-    y = (data['Jet_mcPt']/(data['Jet_pt_raw']*data['Jet_corr_JEC'])).values.reshape(-1,1)
-    X_pt = (data['Jet_pt_raw']).values.reshape(-1,1)
+    y = (data['Jet_mcPt']/data['Jet_pt']).values.reshape(-1,1)  ###temp
+ #   y = (data['Jet_mcPt']/(data['Jet_pt_raw']*data['Jet_corr_JEC'])).values.reshape(-1,1)
+  #  X_pt = (data['Jet_pt_raw']).values.reshape(-1,1)
+    X_pt = (data['Jet_pt']).values.reshape(-1,1) # temp
     X_eta = (abs(data['Jet_eta'])).values.reshape(-1,1)
     X_rho = (data['rho']).values.reshape(-1,1)
     res = (data['Jet_resolution_NN_%s'%input_trainings[ifile]])
@@ -84,10 +86,8 @@ for i in range(0,1):
 
  
     if (ifile==0) : bins=np.linspace(ranges[i][0],ranges[i][1],binning[i])
-    if ifile==0 and i==0 :  bins = np.array([0,20,40,60,80,100,150,200,250,300,400,500]) #ttbar
     if ifile==0 and i==0 :  bins = np.array([0,20,40,60,80,100,150,200,250,300,400]) #ttbar
-   # if ifile==0 and i==0 :  bins = np.array([0,20,40,60,80,100,150,200,250,300]) #ttbar
-   # if ifile==0 and i==0 :   bins = np.array([0,20,40,60,80,100,150,200]) #ZHbbll
+   ## if ifile==0 and i==0 :   bins = np.array([0,20,40,60,80,100,150,200]) #ZHbbll
  
     if ifile==0 :
        _, y_corr_mean_pt, y_corr_std_pt, y_corr_qt_pt = utils.profile(y_corr,X,bins=bins,quantiles=np.array([0.25,0.4,0.5,0.75])) 
@@ -96,6 +96,7 @@ for i in range(0,1):
     else :  
        bins = bins_same[i]
        _, y_corr_mean_pt, y_corr_std_pt, y_corr_qt_pt = utils.profile(y_corr,X,bins=bins,quantiles=np.array([0.25,0.4,0.5,0.75])) 
+
     y_corr_median_pt = y_corr_qt_pt[2]
     y_corr_25_pt,y_corr_40_pt,y_corr_75_pt = y_corr_qt_pt[0],y_corr_qt_pt[1],y_corr_qt_pt[3]
     y_corr_iqr2_pt =  y_corr_qt_pt[0],y_corr_qt_pt[3]
@@ -104,6 +105,15 @@ for i in range(0,1):
     sigma_mu_array.append(sigma_mu_corr)
     sigma_array.append(err_corr_iqr2)
     mu_array.append(y_corr_40_pt)
+########################inclusive#############
+    quantiles=np.array([0.25,0.40,0.5,0.75])
+    inclusive_corr = np.percentile(y_corr,quantiles*100.,axis=0).reshape(-1,1) 
+    sigma_mu_corr_inclusive = np.array(0.5*(inclusive_corr[3]-inclusive_corr[0]))/np.array(inclusive_corr[1])
+##############################################
+
+
+
+
 
     _, y_mean_pt, y_std_pt, y_qt_pt = utils.profile(y,X,bins=bins,quantiles=np.array([0.25,0.4,0.5,0.75])) 
     y_25_pt,y_40_pt,y_75_pt = y_qt_pt[0],y_qt_pt[1],y_qt_pt[3]
@@ -112,7 +122,13 @@ for i in range(0,1):
     sigma_mu_jec = np.array(err_jec_iqr2)/np.array(y_40_pt)
     sigma_jec = np.array(err_jec_iqr2)
     mu_jec = np.array(y_40_pt)
- 
+########################inclusive#############
+    inclusive = np.percentile(y,quantiles*100.,axis=0).reshape(-1,1) 
+    sigma_mu_inclusive = np.array(0.5*(inclusive[3]-inclusive[0]))/np.array(inclusive[1])
+##############################################
+    improvement_inclusive = (np.array(sigma_mu_corr_inclusive[0])-np.array(sigma_mu_inclusive[0]))/(np.array(sigma_mu_inclusive[0]))
+    print('inclusive improvement : ',improvement_inclusive)
+
     binc = 0.5*(bins[1:]+bins[:-1])
 
   #  print(binc.shape,bins.shape,sigma_mu_jec.shape,err_corr_iqr2.shape,y_corr_median_pt.shape) 
@@ -138,7 +154,7 @@ for i in range(0,1):
  samplename=options.samplename
  if options.samplename=='ttbar' : samplename='$t\\bar{t}$'
  if options.samplename=='ZHbbll' : samplename='$Z(\\to{b\\bar{b}})H(\\to{l^+l^-})$'
- if options.samplename=="HHbbgg700" : samplename='$H(\\to{b\\bar{b}})H(\\to{\gamma\gamma})'
+ if  "HHbbgg" in options.samplename : samplename='$H(\\to{b\\bar{b}})H(\\to{\gamma\gamma}) %s'+ options.samplename[options.samplename.find('gg')+2:]
  lgd = ax0.legend(loc="upper left",fontsize=30)
  plt.ylabel(r'$\bar{\sigma}$',fontsize=30)
  if 'p_T' not in whats[i] :
@@ -156,7 +172,7 @@ for i in range(0,1):
     axes.set_xlim(0,ranges[i][1])
     ax1.grid(alpha=0.2,linestyle='--',markevery=1)
  where = (options.where).replace(' ','').replace('<','_').replace('>','_').replace('(','').replace(')','')
- savename='/IQR_compare_%s_%s%s'%(whats[i].replace('\\','').replace(' ','').replace('~',''),options.samplename,where)
+ savename='/IQR_compare_%s_%s%s%s'%(whats[i].replace('\\','').replace(' ','').replace('~',''),options.samplename,where,savetag)
  plt.savefig(scratch_plots+savename+'.pdf',bbox_extra_artists=(lgd,), bbox_inches='tight')
  plt.savefig(scratch_plots+savename+'.png',bbox_extra_artists=(lgd,), bbox_inches='tight')
  plt.clf()
@@ -175,9 +191,10 @@ for i in range(0,1):
      data_csv['delta_%s_JEC_rel'%labels[ifile]] = (np.array(sigma_mu_array[ifile])-np.array(sigma_mu_jec))/(np.array(sigma_mu_jec))
      data_csv['delta_sigma_%s_JEC_rel'%labels[ifile]] = (np.array(sigma_array[ifile])-np.array(sigma_jec))/(np.array(sigma_jec))
      data_csv['delta_mu_%s_JEC_rel'%labels[ifile]] = (np.array(mu_array[ifile])-np.array(mu_jec))/(np.array(mu_jec))
+     data_csv['inclusive_improvement_%s_JEC_rel'%labels[ifile]] = improvement_inclusive
      for jfile in range(ifile+1,len(input_files)):
          data_csv['delta_%s_%s'%(labels[ifile],labels[jfile])] = 2*(np.array(sigma_mu_array[ifile])-np.array(sigma_mu_array[jfile]))/(np.array(sigma_mu_array[ifile])+np.array(sigma_mu_array[jfile]))
          data_csv['delta_sigma_%s_%s'%(labels[ifile],labels[jfile])] = 2*(np.array(sigma_array[ifile])-np.array(sigma_array[jfile]))/(np.array(sigma_array[ifile])+np.array(sigma_array[jfile]))
               
- savename='/data_IQR_compare_%s_%s%s.csv'%(whats[i].replace('\\',''),options.samplename,where)
+ savename='/data_IQR_compare_%s_%s%s%s.csv'%(whats[i].replace('\\',''),options.samplename,where,savetag)
  data_csv.to_csv(scratch_plots+savename)
