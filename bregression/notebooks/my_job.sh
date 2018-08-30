@@ -14,7 +14,7 @@
 export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
 export CRAY_CUDA_MPS=1
 
-source $HOME/env.sh
+source $HOME/env2.sh
 
 cd $HOME/jupyter/bregression
 

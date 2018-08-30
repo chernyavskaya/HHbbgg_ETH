@@ -14,6 +14,7 @@ def profile(target,xvar,bins=10,range=None,uniform=False,moments=True,
     else:
         xmin, xmax = range
     mask = ( xvar >= xmin ) & ( xvar <= xmax )
+    print('shapes : ',xvar.shape,target.shape,mask.shape)
     xvar = xvar[mask]
     target = target[mask]
     if type(bins) == int:
@@ -30,7 +31,9 @@ def profile(target,xvar,bins=10,range=None,uniform=False,moments=True,
     categories = to_categorical( ibins )
 
     ret = [bins]
-    if average==True : ret = [ np.average(xvar,weights=categories,axis=0) ]
+    mxvar=xvar.reshape(-1,1) * categories
+ #   print(xvar.shape,categories.shape,target.shape,mxvar.shape)
+    if average==True : ret = [ np.average(mxvar,weights=categories,axis=0) ]
     if moments:
         mtarget = target.reshape(-1,1) * categories
         weights = categories

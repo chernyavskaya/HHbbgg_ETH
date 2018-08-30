@@ -36,7 +36,7 @@ for i in range(len(dirs)):
   scratch_plots=scratch_plots+'/'+dirs[i]+'/'
   if not os.path.exists(scratch_plots):
     os.mkdir(scratch_plots)
-savetag='_unweighting'
+savetag='_legacy2016_JECv11'
 
 print(options.where)
 whats = ['p_T (GeV)','\eta','\\rho']
@@ -52,8 +52,8 @@ markers=['s','o','^','h','>','<','s','o','o','o','o']
 labels=options.labels.split(',')
 bins_same = []
 
-for i in range(0,1):
-#for i in range(1,3):
+#for i in range(0,1):
+for i in range(0,3):
  sigma_mu_array = []
  sigma_array = []
  mu_array = []
