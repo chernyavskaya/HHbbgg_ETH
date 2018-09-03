@@ -1,12 +1,56 @@
+import numpy as np
 import keras.models
 import os
 import bregnn.io as io
 import bregnn.utils as utils
 import sys
 import json
+import matplotlib.pyplot as plt
 from optparse import OptionParser, make_option
 sys.path.insert(0, '/users/nchernya/HHbbgg_ETH/bregression/python/')
 import datetime
+from array import array
+import ROOT
+from ROOT import TCanvas, TH1F, TGraph, TLegend
+from ROOT import gROOT
+from ROOT import gStyle
+
+gROOT.SetBatch(True)
+gROOT.ProcessLineSync(".x /mnt/t3nfs01/data01/shome/nchernya/setTDRStyle.C")
+gROOT.ForceStyle()
+gStyle.SetPadTopMargin(0.06)
+gStyle.SetPadRightMargin(0.04)
+gStyle.SetPadLeftMargin(0.19)
+
+
+right,top   = gStyle.GetPadRightMargin(),gStyle.GetPadTopMargin()
+left,bottom = gStyle.GetPadLeftMargin(),gStyle.GetPadBottomMargin()
+
+pCMS1 = ROOT.TPaveText(left*1.1,1.-top*4,0.4,1.,"NDC")
+pCMS1.SetTextFont(62)
+pCMS1.AddText("CMS")
+
+pCMS12 = ROOT.TPaveText(left*1.1+0.1,1.-top*4,0.57,1.,"NDC")
+pCMS12.SetTextFont(52)
+pCMS12.AddText("Simulation")
+
+pCMS2 = ROOT.TPaveText(0.5,1.-top,1.-right*0.5,1.,"NDC")
+pCMS2.SetTextFont(42)
+pCMS2.AddText("(13 TeV)")
+
+pCMSt = ROOT.TPaveText(0.5,1.-top*4,0.6,1.,"NDC")
+pCMSt.SetTextFont(42)
+pCMSt.AddText("t#bar{t}")
+
+for item in [pCMSt,pCMS2,pCMS12,pCMS1]:
+	item.SetTextSize(top*0.75)
+	item.SetTextAlign(12)
+	item.SetFillStyle(-1)
+	item.SetBorderSize(0)
+
+for item in [pCMS2]:
+	item.SetTextAlign(32)
+
 
 parser = OptionParser(option_list=[
     make_option("--training",type='string',dest="training",default='HybridLoss'),
@@ -20,7 +64,7 @@ parser = OptionParser(option_list=[
 input_trainings = options.training.split(',')
 
 now = str(datetime.datetime.now()).split(' ')[0]
-scratch_plots ='/users/nchernya/HHbbgg_ETH/bregression/plots/paper/'
+scratch_plots ='/mnt/t3nfs01/data01/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/%s/'%options.samplename
 #dirs=['',input_trainings[0],options.samplename]
 dirs=['',options.samplename]
 for i in range(len(dirs)):
@@ -38,7 +82,7 @@ data.describe()
 data = data.query("isOther!=1")
 
 #Regions of pt and eta 
-file_regions = open('/users/nchernya/HHbbgg_ETH/bregression/scripts/regionsPtEta.json')
+file_regions = open('..//scripts/regionsPtEta.json')
 regions_summary = json.loads(file_regions.read())
 region_names = regions_summary['pt_regions']+regions_summary['eta_region_names']
 
@@ -58,6 +102,7 @@ err = (y[:,0]-y_pred).values.reshape(-1,1)
 linestyles = ['-.', '--','-', ':']
 
 whats = ['p_T (GeV)','\eta','\\rho']
+whats_root = ['p_{T} (GeV)','#eta','#rho']
 ranges = [[30,400],[-2.5,2.5],[0,50]]
 binning =[50,10,20] #[50,20]
 for i in range(0,3):
@@ -88,15 +133,31 @@ for i in range(0,3):
 
 
  plt.plot(binc,y_25_pt,label='baseline',linestyle=linestyles[0],color='b')
+ gr25 = TGraph(len(binc),array('d',binc),array('d',y_25_pt))
  plt.plot(binc,y_corr_25_pt,label='DNN',linestyle=linestyles[2],color='r')
+ grcorr25 = TGraph(len(binc),array('d',binc),array('d',y_corr_25_pt))
  plt.plot(binc,y_40_pt,linestyle=linestyles[0],color='b')
+ gr40 = TGraph(len(binc),array('d',binc),array('d',y_40_pt))
  plt.plot(binc,y_corr_40_pt,linestyle=linestyles[2],color='r')
+ grcorr40 = TGraph(len(binc),array('d',binc),array('d',y_corr_40_pt))
  plt.plot(binc,y_median_pt,linestyle=linestyles[0],color='b')
+ gr50 = TGraph(len(binc),array('d',binc),array('d',y_median_pt))
  plt.plot(binc,y_corr_median_pt,linestyle=linestyles[2],color='r')
+ grcorr50 = TGraph(len(binc),array('d',binc),array('d',y_corr_median_pt))
  plt.plot(binc,y_75_pt,linestyle=linestyles[0],color='b')
+ gr75 = TGraph(len(binc),array('d',binc),array('d',y_75_pt))
  plt.plot(binc,y_corr_75_pt,linestyle=linestyles[2],color='r')
+ grcorr75 = TGraph(len(binc),array('d',binc),array('d',y_corr_75_pt))
  ymin, ymax = (plt.gca()).get_ylim()
  xmin, xmax = (plt.gca()).get_xlim()
+ for item in [gr25,gr40,gr50,gr75] :
+	item.SetLineStyle(5)
+	item.SetLineWidth(3)
+	item.SetLineColor(ROOT.kBlue)
+ for item in [grcorr25,grcorr40,grcorr50,grcorr75] :
+	item.SetLineStyle(1)
+	item.SetLineWidth(3)
+	item.SetLineColor(ROOT.kRed)
 # plt.text(xmin+abs(xmin)*0.05,ymax*0.98,'Quantiles : 0.25, 0.40, 0.50, 0.75', fontsize=30)
 
  samplename=options.samplename
@@ -113,6 +174,44 @@ for i in range(0,3):
  plt.savefig(scratch_plots+savename+savetag+'.pdf')
  plt.clf()
  
+### plot with ROOT : 
+ c2 = ROOT.TCanvas("canvas%d"%i,"canvas%d"%i,900,900)
+ c2.cd()
+ frame = ROOT.TH1F("frame%d"%i,"",1,xmin,xmax)
+ frame.SetStats(0)
+ frame.GetXaxis().SetLabelSize(0.04)
+ frame.GetYaxis().SetLabelSize(0.04)
+ frame.GetYaxis().SetTitle("p_{T,jet}^{gen} / p_{T,jet}^{reco}")
+ frame.GetXaxis().SetTitle(whats_root[i])
+ frame.GetYaxis().SetRangeUser(ymin,ymax*1.1)
+ if ('p_T') in whats[i] : frame.GetYaxis().SetRangeUser(ymin,ymax)
+ frame.Draw()
+ for item in [gr25,gr40,gr50,gr75,grcorr25,grcorr40,grcorr50,grcorr75]:
+     item.Draw("Lsame")
+
+ leg = TLegend()
+ leg = ROOT.TLegend(0.75,0.75,0.9,0.9)
+ leg.AddEntry(gr25,"Baseline" ,"L")
+ leg.AddEntry(grcorr25,"DNN" ,"L")
+ leg.SetFillStyle(-1)
+ leg.SetBorderSize(0)
+ leg.SetTextFont(42)
+ leg.SetTextSize(0.04)
+ leg.Draw()
+
+ pCMS1.Draw()
+ pCMSt.Draw()
+ ROOT.gPad.Update()
+ ROOT.gPad.RedrawAxis()
+ c2.SaveAs(scratch_plots+savename+savetag+"_root.png"  )
+ c2.SaveAs(scratch_plots+savename+savetag+"_root.pdf"  )
+
+
+
+
+
+
+
 ##########################################################
 ##Draw IQR/2 vs resolution estimator
 res_bins_incl, err_qt_res_incl = utils.profile(err,res,bins=30,range=[0,0.3],moments=False,average=True) 
@@ -132,3 +231,35 @@ savename='/IQR_sigma_pt_%s_%s'%(input_trainings[0],options.samplename)
 plt.savefig(scratch_plots+savename+savetag+'.pdf')
 plt.savefig(scratch_plots+savename+savetag+'.png')
 plt.clf()
+
+#####ROOT plot#########
+
+
+
+res_bins_incl_array = array('d',res_bins_incl)
+err_iqr2_incl_array = array('d',err_iqr2_incl)
+gr = TGraph(len(res_bins_incl),res_bins_incl_array,err_iqr2_incl_array)
+gr.SetMarkerStyle(20)
+gr.SetMarkerSize(1.9)
+gr.SetMarkerColor(ROOT.kBlue)
+
+
+
+
+c = ROOT.TCanvas("c","c",900,900)
+c.cd()
+frame = ROOT.TH1F("frame","",1,0,0.30)
+frame.SetStats(0)
+frame.GetXaxis().SetLabelSize(0.04)
+frame.GetYaxis().SetLabelSize(0.04)
+frame.GetYaxis().SetTitle("#bar{#sigma}")
+frame.GetXaxis().SetTitle("<#hat{#sigma}>")
+frame.GetYaxis().SetRangeUser(0.,0.30)
+frame.Draw()
+gr.Draw("Psame")
+pCMS1.Draw()
+pCMSt.Draw()
+ROOT.gPad.Update()
+ROOT.gPad.RedrawAxis()
+c.SaveAs(scratch_plots+savename+"_root.png"  )
+c.SaveAs(scratch_plots+savename+"_root.pdf"  )
