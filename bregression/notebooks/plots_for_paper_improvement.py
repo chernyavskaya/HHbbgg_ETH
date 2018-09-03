@@ -1,7 +1,10 @@
+import pandas as pd
+import numpy as np
 import keras.models
 import os
 import bregnn.io as io
 import bregnn.utils as utils
+import matplotlib.pyplot as plt
 import sys
 import json
 from optparse import OptionParser, make_option
@@ -9,8 +12,50 @@ sys.path.insert(0, '/users/nchernya/HHbbgg_ETH/bregression/python/')
 import datetime
 import math
 from matplotlib import gridspec
+from array import array
+import ROOT
+from ROOT import TCanvas, TH1F, TGraph, TLegend
+from ROOT import gROOT
+from ROOT import gStyle
+
+gROOT.SetBatch(True)
+gROOT.ProcessLineSync(".x /mnt/t3nfs01/data01/shome/nchernya/setTDRStyle.C")
+gROOT.ForceStyle()
+gStyle.SetPadTopMargin(0.06)
+gStyle.SetPadRightMargin(0.04)
+gStyle.SetPadLeftMargin(0.19)
 
 
+right,top   = gStyle.GetPadRightMargin(),gStyle.GetPadTopMargin()
+left,bottom = gStyle.GetPadLeftMargin(),gStyle.GetPadBottomMargin()
+
+pCMS1 = ROOT.TPaveText(left*1.1,1.-top*4,0.4,1.,"NDC")
+pCMS1.SetTextFont(62)
+pCMS1.AddText("CMS")
+
+
+pCMS12 = ROOT.TPaveText(left*1.1+0.1,1.-top*4,0.57,1.,"NDC")
+pCMS12.SetTextFont(52)
+pCMS12.AddText("Simulation")
+
+pCMS2 = ROOT.TPaveText(0.5,1.-top,1.-right*0.5,1.,"NDC")
+pCMS2.SetTextFont(42)
+pCMS2.AddText("(13 TeV)")
+
+pCMSt = ROOT.TPaveText(0.5,1.-top*4,0.6,1.,"NDC")
+pCMSt.SetTextFont(42)
+pCMSt.AddText("t#bar{t}")
+
+for item in [pCMSt,pCMS2,pCMS12,pCMS1]:
+	item.SetTextSize(top*0.75)
+	item.SetTextAlign(12)
+	item.SetFillStyle(-1)
+	item.SetBorderSize(0)
+
+for item in [pCMS2]:
+	item.SetTextAlign(32)
+
+## parse options
 
 parser = OptionParser(option_list=[
     make_option("--training",type='string',dest="training",default='HybridLoss'),
@@ -29,17 +74,18 @@ input_files = options.inp_file.split(',')
 
 now = str(datetime.datetime.now()).split(' ')[0]
 #scratch_plots ='/scratch/snx3000/nchernya/bregression/plots/quantiles/%s/'%now
-scratch_plots ='/users/nchernya/HHbbgg_ETH/bregression/plots/paper/'
+scratch_plots ='/mnt/t3nfs01/data01/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/'
 #dirs=['',input_trainings[0],options.samplename]
 dirs=['',options.samplename]
 for i in range(len(dirs)):
   scratch_plots=scratch_plots+'/'+dirs[i]+'/'
   if not os.path.exists(scratch_plots):
     os.mkdir(scratch_plots)
-savetag='_legacy2016_JECv11'
+savetag=''
 
 print(options.where)
 whats = ['p_T (GeV)','\eta','\\rho']
+whats_root = ['p_{T} (GeV)','#eta','#rho']
 #ranges = [[30,400],[-2.5,2.5],[0,50]]
 #binning =[50,10,20] #[50,20]
 #ranges = [[30,400],[0,2.5],[0,50]]
@@ -65,12 +111,12 @@ for i in range(0,3):
     data.describe()
 
     #Regions of pt and eta 
-    file_regions = open('/users/nchernya/HHbbgg_ETH/bregression/scripts/regionsPtEta.json')
+    file_regions = open('..//scripts/regionsPtEta.json')
     regions_summary = json.loads(file_regions.read())
     region_names = regions_summary['pt_regions']+regions_summary['eta_region_names']
 
-    y = (data['Jet_mcPt']/data['Jet_pt']).values.reshape(-1,1)  ###temp
- #   y = (data['Jet_mcPt']/(data['Jet_pt_raw']*data['Jet_corr_JEC'])).values.reshape(-1,1)
+  #  y = (data['Jet_mcPt']/data['Jet_pt']).values.reshape(-1,1)  ###temp
+    y = (data['Jet_mcPt']/(data['Jet_pt_raw']*data['Jet_corr_JEC'])).values.reshape(-1,1)
   #  X_pt = (data['Jet_pt_raw']).values.reshape(-1,1)
     X_pt = (data['Jet_pt']).values.reshape(-1,1) # temp
     X_eta = (abs(data['Jet_eta'])).values.reshape(-1,1)
@@ -142,6 +188,19 @@ for i in range(0,3):
     if (ifile==0) :  ax0.scatter(binc,sigma_mu_jec,color='black',marker='*',label='baseline')
     ax0.scatter(binc,sigma_mu_corr,color=colors[ifile],marker=markers[ifile],label='%s'%labels[ifile])
 
+###########declaring TGraphs###############
+    gr_baseline = TGraph(len(binc),array('d',binc),array('d',sigma_mu_jec))
+    gr_corrected = TGraph(len(binc),array('d',binc),array('d',sigma_mu_corr))
+    for item in [gr_baseline,gr_corrected]:
+        item.SetMarkerSize(1.9)
+    gr_corrected.SetMarkerStyle(21)
+    gr_corrected.SetMarkerColor(ROOT.kSpring-6)
+    gr_baseline.SetMarkerStyle(29)
+    gr_baseline.SetMarkerSize(2.4)
+    gr_baseline.SetMarkerColor(ROOT.kBlack)
+##########################################
+
+
  ax0.grid(alpha=0.2,linestyle='--',markevery=2)
  axes = plt.gca()
  if (i==0) : axes.set_ylim(0.02,0.3)
@@ -157,7 +216,43 @@ for i in range(0,3):
  if  "HHbbgg" in options.samplename : samplename='$H(\\to{b\\bar{b}})H(\\to{\gamma\gamma}) %s'+ options.samplename[options.samplename.find('gg')+2:]
  lgd = ax0.legend(loc="upper left",fontsize=30)
  plt.ylabel(r'$\bar{\sigma}$',fontsize=30)
+
+####################
+##with ROOT 
+ c2 = ROOT.TCanvas("canvas%d"%i,"canvas%d"%i,900,900)
+ c2.cd()
+ c2.SetGrid()
+ frame = ROOT.TH1F("frame%d"%i,"",1,xmin,xmax)
+ frame.SetStats(0)
+ frame.GetXaxis().SetLabelSize(0.04)
+ frame.GetYaxis().SetLabelSize(0.04)
+ frame.GetYaxis().SetTitle("#bar{#sigma}")
+ frame.GetYaxis().SetRangeUser(ymin,ymax)
+
+ leg = TLegend()
+ leg = ROOT.TLegend(0.75,0.75,0.9,0.9)
+ leg.AddEntry(gr_baseline,"Baseline" ,"P")
+ leg.AddEntry(gr_corrected,'%s'%labels[ifile] ,"P")
+ leg.SetFillStyle(-1)
+ leg.SetBorderSize(0)
+ leg.SetTextFont(42)
+ leg.SetTextSize(0.04)
+
+
+ 
+
+
+
  if 'p_T' not in whats[i] :
+    frame.GetYaxis().SetRangeUser(ymin,ymax*1.2)
+    frame.GetXaxis().SetTitle(whats_root[i])
+    frame.Draw()
+    leg.Draw()
+    pCMS1.Draw()
+    pCMSt.Draw()
+    gr_corrected.Draw("Psame")
+    gr_baseline.Draw("Psame")
+
     plt.xlabel(r'$%s$'%whats[i],fontsize=30)
     ax0.text(xmax*0.8,ymax*0.95,r'%s'%samplename, fontsize=30)
  else :
@@ -171,12 +266,52 @@ for i in range(0,3):
     axes.set_ylim(-0.12,0.)
     axes.set_xlim(0,ranges[i][1])
     ax1.grid(alpha=0.2,linestyle='--',markevery=1)
+
+
+    c2.SetBottomMargin(0.3)
+    frame.GetXaxis().SetTitleOffset(0.91);
+    frame.GetXaxis().SetLabelSize(0)
+    frame.Draw()
+    leg.Draw()
+    pCMS1.Draw()
+    pCMSt.Draw()
+    gr_baseline.Draw("Psame")
+    gr_corrected.Draw("Psame")
+	
+    pad2 = ROOT.TPad("pad2", "pad2", 0., 0., 1., 1.)
+    pad2.SetTopMargin(0.73)
+    pad2.SetFillColor(0)
+    pad2.SetFillStyle(0)
+    pad2.Draw()
+    pad2.cd()
+ 
+    frame2 = ROOT.TH1F("frame_low_%d"%i,"",1,xmin,xmax)
+    frame2.SetStats(0)
+    frame2.GetXaxis().SetLabelSize(0.04)
+    frame2.GetYaxis().SetLabelSize(0.02)
+    frame2.GetXaxis().SetTitle(whats_root[i])
+  #  frame2.GetYaxis().SetTitle("#frac{(#bar{#sigma}_{DNN}-#bar{#sigma}_{baseline})}{#bar{#sigma}_{baseline}}")	
+    frame2.GetYaxis().SetTitle("#frac{#Delta#bar{#sigma}}{#bar{#sigma}_{0}}")	
+    frame2.GetYaxis().SetRangeUser(-0.12,0.)
+    frame2.Draw()
+    gr_improvement = TGraph(len(binc),array('d',binc),array('d',improvement))
+    gr_improvement.SetMarkerSize(1.9)
+    gr_improvement.SetMarkerStyle(21)
+    gr_improvement.SetMarkerColor(ROOT.kSpring-6)
+    gr_improvement.Draw("Psame") 
+
  where = (options.where).replace(' ','').replace('<','_').replace('>','_').replace('(','').replace(')','')
  savename='/IQR_compare_%s_%s%s%s'%(whats[i].replace('\\','').replace(' ','').replace('~',''),options.samplename,where,savetag)
  plt.savefig(scratch_plots+savename+'.pdf',bbox_extra_artists=(lgd,), bbox_inches='tight')
  plt.savefig(scratch_plots+savename+'.png',bbox_extra_artists=(lgd,), bbox_inches='tight')
  plt.clf()
 
+ ROOT.gPad.Update()
+ ROOT.gPad.RedrawAxis()
+ c2.SaveAs(scratch_plots+savename+savetag+"_root.png"  )
+ c2.SaveAs(scratch_plots+savename+savetag+"_root.pdf"  )
+
+#########
 # difference = 2*(np.array(sigma_mu_array[0])-np.array(sigma_mu_array[1]))/(np.array(sigma_mu_array[0])+np.array(sigma_mu_array[1]))
 # difference = [round(a,4) for a in difference]
 # data_csv = pd.DataFrame(np.array(difference).reshape(1,binc.shape[0]), columns=(binc))

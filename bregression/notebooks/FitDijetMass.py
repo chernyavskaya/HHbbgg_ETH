@@ -22,7 +22,7 @@ parser = OptionParser(option_list=[
 ## parse options
 (options, args) = parser.parse_args()
 
-out_dir = '/scratch/snx3000/nchernya/bregression/output_root/'
+out_dir = '/scratch/nchernya/HHbbgg/paper/output_root/'
 filename = 'ZHbll_dijetmass_pt_per_event'
 cut_name = options.cut
 data=pd.read_hdf(out_dir+filename+'.hd5',columns=None)
@@ -106,7 +106,7 @@ def fit_dijetmass(rel_diff_regressed,rel_diff,style=True,n_bins=100,outString=No
     print('Regresesd : mean, RMS,fwhm : ',h_rel_diff_reg.GetMean(), h_rel_diff_reg.GetRMS(),fwhm_reg0)
 
 
-    plotFolder='/scratch/snx3000/nchernya/bregression/plots/dijet/'
+    plotFolder='/mnt/t3nfs01/data01/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/ZHbbll/'
 
 
 
@@ -245,8 +245,8 @@ def fit_dijetmass(rel_diff_regressed,rel_diff,style=True,n_bins=100,outString=No
     h_rel_diff_reg.Draw("PEHISTsame")
     leg.Draw()
 
-    c2.SaveAs(plotFolder+"dijet_%s_"%(fitfunc)+str(outString)+'.png')
-    c2.SaveAs(plotFolder+"dijet_%s_"%(fitfunc)+str(outString)+'.pdf')
+    c2.SaveAs(plotFolder+"dijet_%s_"%(fitfunc)+str(outString)+'_root.png')
+    c2.SaveAs(plotFolder+"dijet_%s_"%(fitfunc)+str(outString)+'_root.pdf')
     c2.Draw()
 
 
