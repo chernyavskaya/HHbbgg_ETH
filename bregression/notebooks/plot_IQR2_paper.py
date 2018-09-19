@@ -36,7 +36,7 @@ pCMS12.AddText("Simulation")
 
 pCMS2 = ROOT.TPaveText(0.5,1.-top,1.-right*0.5,1.,"NDC")
 pCMS2.SetTextFont(42)
-pCMS2.AddText("(13 TeV)")
+pCMS2.AddText("13 TeV")
 
 pCMSt = ROOT.TPaveText(0.5,1.-top*4,0.6,1.,"NDC")
 pCMSt.SetTextFont(42)
@@ -101,8 +101,8 @@ err = (y[:,0]-y_pred).values.reshape(-1,1)
 
 linestyles = ['-.', '--','-', ':']
 
-whats = ['p_T (GeV)','\eta','\\rho']
-whats_root = ['p_{T} (GeV)','#eta','#rho']
+whats = ['p_T (GeV)','\eta','\\rho (GeV)']
+whats_root = ['p_{T} (GeV)','#eta','#rho (GeV)']
 ranges = [[30,400],[-2.5,2.5],[0,50]]
 binning =[50,10,20] #[50,20]
 for i in range(0,3):
@@ -167,7 +167,7 @@ for i in range(0,3):
  plt.text(xmin+abs(xmin)*0.05,ymax*0.96,'%s'%samplename, fontsize=30)
  
  plt.xlabel('$%s$'%whats[i], fontsize=30)
- plt.ylabel('$p_{T,jet}^{gen} / p_{T,jet}^{reco}$', fontsize=30)
+ plt.ylabel('$p_{T}^{gen} / p_{T}^{reco}$', fontsize=30)
  plt.legend(loc='upper right',fontsize=30)
  savename='/quantiles_col_%s_%s_%s'%(input_trainings[0],whats[i].replace('\\',''),options.samplename)
  plt.savefig(scratch_plots+savename+savetag+'.png')
@@ -181,7 +181,7 @@ for i in range(0,3):
  frame.SetStats(0)
  frame.GetXaxis().SetLabelSize(0.04)
  frame.GetYaxis().SetLabelSize(0.04)
- frame.GetYaxis().SetTitle("p_{T,jet}^{gen} / p_{T,jet}^{reco}")
+ frame.GetYaxis().SetTitle("p_{T}^{gen} / p_{T}^{reco}")
  frame.GetXaxis().SetTitle(whats_root[i])
  frame.GetYaxis().SetRangeUser(ymin,ymax*1.1)
  if ('p_T') in whats[i] : frame.GetYaxis().SetRangeUser(ymin,ymax)
@@ -200,7 +200,9 @@ for i in range(0,3):
  leg.Draw()
 
  pCMS1.Draw()
- pCMSt.Draw()
+ pCMS12.Draw()
+ pCMS2.Draw()
+# pCMSt.Draw()
  ROOT.gPad.Update()
  ROOT.gPad.RedrawAxis()
  c2.SaveAs(scratch_plots+savename+savetag+"_root.png"  )
@@ -258,7 +260,9 @@ frame.GetYaxis().SetRangeUser(0.,0.30)
 frame.Draw()
 gr.Draw("Psame")
 pCMS1.Draw()
-pCMSt.Draw()
+pCMS12.Draw()
+pCMS2.Draw()
+#pCMSt.Draw()
 ROOT.gPad.Update()
 ROOT.gPad.RedrawAxis()
 c.SaveAs(scratch_plots+savename+"_root.png"  )

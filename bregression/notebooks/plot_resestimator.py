@@ -62,7 +62,7 @@ pCMS12.AddText("Simulation")
 
 pCMS2 = ROOT.TPaveText(0.5,1.-top,1.-right*0.5,1.,"NDC")
 pCMS2.SetTextFont(42)
-pCMS2.AddText("(13 TeV)")
+pCMS2.AddText("13 TeV")
 
 
 pCMSt = ROOT.TPaveText(0.8,1.-top*4,0.85,1,"NDC")
@@ -88,7 +88,7 @@ frame = ROOT.TH1F("frame","",1,xmin,xmax)
 frame.SetStats(0)
 frame.GetXaxis().SetLabelSize(0.04)
 frame.GetYaxis().SetLabelSize(0.04)
-frame.GetYaxis().SetTitle("Arbitrary Units")
+frame.GetYaxis().SetTitle("A.U.")
 frame.GetXaxis().SetTitle("#hat{#sigma}")
 frame.GetYaxis().SetRangeUser(0.,Rhist.GetMaximum()*1.2)
 frame.Draw()

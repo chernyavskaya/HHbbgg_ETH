@@ -40,7 +40,7 @@ pCMS12.AddText("Simulation")
 
 pCMS2 = ROOT.TPaveText(0.5,1.-top,1.-right*0.5,1.,"NDC")
 pCMS2.SetTextFont(42)
-pCMS2.AddText("(13 TeV)")
+pCMS2.AddText("13 TeV")
 
 pCMSt = ROOT.TPaveText(0.5,1.-top*4,0.6,1.,"NDC")
 pCMSt.SetTextFont(42)
@@ -84,8 +84,8 @@ for i in range(len(dirs)):
 savetag=''
 
 print(options.where)
-whats = ['p_T (GeV)','\eta','\\rho']
-whats_root = ['p_{T} (GeV)','#eta','#rho']
+whats = ['p_T (GeV)','\eta','\\rho (GeV)']
+whats_root = ['p_{T} (GeV)','#eta','#rho (GeV)']
 #ranges = [[30,400],[-2.5,2.5],[0,50]]
 #binning =[50,10,20] #[50,20]
 #ranges = [[30,400],[0,2.5],[0,50]]
@@ -244,12 +244,14 @@ for i in range(0,3):
 
 
  if 'p_T' not in whats[i] :
-    frame.GetYaxis().SetRangeUser(ymin,ymax*1.2)
+    frame.GetYaxis().SetRangeUser(ymin,ymax*1.1)
     frame.GetXaxis().SetTitle(whats_root[i])
     frame.Draw()
     leg.Draw()
     pCMS1.Draw()
-    pCMSt.Draw()
+    pCMS12.Draw()
+    pCMS2.Draw()
+ #   pCMSt.Draw()
     gr_corrected.Draw("Psame")
     gr_baseline.Draw("Psame")
 
@@ -274,7 +276,9 @@ for i in range(0,3):
     frame.Draw()
     leg.Draw()
     pCMS1.Draw()
-    pCMSt.Draw()
+    pCMS12.Draw()
+    pCMS2.Draw()
+  #  pCMSt.Draw()
     gr_baseline.Draw("Psame")
     gr_corrected.Draw("Psame")
 	
@@ -288,10 +292,13 @@ for i in range(0,3):
     frame2 = ROOT.TH1F("frame_low_%d"%i,"",1,xmin,xmax)
     frame2.SetStats(0)
     frame2.GetXaxis().SetLabelSize(0.04)
+    frame2.GetYaxis().SetTitleSize(0.04)
+    frame2.GetYaxis().SetTitleOffset(2.0)
     frame2.GetYaxis().SetLabelSize(0.02)
     frame2.GetXaxis().SetTitle(whats_root[i])
+    frame2.GetYaxis().CenterTitle(ROOT.kTRUE)
   #  frame2.GetYaxis().SetTitle("#frac{(#bar{#sigma}_{DNN}-#bar{#sigma}_{baseline})}{#bar{#sigma}_{baseline}}")	
-    frame2.GetYaxis().SetTitle("#frac{#Delta#bar{#sigma}}{#bar{#sigma}_{0}}")	
+    frame2.GetYaxis().SetTitle("#frac{#Delta#bar{#sigma}}{#bar{#sigma}_{baseline}}")	
     frame2.GetYaxis().SetRangeUser(-0.12,0.)
     frame2.Draw()
     gr_improvement = TGraph(len(binc),array('d',binc),array('d',improvement))
