@@ -69,8 +69,7 @@ for i in range(0,3):
     regions_summary = json.loads(file_regions.read())
     region_names = regions_summary['pt_regions']+regions_summary['eta_region_names']
 
-    y = (data['Jet_mcPt']/data['Jet_pt']).values.reshape(-1,1)  ###temp
- #   y = (data['Jet_mcPt']/(data['Jet_pt_raw']*data['Jet_corr_JEC'])).values.reshape(-1,1)
+    y = (data['Jet_mcPt']/(data['Jet_pt_raw']*data['Jet_corr_JEC'])).values.reshape(-1,1)
   #  X_pt = (data['Jet_pt_raw']).values.reshape(-1,1)
     X_pt = (data['Jet_pt']).values.reshape(-1,1) # temp
     X_eta = (abs(data['Jet_eta'])).values.reshape(-1,1)
