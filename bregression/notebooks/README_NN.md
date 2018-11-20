@@ -189,6 +189,8 @@ ipython plot_IQR2_paper.py -- --inp-file applied_res_2018-07-20_HHresSM_morevar.
 
 ipython plots_for_paper_improvement.py -- --inp-file applied_res_2018-07-20_ttbar_full_RegressionPerJet_heppy_energyRings_testing_morevar.hd5 --sample-name ttbar --labels 'DNN'
 
+ipython plot_resEstimatorFunc_paper.py -- --inp-file applied_res_2018-07-20_ttbar_full_RegressionPerJet_heppy_energyRings_testing_morevar.hd5 --sample-name ttbar
+
 #### Check effect of regression on semi-leptonic and hadronic decays separately
 ipython plot_IQR2_paper.py -- --inp-file applied_res_2018-07-20_ttbar_full_RegressionPerJet_heppy_energyRings_testing_morevar.hd5 --sample-name ttbar --where 'isOther==1'
 ipython plot_IQR2_paper.py -- --inp-file applied_res_2018-07-20_ttbar_full_RegressionPerJet_heppy_energyRings_testing_morevar.hd5 --sample-name ttbar --where 'isOther==0'
