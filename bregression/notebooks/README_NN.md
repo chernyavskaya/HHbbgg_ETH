@@ -176,3 +176,20 @@ python submit_jobs.py --njobs 1 --jdir 2018-02-03_17_55_01
 ```
 This will print the command that runs the jobs on GPUs. Copy and paste the output to run the jobs. Script can be modified very easily to submit jobs directly, I just prefer to have a look before I submit
 
+# Prepare plots for paper
+
+### Input files for 2016 :
+/scratch/nchernya/HHbbgg/paper/output_root
+### Commands to make plots :
+ipython plot_IQR2_paper.py -- --inp-file applied_res_2018-07-20_ttbar_full_RegressionPerJet_heppy_energyRings_testing_morevar.hd5 --sample-name ttbar
+ipython plot_IQR2_paper.py -- --inp-file applied_res_2018-07-20_ZHbbll_morevar.hd5 --sample-name ZHbbll
+ipython plot_IQR2_paper.py -- --inp-file applied_res_2018-07-20_HHres700_morevar.hd5 --sample-name HHbbgg700
+ipython plot_IQR2_paper.py -- --inp-file applied_res_2018-07-20_HHres500_morevar.hd5 --sample-name HHbbgg500
+ipython plot_IQR2_paper.py -- --inp-file applied_res_2018-07-20_HHresSM_morevar.hd5 --sample-name HHbbggSM
+
+ipython plots_for_paper_improvement.py -- --inp-file applied_res_2018-07-20_ttbar_full_RegressionPerJet_heppy_energyRings_testing_morevar.hd5 --sample-name ttbar --labels 'DNN'
+
+#### Check effect of regression on semi-leptonic and hadronic decays separately
+ipython plot_IQR2_paper.py -- --inp-file applied_res_2018-07-20_ttbar_full_RegressionPerJet_heppy_energyRings_testing_morevar.hd5 --sample-name ttbar --where 'isOther==1'
+ipython plot_IQR2_paper.py -- --inp-file applied_res_2018-07-20_ttbar_full_RegressionPerJet_heppy_energyRings_testing_morevar.hd5 --sample-name ttbar --where 'isOther==0'
+
