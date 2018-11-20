@@ -58,9 +58,9 @@ for item in [pCMS2]:
 ## parse options
 
 parser = OptionParser(option_list=[
-    make_option("--training",type='string',dest="training",default='HybridLoss'),
+    make_option("--training",type='string',dest="training",default='2018-04-06_job23_2016'),
     make_option("--inp-file",type='string',dest='inp_file',default='applied_res_ttbar_RegressionPerJet_heppy_energyRings3_forTesting.hd5'),
-    make_option("--inp-dir",type='string',dest="inp_dir",default='/scratch/snx3000/nchernya/bregression/output_root/'),
+    make_option("--inp-dir",type='string',dest="inp_dir",default='/scratch/nchernya/HHbbgg/paper/output_root/'),
     make_option("--sample-name",type='string',dest="samplename",default='ttbar'),
     make_option("--labels",type='string',dest="labels",default=''),
     make_option("--where",type='string',dest="where",default=''),
@@ -73,15 +73,15 @@ input_files = options.inp_file.split(',')
 
 
 now = str(datetime.datetime.now()).split(' ')[0]
-#scratch_plots ='/scratch/snx3000/nchernya/bregression/plots/quantiles/%s/'%now
-scratch_plots ='/mnt/t3nfs01/data01/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/'
+scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/November20/'
 #dirs=['',input_trainings[0],options.samplename]
 dirs=['',options.samplename]
 for i in range(len(dirs)):
   scratch_plots=scratch_plots+'/'+dirs[i]+'/'
   if not os.path.exists(scratch_plots):
     os.mkdir(scratch_plots)
-savetag=''
+savetag='Nov20'
+
 
 print(options.where)
 whats = ['p_T (GeV)','\eta','\\rho (GeV)']
@@ -115,10 +115,9 @@ for i in range(0,3):
     regions_summary = json.loads(file_regions.read())
     region_names = regions_summary['pt_regions']+regions_summary['eta_region_names']
 
-  #  y = (data['Jet_mcPt']/data['Jet_pt']).values.reshape(-1,1)  ###temp
     y = (data['Jet_mcPt']/(data['Jet_pt_raw']*data['Jet_corr_JEC'])).values.reshape(-1,1)
-  #  X_pt = (data['Jet_pt_raw']).values.reshape(-1,1)
-    X_pt = (data['Jet_pt']).values.reshape(-1,1) # temp
+    X_pt = (data['Jet_pt_raw']).values.reshape(-1,1)
+    X_pt_jec = (data['Jet_pt']).values.reshape(-1,1) # temp
     X_eta = (abs(data['Jet_eta'])).values.reshape(-1,1)
     X_rho = (data['rho']).values.reshape(-1,1)
     res = (data['Jet_resolution_NN_%s'%input_trainings[ifile]])
@@ -204,8 +203,9 @@ for i in range(0,3):
  ax0.grid(alpha=0.2,linestyle='--',markevery=2)
  axes = plt.gca()
  if (i==0) : axes.set_ylim(0.02,0.3)
- if (i==1) : axes.set_ylim(0.06,0.15)
- if (i==2) : axes.set_ylim(0.08,0.15)
+# if (i==1) : axes.set_ylim(0.06,0.15)
+ if (i==1) : axes.set_ylim(0.08,0.16)
+ if (i==2) : axes.set_ylim(0.08,0.17)
  axes.set_xlim(ranges[i][0],ranges[i][1])
  if (i==0) : axes.set_xlim(0,ranges[i][1])
  ymin, ymax = (axes).get_ylim()
@@ -243,7 +243,8 @@ for i in range(0,3):
 
 
 
- if 'p_T' not in whats[i] :
+# if 'p_T' not in whats[i] :
+ if 'blablalbalbalbal'  in whats[i] :
     frame.GetYaxis().SetRangeUser(ymin,ymax*1.1)
     frame.GetXaxis().SetTitle(whats_root[i])
     frame.Draw()
@@ -299,7 +300,8 @@ for i in range(0,3):
     frame2.GetYaxis().CenterTitle(ROOT.kTRUE)
   #  frame2.GetYaxis().SetTitle("#frac{(#bar{#sigma}_{DNN}-#bar{#sigma}_{baseline})}{#bar{#sigma}_{baseline}}")	
     frame2.GetYaxis().SetTitle("#frac{#Delta#bar{#sigma}}{#bar{#sigma}_{baseline}}")	
-    frame2.GetYaxis().SetRangeUser(-0.12,0.)
+    if i==0 : frame2.GetYaxis().SetRangeUser(-0.12,0.)
+    else : frame2.GetYaxis().SetRangeUser(-0.30,0.)
     frame2.Draw()
     gr_improvement = TGraph(len(binc),array('d',binc),array('d',improvement))
     gr_improvement.SetMarkerSize(1.9)
@@ -309,8 +311,8 @@ for i in range(0,3):
 
  where = (options.where).replace(' ','').replace('<','_').replace('>','_').replace('(','').replace(')','')
  savename='/IQR_compare_%s_%s%s%s'%(whats[i].replace('\\','').replace(' ','').replace('~',''),options.samplename,where,savetag)
- plt.savefig(scratch_plots+savename+'.pdf',bbox_extra_artists=(lgd,), bbox_inches='tight')
- plt.savefig(scratch_plots+savename+'.png',bbox_extra_artists=(lgd,), bbox_inches='tight')
+# plt.savefig(scratch_plots+savename+'.pdf',bbox_extra_artists=(lgd,), bbox_inches='tight')
+# plt.savefig(scratch_plots+savename+'.png',bbox_extra_artists=(lgd,), bbox_inches='tight')
  plt.clf()
 
  ROOT.gPad.Update()
