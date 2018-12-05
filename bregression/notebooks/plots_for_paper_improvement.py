@@ -309,8 +309,8 @@ for i in range(0,3):
     gr_improvement.SetMarkerColor(ROOT.kSpring-6)
     gr_improvement.Draw("Psame") 
 
- where = (options.where).replace(' ','').replace('<','_').replace('>','_').replace('(','').replace(')','')
- savename='/IQR_compare_%s_%s%s%s'%(whats[i].replace('\\','').replace(' ','').replace('~',''),options.samplename,where,savetag)
+ where = (options.where).replace(' ','').replace('<','_').replace('>','_').replace('(','').replace(')','').replace('=','_').replace('!=','notequal')
+ savename='/IQR_compare_%s_%s%s%s'%(whats[i].replace('\\','').replace(' ','').replace('~','').replace(' ','').replace(')','').replace('(','').replace('-','_'),options.samplename,where,savetag)
 # plt.savefig(scratch_plots+savename+'.pdf',bbox_extra_artists=(lgd,), bbox_inches='tight')
 # plt.savefig(scratch_plots+savename+'.png',bbox_extra_artists=(lgd,), bbox_inches='tight')
  plt.clf()
@@ -340,5 +340,5 @@ for i in range(0,3):
          data_csv['delta_%s_%s'%(labels[ifile],labels[jfile])] = 2*(np.array(sigma_mu_array[ifile])-np.array(sigma_mu_array[jfile]))/(np.array(sigma_mu_array[ifile])+np.array(sigma_mu_array[jfile]))
          data_csv['delta_sigma_%s_%s'%(labels[ifile],labels[jfile])] = 2*(np.array(sigma_array[ifile])-np.array(sigma_array[jfile]))/(np.array(sigma_array[ifile])+np.array(sigma_array[jfile]))
               
- savename='/data_IQR_compare_%s_%s%s%s.csv'%(whats[i].replace('\\',''),options.samplename,where,savetag)
+ savename='/data_IQR_compare_%s_%s%s%s.csv'%(whats[i].replace('\\','').replace(' ','').replace(')','').replace('(','').replace('-','_'),options.samplename,where,savetag)
  data_csv.to_csv(scratch_plots+savename)

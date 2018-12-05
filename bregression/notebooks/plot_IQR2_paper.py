@@ -184,7 +184,7 @@ for i in range(0,3):
  plt.xlabel('$%s$'%whats[i], fontsize=30)
  plt.ylabel('$p_{T}^{gen} / p_{T}^{reco}$', fontsize=30)
  plt.legend(loc='upper right',fontsize=30)
- savename='/quantiles_col_%s_%s_%s_%s'%(input_trainings[0],whats[i].replace('\\',''),options.samplename,where)
+ savename='/quantiles_col_%s_%s_%s_%s'%(input_trainings[0],whats[i].replace('\\','').replace(' ','').replace(')','').replace('(','').replace('-','_'),options.samplename,where)
 # plt.savefig(scratch_plots+savename+savetag+'.png')
 # plt.savefig(scratch_plots+savename+savetag+'.pdf')
  plt.clf()

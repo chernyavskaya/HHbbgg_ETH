@@ -122,6 +122,8 @@ func = ROOT.TF1("func","pol1",0.,0.4)
 gr.Fit("func","0")
 par0 = func.GetParameter(0)
 par1 = func.GetParameter(1)
+#par0=0
+#par1=1.
 colors=[ROOT.kRed,ROOT.kOrange-3,ROOT.kSpring+9,3,4,5,6]
 markers=[29,33,34,21,22,23,24]
 
