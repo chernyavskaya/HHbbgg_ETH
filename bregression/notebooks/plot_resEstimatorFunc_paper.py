@@ -144,6 +144,8 @@ gr_up.SetFillColor(ROOT.kCyan-10)
 pt_bins=["(Jet_mcPt>=60 & Jet_mcPt<70) ","(Jet_mcPt>=80 & Jet_mcPt<90)", "(Jet_mcPt>=100 & Jet_mcPt<110)"]
 pt_bins=["(Jet_mcPt>=30 & Jet_mcPt<50)", "(Jet_mcPt>=50 & Jet_mcPt<70) ","(Jet_mcPt>=70 & Jet_mcPt<100)"]
 pt_bins_names=["30 < p_{T} < 50 GeV ","50 < p_{T} < 70 GeV", "70 < p_{T} < 100 GeV"]
+pt_bins=["(Jet_mcPt>=30 & Jet_mcPt<50)", "(Jet_mcPt>=50 & Jet_mcPt<70) ","(Jet_mcPt>=110 & Jet_mcPt<120)"]
+pt_bins_names=["30 < p_{T} < 50 GeV ","50 < p_{T} < 70 GeV", "110 < p_{T} < 120 GeV"]
 ymin, ymax = 0.,0.30 
 xmin, xmax = 0.,0.30 
 graphs=[]
