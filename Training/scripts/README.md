@@ -23,7 +23,7 @@ source HHbbgg_ETH_devel/scripts/setup_scikit.sh
 ```
 * Run the engines in screen specifying number of desired jobs:
 ```
-ipcluster start --profile=gcc49_5gb_smp4 -n NJOBS
+ipcluster start --profile=gcc49_5gb_smp1_all -n NJOBS
 ```
 * *Wait untill all engines are running!*
 * Once all engines are running, you can run your scipts which has this line inside :
