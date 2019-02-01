@@ -14,6 +14,7 @@ import ROOT
 from ROOT import TCanvas, TH1F, TGraph, TLegend
 from ROOT import gROOT
 from ROOT import gStyle
+from ROOT import TLatex
 
 gROOT.SetBatch(True)
 gROOT.ProcessLineSync(".x /mnt/t3nfs01/data01/shome/nchernya/setTDRStyle.C")
@@ -69,7 +70,7 @@ parser = OptionParser(option_list=[
 input_trainings = options.training.split(',')
 
 now = str(datetime.datetime.now()).split(' ')[0]
-scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/November20/'
+scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/January28/'
 #dirs=['',input_trainings[0],options.samplename]
 dirs=['',options.samplename]
 for i in range(len(dirs)):
@@ -163,11 +164,12 @@ for i in range(0,3):
  grcorr75 = TGraph(len(binc),array('d',binc),array('d',y_corr_75_pt))
  ymin, ymax = (plt.gca()).get_ylim()
  xmin, xmax = (plt.gca()).get_xlim()
- for item in [gr25,gr40,gr50,gr75] :
+ widths = [2,3,4,5]
+ for num,item in enumerate([gr25,gr40,gr50,gr75]) :
 	item.SetLineStyle(5)
 	item.SetLineWidth(3)
 	item.SetLineColor(ROOT.kBlue)
- for item in [grcorr25,grcorr40,grcorr50,grcorr75] :
+ for num,item in enumerate([grcorr25,grcorr40,grcorr50,grcorr75]) :
 	item.SetLineStyle(1)
 	item.SetLineWidth(3)
 	item.SetLineColor(ROOT.kRed)
@@ -199,8 +201,10 @@ for i in range(0,3):
  frame.GetYaxis().SetTitle("p_{T}^{gen} / p_{T}^{reco}")
  frame.GetXaxis().SetTitle(whats_root[i])
  frame.GetYaxis().SetRangeUser(ymin,ymax*1.1)
- if ('p_T') in whats[i] : frame.GetYaxis().SetRangeUser(ymin,ymax)
+ frame.GetYaxis().SetRangeUser(0.85,1.35)
  if ('p_T') in whats[i] and 'HHbbgg' in options.samplename: frame.GetXaxis().SetLimits(30, 350)
+ if ('rho') in whats[i] and 'ttbar' in options.samplename: frame.GetXaxis().SetLimits(0, 45)
+ if ('eta') in whats[i] and 'ttbar' in options.samplename: frame.GetXaxis().SetLimits(-3.2, 3.2)
  frame.Draw()
  for item in [gr25,gr40,gr50,gr75,grcorr25,grcorr40,grcorr50,grcorr75]:
      item.Draw("Lsame")
@@ -217,6 +221,25 @@ for i in range(0,3):
  leg.SetTextFont(42)
  leg.SetTextSize(0.04)
  leg.Draw()
+
+ latex_posX_before = [5,-3.,1.]
+ latex_posY_before = [[0.87,0.94,0.98,1.14],[0.9,0.955,0.99,1.11],[0.915,0.965,0.994,1.094]]
+ latex_posX_after = [310.,2.6,40.]
+ latex_posY_after = [[0.95,0.98,1.00,1.06],[.95,1.01,1.05,1.20],[0.95,1.01,1.055,1.205]]
+ latex = TLatex()
+ latex.SetTextFont(72)
+ latex.SetTextSize(0.028)
+ latex.SetTextAlign(12)
+ latex.SetTextColor(4)
+ latex.DrawLatex(latex_posX_after[i],latex_posY_after[i][0],"25%")
+ latex.DrawLatex(latex_posX_after[i],latex_posY_after[i][1],"40%")
+ latex.DrawLatex(latex_posX_after[i],latex_posY_after[i][2],"50%")
+ latex.DrawLatex(latex_posX_after[i],latex_posY_after[i][3],"75%")
+ latex.SetTextColor(2)
+ latex.DrawLatex(latex_posX_before[i],latex_posY_before[i][0],"25%")
+ latex.DrawLatex(latex_posX_before[i],latex_posY_before[i][1],"40%")
+ latex.DrawLatex(latex_posX_before[i],latex_posY_before[i][2],"50%")
+ latex.DrawLatex(latex_posX_before[i],latex_posY_before[i][3],"75%")
 
  pCMS1.Draw()
  pCMS12.Draw()

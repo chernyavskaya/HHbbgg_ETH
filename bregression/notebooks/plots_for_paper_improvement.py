@@ -73,7 +73,7 @@ input_files = options.inp_file.split(',')
 
 
 now = str(datetime.datetime.now()).split(' ')[0]
-scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/November20/'
+scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/January28/'
 #dirs=['',input_trainings[0],options.samplename]
 dirs=['',options.samplename]
 for i in range(len(dirs)):
