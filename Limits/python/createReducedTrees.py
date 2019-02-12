@@ -15,7 +15,8 @@ import root_pandas as rpd
 
 
 #samples = ["GluGluToHHTo2B2G_node_SM","DiPhotonJetsBox_","GJet_Pt-20to40","GJet_Pt-40","DiPhotonJetsBox2BJets_","DiPhotonJetsBox1BJet_","GluGluHToGG_","VBFHToGG_","VHToGG_","ttHToGG_"]#
-samples = ["GluGluToHHTo2B2G_node_SM","DiPhotonJetsBox_","GJet_Pt-20to40","GJet_Pt-40"]#
+#samples = ["GluGluToHHTo2B2G_node_SM","DiPhotonJetsBox_","GJet_Pt-20to40","GJet_Pt-40"]#
+samples = ["GluGluToHHTo2B2G_node_SM","DiPhotonJetsBox_","GJet_Pt-20to40","GJet_Pt-40","DiPhotonJetsBox2BJets_","DiPhotonJetsBox1BJet_"]#
 treeDir = 'tagsDumper/trees/'
 
 def addSamples():#define here the samples you want to process
@@ -144,7 +145,8 @@ def main(options,args):
     #define MVA cut and additional variables needed
    # additionalCut_names = 'noexpand:diphotonCandidate.M(),noexpand:dijetCandidate.M(),MX,isSignal,event,noexpand:dijetCandidateCorr.M(),noexpand:(event%2!=0),subleadingJet_genHadronFlavourb,leadingJet_genHadronFlavourb'.split(",")
   #  additionalCut_names = 'CMS_hgg_mass,Mjj,noexpand:(event%2!=0),noexpand:(event%5!=0)'.split(',')
-    additionalCut_names = 'CMS_hgg_mass,Mjj,MX'.split(',')
+  #  additionalCut_names = 'CMS_hgg_mass,Mjj,MX'.split(',')
+    additionalCut_names = 'CMS_hgg_mass,Mjj,MX,leadingJet_hflav,leadingJet_pflav,subleadingJet_hflav,subleadingJet_pflav'.split(',')
     signal_trainedOn = ['noexpand:(event%2!=0)']
     bkg_trainedOn = ['noexpand:(event%1==0)'] #to accept all events
     overlap = ['overlapSave']
@@ -160,14 +162,15 @@ def main(options,args):
     branch_names+=event_branches
     
     sig_count_df = (rpd.read_root(utils.IO.signalName[0],utils.IO.signalTreeName[0], columns = branch_names+additionalCut_names+signal_trainedOn)).query(cuts)
-    preprocessing.define_process_weight(sig_count_df,utils.IO.sigProc[0],utils.IO.signalName[0],utils.IO.signalTreeName[0])
+    preprocessing.define_process_weight(sig_count_df,utils.IO.sigProc[0],utils.IO.signalName[0],utils.IO.signalTreeName[0],cleanSignal=True,cleanOverlap=True)
        
  
     #nTot is a multidim vector with all additional variables, dictVar is a dictionary associating a name of the variable
     #to a position in the vector
-    nTot,dictVar = postprocessing.stackFeatures(sig_count_df,branch_names+additionalCut_names+signal_trainedOn)
+    nTot,dictVar = postprocessing.stackFeatures(sig_count_df,branch_names+additionalCut_names+signal_trainedOn+overlap)
     #apply isSignal cleaning
-    nCleaned = nTot[np.where(nTot[:,dictVar['weight']]!=0),:][0]
+ #   nCleaned = nTot[np.where(nTot[:,dictVar['weight']]!=0),:][0]
+    nCleaned = nTot 
     
     processPath=os.path.expanduser('/shome/nchernya/HHbbgg_ETH_devel/outfiles/')+outTag+'/'+utils.IO.signalName[0].split("/")[len(utils.IO.signalName[0].split("/"))-1].replace("output_","").replace(".root","")+"_preselection"+".root"
 
@@ -185,24 +188,25 @@ def main(options,args):
     
     ## do gJets not in the loop since they have two samples for one process, to be fixed
     bkg_1_count_df = (rpd.read_root(utils.IO.backgroundName[1],utils.IO.bkgTreeName[1], columns = branch_names+additionalCut_names+bkg_trainedOn)).query(cuts)
-    preprocessing.define_process_weight(bkg_1_count_df,utils.IO.bkgProc[1],utils.IO.backgroundName[1],utils.IO.bkgTreeName[1])
+    preprocessing.define_process_weight(bkg_1_count_df,utils.IO.bkgProc[1],utils.IO.backgroundName[1],utils.IO.bkgTreeName[1],cleanSignal=True,cleanOverlap=True)
     
     crazySF_20=25
-    nTot,dictVar = postprocessing.stackFeatures(bkg_1_count_df,branch_names+additionalCut_names+bkg_trainedOn,SF=crazySF_20)
+    nTot,dictVar = postprocessing.stackFeatures(bkg_1_count_df,branch_names+additionalCut_names+bkg_trainedOn+overlap,SF=crazySF_20)
     
     print nTot.shape
     
     bkg_2_count_df = (rpd.read_root(utils.IO.backgroundName[2],utils.IO.bkgTreeName[2], columns = branch_names+additionalCut_names+bkg_trainedOn)).query(cuts)
-    preprocessing.define_process_weight(bkg_2_count_df,utils.IO.bkgProc[2],utils.IO.backgroundName[2],utils.IO.bkgTreeName[2])
+    preprocessing.define_process_weight(bkg_2_count_df,utils.IO.bkgProc[2],utils.IO.backgroundName[2],utils.IO.bkgTreeName[2],cleanSignal=True,cleanOverlap=True)
     
     crazySF_40=3
-    nTot_2,dictVar = postprocessing.stackFeatures(bkg_2_count_df,branch_names+additionalCut_names+bkg_trainedOn,SF=crazySF_40)
+    nTot_2,dictVar = postprocessing.stackFeatures(bkg_2_count_df,branch_names+additionalCut_names+bkg_trainedOn+overlap,SF=crazySF_40)
     
     
     nTot_3 = np.concatenate((nTot,nTot_2))
     
     print nTot_3.shape
-    nCleaned = nTot_3[np.where(nTot_3[:,dictVar['weight']]!=0),:][0]
+   # nCleaned = nTot_3[np.where(nTot_3[:,dictVar['weight']]!=0),:][0]
+    nCleaned = nTot_3
     print "nCleaned"
     print nCleaned.shape
     
@@ -231,16 +235,17 @@ def main(options,args):
         
         print "Processing sample: "+str(iProcess)
         bkg_count_df = (rpd.read_root(utils.IO.backgroundName[iProcess],utils.IO.bkgTreeName[iProcess], columns = branch_names+additionalCut_names+bkg_trainedOn)).query(cuts)
-        preprocessing.define_process_weight(bkg_count_df,utils.IO.bkgProc[iProcess],utils.IO.backgroundName[iProcess],utils.IO.bkgTreeName[iProcess])
+        preprocessing.define_process_weight(bkg_count_df,utils.IO.bkgProc[iProcess],utils.IO.backgroundName[iProcess],utils.IO.bkgTreeName[iProcess],cleanSignal=True,cleanOverlap=True)
     
         crazySF=1
         ##scale diphoton + jets
         if iProcess == 0:
             crazySF=1.45
-        nTot,dictVar = postprocessing.stackFeatures(bkg_count_df,branch_names+additionalCut_names+bkg_trainedOn,SF=crazySF)
+        nTot,dictVar = postprocessing.stackFeatures(bkg_count_df,branch_names+additionalCut_names+bkg_trainedOn+overlap,SF=crazySF)
     
     
-        nCleaned = nTot[np.where(nTot[:,dictVar['weight']]!=0),:][0]
+     #   nCleaned = nTot[np.where(nTot[:,dictVar['weight']]!=0),:][0]
+        nCleaned = nTot
         print "nCleaned"
         print nCleaned.shape
     
