@@ -35,7 +35,7 @@ def cleanOverlapDiphotons(name,dataframe):
         if abs(cflavSubLeading)==5 or abs(cflavLeading)==5 :
             dataframe.at[index,'overlapSave']=0
         else : dataframe.at[index,'overlapSave']=1
-    dataframe["weight"] *= dataframe['overlapSave']
+  #  dataframe["weight"] *= dataframe['overlapSave']
 
     
         
