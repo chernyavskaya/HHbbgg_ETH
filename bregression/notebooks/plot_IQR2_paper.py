@@ -70,14 +70,14 @@ parser = OptionParser(option_list=[
 input_trainings = options.training.split(',')
 
 now = str(datetime.datetime.now()).split(' ')[0]
-scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/January28/'
+scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/February25/'
 #dirs=['',input_trainings[0],options.samplename]
 dirs=['',options.samplename]
 for i in range(len(dirs)):
   scratch_plots=scratch_plots+'/'+dirs[i]+'/'
   if not os.path.exists(scratch_plots):
     os.mkdir(scratch_plots)
-savetag='Nov20'
+savetag='Feb25'
  
 
 # ## Read test data and model
@@ -112,6 +112,7 @@ whats_root = ['p_{T} (GeV)','#eta','#rho (GeV)']
 ranges = [[30,400],[-3,3],[0,50]]
 binning =[50,10,20] #[50,20]
 for i in range(0,3):
+#for i in range(2,3):
  if i==0 : X = X_pt
  elif i==1 : X = X_eta
  elif i==2 : X = X_rho
@@ -162,6 +163,17 @@ for i in range(0,3):
  gr75 = TGraph(len(binc),array('d',binc),array('d',y_75_pt))
  plt.plot(binc,y_corr_75_pt,linestyle=linestyles[2],color='r')
  grcorr75 = TGraph(len(binc),array('d',binc),array('d',y_corr_75_pt))
+
+ grmean = TGraph(len(binc),array('d',binc),array('d',y_mean_pt))
+ grcorrmean = TGraph(len(binc),array('d',binc),array('d',y_corr_mean_pt))
+ for num,item in enumerate([grmean,grcorrmean]) :
+	item.SetLineStyle(5)
+	item.SetLineWidth(3)
+	item.SetLineColor(ROOT.kGreen)
+ for num,item in enumerate([grcorrmean]) :
+	item.SetLineStyle(1)
+ 
+
  ymin, ymax = (plt.gca()).get_ylim()
  xmin, xmax = (plt.gca()).get_xlim()
  widths = [2,3,4,5]
@@ -207,6 +219,7 @@ for i in range(0,3):
  if ('eta') in whats[i] and 'ttbar' in options.samplename: frame.GetXaxis().SetLimits(-3.2, 3.2)
  frame.Draw()
  for item in [gr25,gr40,gr50,gr75,grcorr25,grcorr40,grcorr50,grcorr75]:
+# for item in [gr25,gr40,gr50,gr75,grcorr25,grcorr40,grcorr50,grcorr75,grmean,grcorrmean]:
      item.Draw("Lsame")
 
  
@@ -214,8 +227,11 @@ for i in range(0,3):
 
  leg = TLegend()
  leg = ROOT.TLegend(0.75,0.75,0.9,0.9)
+# leg = ROOT.TLegend(0.6,0.75,0.9,0.9)
  leg.AddEntry(gr25,"Baseline" ,"L")
  leg.AddEntry(grcorr25,"DNN" ,"L")
+ leg.AddEntry(grmean,"Baseline average" ,"L")
+ leg.AddEntry(grcorrmean,"DNN average" ,"L")
  leg.SetFillStyle(-1)
  leg.SetBorderSize(0)
  leg.SetTextFont(42)

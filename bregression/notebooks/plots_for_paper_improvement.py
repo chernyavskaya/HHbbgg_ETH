@@ -73,14 +73,14 @@ input_files = options.inp_file.split(',')
 
 
 now = str(datetime.datetime.now()).split(' ')[0]
-scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/January28/'
+scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/February25/'
 #dirs=['',input_trainings[0],options.samplename]
 dirs=['',options.samplename]
 for i in range(len(dirs)):
   scratch_plots=scratch_plots+'/'+dirs[i]+'/'
   if not os.path.exists(scratch_plots):
     os.mkdir(scratch_plots)
-savetag='Nov20'
+savetag='Feb25_sigmaOnly'
 
 
 print(options.where)
@@ -90,16 +90,18 @@ whats_root = ['p_{T} (GeV)','#eta','#rho (GeV)']
 #binning =[50,10,20] #[50,20]
 #ranges = [[30,400],[0,2.5],[0,50]]
 #binning =[10,10,10] #[50,20]
-ranges = [[0,400],[0,2.5],[0,50]]
-binning =[7,10,20] #[50,20]
+#ranges = [[0,400],[0,2.5],[0,50]]
+ranges = [[20,400],[0,2.5],[0,50]]
+#binning =[7,10,20] #[50,20]
+binning =[7,10,15] #[50,20]
 linestyles = ['-.', '--','-', ':','-']
 colors=['green','red','blue','cyan','magenta','blueviolet','orange','lime','brown','blue','blue']
 markers=['s','o','^','h','>','<','s','o','o','o','o']
 labels=options.labels.split(',')
 bins_same = []
 
-#for i in range(0,1):
-for i in range(0,3):
+for i in range(0,1):
+#for i in range(0,3):
  sigma_mu_array = []
  sigma_array = []
  mu_array = []
@@ -124,6 +126,7 @@ for i in range(0,3):
     y_pred = (data['Jet_pt_reg_NN_%s'%input_trainings[ifile]]) #bad name because it is actually a correction
     y_corr = (y[:,0]/y_pred).values.reshape(-1,1)
 
+    print 'Average pT : ',np.average(data['Jet_mcPt'])
 
     if i==0 : X = X_pt
     elif i==1 : X = X_eta
@@ -131,12 +134,15 @@ for i in range(0,3):
 
  
     if (ifile==0) : bins=np.linspace(ranges[i][0],ranges[i][1],binning[i])
-    if ifile==0 and i==0 :  bins = np.array([0,20,40,60,80,100,150,200,250,300,400]) #ttbar
+   # if ifile==0 and i==0 :  bins = np.array([0,20,40,60,80,100,150,200,250,300,400]) #ttbar
+    if ifile==0 and i==0 :  bins = np.array([20,40,60,80,100,150,200,250,300,400]) #ttbar
+ #   if ifile==0 and i==2 :  bins = np.array([ 0.   ,       6.66732836,  8.11298199,  9.22305012 ,10.14321423, 10.97165012,11.75445137, 12.51883049 ,13.27694359, 14.0332222 , 14.80068302, 15.59469814, 16.44004822, 17.36221085, 18.36169586 ,19.47189522 ,20.77418327 ,22.39320679, 24.55589256 ,27.99963531, 50.]) #ttbar and pt<50 and pt>30 for rho
    ## if ifile==0 and i==0 :   bins = np.array([0,20,40,60,80,100,150,200]) #ZHbbll
  
+ #   bins_from_profile, _,_,_ = utils.profile(y_corr,X,range=ranges[i],bins=20,quantiles=np.array([0.25,0.4,0.5,0.75])) 
+ #   print 'bins from profile : ',bins_from_profile
     if ifile==0 :
        _, y_corr_mean_pt, y_corr_std_pt, y_corr_qt_pt = utils.profile(y_corr,X,bins=bins,quantiles=np.array([0.25,0.4,0.5,0.75])) 
-    #   bins, y_corr_mean_pt, y_corr_std_pt, y_corr_qt_pt = utils.profile(y_corr,X,range=ranges[i],bins=bins,quantiles=np.array([0.25,0.4,0.5,0.75])) 
        bins_same.append(bins)
     else :  
        bins = bins_same[i]
@@ -170,6 +176,7 @@ for i in range(0,3):
 ########################inclusive#############
     inclusive = np.percentile(y,quantiles*100.,axis=0).reshape(-1,1) 
     sigma_mu_inclusive = np.array(0.5*(inclusive[3]-inclusive[0]))/np.array(inclusive[1])
+    print 'printing inclusive : ',sigma_mu_inclusive,' [0] : ',sigma_mu_inclusive[0]
 ##############################################
     improvement_inclusive = (np.array(sigma_mu_corr_inclusive[0])-np.array(sigma_mu_inclusive[0]))/(np.array(sigma_mu_inclusive[0]))
     print('inclusive improvement : ',improvement_inclusive)
@@ -202,10 +209,12 @@ for i in range(0,3):
 
  ax0.grid(alpha=0.2,linestyle='--',markevery=2)
  axes = plt.gca()
- if (i==0) : axes.set_ylim(0.02,0.3)
+ #if (i==0) : axes.set_ylim(0.02,0.3)
+ if (i==0) : axes.set_ylim(0.02,0.25)
 # if (i==1) : axes.set_ylim(0.06,0.15)
  if (i==1) : axes.set_ylim(0.08,0.16)
- if (i==2) : axes.set_ylim(0.08,0.17)
+# if (i==2) : axes.set_ylim(0.08,0.17)
+ if (i==2) : axes.set_ylim(0.08,0.25)
  axes.set_xlim(ranges[i][0],ranges[i][1])
  if (i==0) : axes.set_xlim(0,ranges[i][1])
  ymin, ymax = (axes).get_ylim()
@@ -227,6 +236,7 @@ for i in range(0,3):
  frame.GetXaxis().SetLabelSize(0.04)
  frame.GetYaxis().SetLabelSize(0.04)
  frame.GetYaxis().SetTitle("#bar{#sigma}")
+# frame.GetYaxis().SetTitle("#sigma")  #when sigma only
  frame.GetYaxis().SetRangeUser(ymin,ymax)
 
  leg = TLegend()
@@ -298,9 +308,13 @@ for i in range(0,3):
     frame2.GetYaxis().SetLabelSize(0.02)
     frame2.GetXaxis().SetTitle(whats_root[i])
     frame2.GetYaxis().CenterTitle(ROOT.kTRUE)
-  #  frame2.GetYaxis().SetTitle("#frac{(#bar{#sigma}_{DNN}-#bar{#sigma}_{baseline})}{#bar{#sigma}_{baseline}}")	
-    frame2.GetYaxis().SetTitle("#frac{#Delta#bar{#sigma}}{#bar{#sigma}_{baseline}}")	
-    if i==0 : frame2.GetYaxis().SetRangeUser(-0.12,0.)
+    frame2.GetYaxis().SetTitle("#frac{(#bar{#sigma}_{DNN}-#bar{#sigma}_{baseline})}{#bar{#sigma}_{baseline}}")	
+  #  frame2.GetYaxis().SetTitle("#frac{#Delta#sigma}{#sigma_{baseline}}")	 #when sigma only
+   # if i==0 : frame2.GetYaxis().SetRangeUser(-0.12,0.)
+    if i==0 : 
+          frame2.GetYaxis().SetRangeUser(-0.17,0.)
+        #  frame2.GetYaxis().SetRangeUser(-0.3,0.)
+         # frame2.GetYaxis().SetNDivisions()
     else : frame2.GetYaxis().SetRangeUser(-0.30,0.)
     frame2.Draw()
     gr_improvement = TGraph(len(binc),array('d',binc),array('d',improvement))
@@ -326,6 +340,7 @@ for i in range(0,3):
 # data_csv = pd.DataFrame(np.array(difference).reshape(1,binc.shape[0]), columns=(binc))
  data_csv = pd.DataFrame({whats[i].replace('\\',''):binc})
  data_csv['onlyJEC'] = sigma_mu_jec
+ data_csv['muJEC'] = mu_jec
  data_csv['sigma_onlyJEC'] = sigma_jec
  for ifile in range(len(input_files)):
      data_csv['%s'%labels[ifile]] = sigma_mu_array[ifile]

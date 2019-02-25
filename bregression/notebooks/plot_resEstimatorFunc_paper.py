@@ -69,14 +69,14 @@ parser = OptionParser(option_list=[
 input_trainings = options.training.split(',')
 
 now = str(datetime.datetime.now()).split(' ')[0]
-scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/November20/'
+scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/February25/'
 #dirs=['',input_trainings[0],options.samplename]
 dirs=['',options.samplename]
 for i in range(len(dirs)):
   scratch_plots=scratch_plots+'/'+dirs[i]+'/'
   if not os.path.exists(scratch_plots):
     os.mkdir(scratch_plots)
-savetag='Nov20'
+savetag='Feb25'
  
 
 # ## Read test data and model
@@ -116,10 +116,11 @@ res_bins_incl_array = array('d',res_bins_incl)
 err_iqr2_incl_array = array('d',err_iqr2_incl)
 gr = TGraph(len(res_bins_incl),res_bins_incl_array,err_iqr2_incl_array)
 gr.SetMarkerStyle(20)
-gr.SetMarkerSize(1.9)
+gr.SetMarkerSize(1.8)
 gr.SetMarkerColor(ROOT.kBlue)
 func = ROOT.TF1("func","pol1",0.,0.4)
 gr.Fit("func","0")
+#gr.Fit("func")
 par0 = func.GetParameter(0)
 par1 = func.GetParameter(1)
 #par0=0
@@ -141,11 +142,13 @@ for i in range(n_points):
 gr_up.SetLineColor(ROOT.kCyan-10)
 gr_up.SetFillColor(ROOT.kCyan-10)
 
-pt_bins=["(Jet_mcPt>=60 & Jet_mcPt<70) ","(Jet_mcPt>=80 & Jet_mcPt<90)", "(Jet_mcPt>=100 & Jet_mcPt<110)"]
-pt_bins=["(Jet_mcPt>=30 & Jet_mcPt<50)", "(Jet_mcPt>=50 & Jet_mcPt<70) ","(Jet_mcPt>=70 & Jet_mcPt<100)"]
-pt_bins_names=["30 < p_{T} < 50 GeV ","50 < p_{T} < 70 GeV", "70 < p_{T} < 100 GeV"]
+#pt_bins=["(Jet_mcPt>=60 & Jet_mcPt<70) ","(Jet_mcPt>=80 & Jet_mcPt<90)", "(Jet_mcPt>=100 & Jet_mcPt<110)"]
+#pt_bins=["(Jet_mcPt>=30 & Jet_mcPt<50)", "(Jet_mcPt>=50 & Jet_mcPt<70) ","(Jet_mcPt>=70 & Jet_mcPt<100)"]
+#pt_bins_names=["30 < p_{T} < 50 GeV ","50 < p_{T} < 70 GeV", "70 < p_{T} < 100 GeV"]
 pt_bins=["(Jet_mcPt>=30 & Jet_mcPt<50)", "(Jet_mcPt>=50 & Jet_mcPt<70) ","(Jet_mcPt>=110 & Jet_mcPt<120)"]
 pt_bins_names=["30 < p_{T} < 50 GeV ","50 < p_{T} < 70 GeV", "110 < p_{T} < 120 GeV"]
+#pt_bins=["(Jet_mcPt>=25 & Jet_mcPt<30)","(Jet_mcPt>=25 & Jet_mcPt<50)","(Jet_mcPt>=30 & Jet_mcPt<50)", "(Jet_mcPt>=50 & Jet_mcPt<70) ","(Jet_mcPt>=70 & Jet_mcPt<100)"]
+#pt_bins_names=["25 < p_{T} < 30 GeV","25 < p_{T} < 50 GeV","30 < p_{T} < 50 GeV","50 < p_{T} < 70 GeV", "70 < p_{T} < 100 GeV"]
 ymin, ymax = 0.,0.30 
 xmin, xmax = 0.,0.30 
 graphs=[]
@@ -197,7 +200,7 @@ for num,pt_bin in enumerate(pt_bins):
     graphs[num].Draw("Psame")
     leg.AddEntry(graphs[num],"%s"%pt_bins_names[num] ,"P")
 
-#gr.Draw("Psame")
+gr.Draw("Psame")
 leg.Draw()
 ROOT.gPad.Update()
 ROOT.gPad.RedrawAxis()
