@@ -58,8 +58,8 @@ for ring in rings:
 
 ## command_line options
 parser = OptionParser(option_list=[
-    make_option("--inp-dir",type='string',dest="inp_dir",default=os.environ['SCRATCH']+'/bregression'),
-    make_option("--out-dir",type='string',dest="out_dir",default=os.environ['SCRATCH']+'/bregression/NN_output/'),
+    make_option("--inp-dir",type='string',dest="inp_dir",default='/scratch/nchernya/HHbbgg/ttbar_2016_legacy_JECv11/'),
+    make_option("--out-dir",type='string',dest="out_dir",default='/scratch/nchernya/HHbbgg/bregression_training_psi/output/'),
     make_option("--inp-files",type='string',dest='inp_files',default='ttbar_unweighted_full80M_selected_train.hd5'),
     make_option("--inp-file-valid",type='string',dest='inp_file_valid',default='ttbar_unweighted_full80M_selected_train.hd5'),
     make_option("--features",type='string',dest='features',default=''),
@@ -120,6 +120,7 @@ for data in df_list+[data_valid]:
     data['Jet_mass']=data['Jet_mass']*data['Jet_rawEnergy']/data['Jet_e']
     data['Jet_leptonPtRelInv']=data['Jet_leptonPtRelInv']*data['Jet_rawEnergy']/data['Jet_e']
     data['Jet_mcPt_Jet_pt']=data['Jet_mcPt']/(data['Jet_pt']*data['Jet_corr_JEC'])
+   # data['Jet_mcPt_Jet_pt']=data['Jet_mcPt']/(data['Jet_pt'])
 
 
 X_shape = (data_valid[features].values).shape[1:]
