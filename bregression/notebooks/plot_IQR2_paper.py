@@ -70,14 +70,17 @@ parser = OptionParser(option_list=[
 input_trainings = options.training.split(',')
 
 now = str(datetime.datetime.now()).split(' ')[0]
-scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/February25/'
+#scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/noJEC/March6/'   #for studies
+scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/LegacyJECv11_06_03_2019/March7/'   #for studies
+#scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/February25/'  #for paper
 #dirs=['',input_trainings[0],options.samplename]
 dirs=['',options.samplename]
 for i in range(len(dirs)):
   scratch_plots=scratch_plots+'/'+dirs[i]+'/'
   if not os.path.exists(scratch_plots):
     os.mkdir(scratch_plots)
-savetag='Feb25'
+#savetag='Feb25'
+savetag='March7'
  
 
 # ## Read test data and model
