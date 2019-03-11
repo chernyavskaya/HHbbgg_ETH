@@ -15,7 +15,7 @@ import datetime
 
 parser = OptionParser(option_list=[
     make_option("--training",type='string',dest="training",default='HybridLossRaw'),
-    make_option("--inp-dir",type='string',dest="inp_dir",default=os.environ['SCRATCH']+'/bregression/NN_output/'),
+    make_option("--inp-dir",type='string',dest="inp_dir",default='/work/nchernya/HHbbgg_ETH_devel/bregression/output_files/NN_psi_training/'),
     make_option("--inp-file",type='string',dest='inp_file',default='metrics'),
     make_option("--out-dir",type='string',dest="out_dir",default='/users/nchernya//HHbbgg_ETH/bregression/plots/NN_epochs/'),
     make_option("--metrics",type='string',dest="metrics",default='loss,mae0,mse0'),
@@ -30,8 +30,8 @@ colors=['r','b','g','k','c','y']
 input_trainings = options.training.split(',')
 input_metrics = options.metrics.split(',')
 
-now = str(datetime.datetime.now()).split(' ')[0]
-options.out_dir = scratch_plots ='/scratch/snx3000/nchernya/bregression/plots/quantiles/%s/'%now
+#now = str(datetime.datetime.now()).split(' ')[0]
+#options.out_dir = scratch_plots ='/scratch/snx3000/nchernya/bregression/plots/quantiles/%s/'%now
 nxval=options.nxval
 
 #for each metric we plot it for train and validation sample vs epoch 
@@ -70,6 +70,7 @@ for idx,met in enumerate(input_metrics):
         rolling_std = dataframe['mean_%i'%idx_nn].rolling(window=2).std()
         plt.plot(rolling_mean.index,rolling_mean,linestyle='--',label='',color=colors[idx_nn])
         plt.fill_between(rolling_std.index, rolling_mean-rolling_std, rolling_mean+rolling_std, color=colors[idx_nn], alpha=0.2)
+        print dictVar['epoch']
     plt.xlabel('# epochs')
     plt.ylabel('%s'%met)
     axes = plt.gca()

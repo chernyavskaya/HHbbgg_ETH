@@ -73,14 +73,16 @@ input_files = options.inp_file.split(',')
 
 
 now = str(datetime.datetime.now()).split(' ')[0]
-scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/February25/'
+scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/LegacyJECv11_06_03_2019/March7/'   #for studies
+#scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/February25/' #for paper
 #dirs=['',input_trainings[0],options.samplename]
 dirs=['',options.samplename]
 for i in range(len(dirs)):
   scratch_plots=scratch_plots+'/'+dirs[i]+'/'
   if not os.path.exists(scratch_plots):
     os.mkdir(scratch_plots)
-savetag='Feb25_sigmaOnly'
+#savetag='March6_noJEC_training'
+savetag='March7'
 
 
 print(options.where)
@@ -100,8 +102,8 @@ markers=['s','o','^','h','>','<','s','o','o','o','o']
 labels=options.labels.split(',')
 bins_same = []
 
-for i in range(0,1):
-#for i in range(0,3):
+#for i in range(0,1):
+for i in range(0,3):
  sigma_mu_array = []
  sigma_array = []
  mu_array = []

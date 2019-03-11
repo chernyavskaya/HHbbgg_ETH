@@ -6,18 +6,19 @@ import matplotlib.pyplot as plt
 import sys
 import json
 from optparse import OptionParser, make_option
-sys.path.insert(0, '/users/nchernya/HHbbgg_ETH/bregression/python/')
+#sys.path.insert(0, '/users/nchernya/HHbbgg_ETH/bregression/python/')
 import plotting_utils as plotting
 import pprint
 import matplotlib.offsetbox as offsetbox 
-
+import numpy as np
 
 parser = OptionParser(option_list=[
     make_option("--training",type='string',dest="training",default='2018-02-03_17_57_53_job'),
     make_option("--njobs",type='int',dest="njobs",default=0),
-    make_option("--inp-dir",type='string',dest="inp_dir",default=os.environ['SCRATCH']+'/bregression/NN_output/'),
+    make_option("--inp-dir",type='string',dest="inp_dir",default='/work/nchernya/HHbbgg_ETH_devel/bregression/output_files/NN_psi_training/'),
     make_option("--inp-file",type='string',dest='inp_file',default='metrics'),
-    make_option("--out-dir",type='string',dest="out_dir",default='/users/nchernya//HHbbgg_ETH/bregression/plots/NN_epochs/'),
+    #make_option("--out-dir",type='string',dest="out_dir",default='/users/nchernya//HHbbgg_ETH/bregression/plots/NN_epochs/'),
+    make_option("--out-dir",type='string',dest="out_dir",default='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/noJEC/March6/'), 
     make_option("--metrics",type='string',dest="metrics",default='loss,mae0,mse0'),
     make_option("--nxval",type='int',dest="nxval",default=1),
 ])
@@ -62,15 +63,16 @@ for idx,met in enumerate(input_metrics):
       #  plt.fill_between(mean[:,dictVar['epoch']],mean[:,dictVar['val_%s'%met]]-std[:,dictVar['val_%s'%met]],mean[:,dictVar['val_%s'%met]]+std[:,dictVar['val_%s'%met]],alpha=0.2,color=colors[idx_nn])
         dataframe = pd.DataFrame()
         dataframe['mean_%i'%idx_nn] = mean[:,dictVar['val_%s'%met]]
-        rolling_mean = dataframe['mean_%i'%idx_nn].rolling(window=2).mean()
-        rolling_std = dataframe['mean_%i'%idx_nn].rolling(window=2).std()
+        rolling_mean = dataframe['mean_%i'%idx_nn].rolling(window=5).mean()
+        rolling_std = dataframe['mean_%i'%idx_nn].rolling(window=5).std()
         plt.plot(rolling_mean.index,rolling_mean,linestyle='--',label='',color=colors[idx_nn])
         plt.fill_between(rolling_std.index, rolling_mean-rolling_std, rolling_mean+rolling_std, color=colors[idx_nn], alpha=0.2)
      #   plt.plot(mean[:,dictVar['epoch']],mean[:,dictVar['val_%s'%met]],linestyle='-',label='Validation %s'%nn,color=colors[idx_nn])
     plt.xlabel('# epochs')
     plt.ylabel('%s'%met)
     axes = plt.gca()
-    axes.set_xlim(-1,10)
+   # axes.set_xlim(-1,30)
+    axes.set_xlim(-1,60)
     ymin,ymax = axes.get_ylim()
     xmin,xmax=axes.get_xlim()
   #  current_dict = param_dicts[0]
