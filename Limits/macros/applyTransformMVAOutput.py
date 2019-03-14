@@ -23,7 +23,7 @@ def main(options,args):
    #     processes.append("reducedTree_sig_node_"+str(i))
 
   #  for i in range(0,8):
-    for i in range(0,3):
+    for i in range(0,5):
         if i == 1: continue #gJets are combined in one, i==2
         processes.append("reducedTree_bkg_"+str(i))
 

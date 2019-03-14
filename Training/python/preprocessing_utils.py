@@ -35,13 +35,13 @@ def cleanOverlapDiphotons(name,dataframe):
         if abs(cflavSubLeading)==5 or abs(cflavLeading)==5 :
             dataframe.at[index,'overlapSave']=0
         else : dataframe.at[index,'overlapSave']=1
-    dataframe["weight"] *= dataframe['overlapSave']
+  #  dataframe["weight"] *= dataframe['overlapSave']
 
     
         
 
 
-def define_process_weight(df,proc,name,treename='bbggSelectionTree',cleanSignal=True):
+def define_process_weight(df,proc,name,treename='bbggSelectionTree',cleanSignal=True,cleanOverlap=False):
     df['proc'] = ( np.ones_like(df.index)*proc ).astype(np.int8)
     if treename=='bbggSelectionTree':
         df['weight'] = ( np.ones_like(df.index)).astype(np.float32)
@@ -55,7 +55,9 @@ def define_process_weight(df,proc,name,treename='bbggSelectionTree',cleanSignal=
             df['weight']= np.multiply(w,input_df[['isSignal']])
         else:
             df['weight']=w
-            
+
+    if cleanOverlap : cleanOverlapDiphotons(name,df)
+ 
 
         
 def reweight_MX():
