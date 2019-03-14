@@ -1,7 +1,8 @@
 # coding: utf-8
 
 import os
-import sys; sys.path.append("/t3home/micheli/HHbbgg_ETH_20190128/HHbbgg_ETH/Training/python") # to load packages
+#import sys; sys.path.append("/t3home/micheli/HHbbgg_ETH_20190128/HHbbgg_ETH/Training/python") # to load packages
+import sys; sys.path.append("~/HHbbgg_ETH_devel/Training/python") # to load packages
 import training_utils as utils
 reload(utils)
 import preprocessing_utils as preprocessing
@@ -18,7 +19,8 @@ import commands
 now = str(datetime.datetime.now()).split(' ')[0]
 print(now)
 outstr = now+"20190201_test50iter"
-outputFolder = '/t3home/micheli/HHbbgg_ETH_20190128/HHbbgg_ETH/Training/output_files/%s/'%outstr
+#outputFolder = '/t3home/micheli/HHbbgg_ETH_20190128/HHbbgg_ETH/Training/output_files/%s/'%outstr
+outputFolder = '/shome/nchernya/HHbbgg_ETH_devel/Training/output_files/%s/'%outstr
 if not os.path.exists(outputFolder):
     print outputFolder, "doesn't exist, creating it..."
     os.makedirs(outputFolder)
@@ -132,8 +134,9 @@ if (year==1 and doReweight2017 == True):
         
 X_bkg,y_bkg,weights_bkg,event_bkg,X_sig,y_sig,weights_sig,event_sig=preprocessing.set_variables(branch_names,use_event_num=True)
 
-utils.IO.plotFolder = '/t3home/micheli/HHbbgg_ETH_20190128/HHbbgg_ETH/Training/plots/%s/'%outstr
-utils.IO.plotFolder = '/t3home/micheli/HHbbgg_ETH_20190128/HHbbgg_ETH/Training/output_files/%s'%outstr
+#utils.IO.plotFolder = '/t3home/micheli/HHbbgg_ETH_20190128/HHbbgg_ETH/Training/plots/%s/'%outstr
+#utils.IO.plotFolder = '/t3home/micheli/HHbbgg_ETH_20190128/HHbbgg_ETH/Training/output_files/%s'%outstr
+utils.IO.plotFolder = '/shome/nchernya/HHbbgg_ETH_devel/outfiles/%s'%outstr
 info_file = open(utils.IO.plotFolder+"info_%s.txt"%outstr,"w") 
 info_file.write("\n".join(branch_names))
 info_file.write("Resolution weighting : %s\n"%resolution_weighting)
