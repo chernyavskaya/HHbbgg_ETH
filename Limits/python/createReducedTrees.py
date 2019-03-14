@@ -2,7 +2,7 @@ from optparse import OptionParser, make_option
 from  pprint import pprint
 
 import os
-import sys; sys.path.append("/t3home/micheli/HHbbgg_ETH_20190128/HHbbgg_ETH/Training/python") # to load packages
+import sys; sys.path.append("/shome/nchernya/HHbbgg_ETH_devel/Training/python") # to load packages
 import training_utils as utils
 import numpy as np
 import preprocessing_utils as preprocessing
@@ -355,7 +355,7 @@ if __name__ == "__main__":
                         help="decide if you want to process or not data",
                         ),
             make_option("-f","--outputFileDir",
-                        action="store",type="string",dest="outputFileDir",default="/t3home/micheli/HHbbgg_ETH_20190128/HHbbgg_ETH/Training/output_files/",
+                        action="store",type="string",dest="outputFileDir",default="/shome/nchernya/HHbbgg_ETH_devel/outfiles/",
                         help="directory from where to load pklfile",
                         ),
             ]
