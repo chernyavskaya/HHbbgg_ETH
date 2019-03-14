@@ -27,7 +27,7 @@ def main(options,args):
 
 
     #$HOME
-    fout = ROOT.TFile.Open("/shome/nchernya/HHbbgg_ETH_devel/Limits/macros/plots/cumulatives/cumulativeTransformation_"+name+".root","recreate")
+    fout = ROOT.TFile.Open("./macros/plots/cumulatives/cumulativeTransformation_"+name+".root","recreate")
 
     nbins = 80000
     xlow = 0.
@@ -66,15 +66,15 @@ def main(options,args):
     formats = [".png",".pdf"]
 
     for format in formats:
-        c.SaveAs("/shome/nchernya/HHbbgg_ETH_devel/Limits/macros/plots/cumulatives/"+name+"_func"+format)
+        c.SaveAs("./macros/plots/cumulatives/"+name+"_func"+format)
 
     cumulativeGraph.Draw("AP")
     for format in formats:
-        c.SaveAs("/shome/nchernya/HHbbgg_ETH_devel/Limits/macros/plots/cumulatives/"+name+"_cum"+format)
+        c.SaveAs("./macros/plots/cumulatives/"+name+"_cum"+format)
 
     evalCumulatives.Draw("EP")
     for format in formats:
-        c.SaveAs("/shome/nchernya/HHbbgg_ETH_devel/Limits/macros/plots/cumulatives/"+name+"_evalx"+format)
+        c.SaveAs("./macros/plots/cumulatives/"+name+"_evalx"+format)
     
 
     cumulativeGraph.Write()
@@ -85,15 +85,15 @@ def main(options,args):
     fin.cd()
 
     processes = [
-        "reducedTree_sig" #,
-       # "reducedTree_data"
+        "reducedTree_sig",
+        "reducedTree_data"
         ]
 
-   # for i in range(2,15): #15 13+box
-   #     processes.append("reducedTree_sig_node_"+str(i))
+    for i in range(2,14): #15 13+box
+        processes.append("reducedTree_sig_node_"+str(i))
 
   #  for i in range(0,8):
-    for i in range(0,3):
+    for i in range(0,5):
         if i == 1: continue #gJets are combined in one, i==2
         processes.append("reducedTree_bkg_"+str(i))
 
