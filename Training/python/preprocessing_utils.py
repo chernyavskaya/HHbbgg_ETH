@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import root_pandas as rpd
 from ROOT import TFile, TH1F
+import copy 
 
 
 def cleanOverlapDiphotons(name,dataframe):
@@ -360,14 +361,14 @@ def get_total_test_sample(x_sig,x_bkg,splitting=0.5):
     halfSample_b = int((x_b.size/len(x_b.columns))*splitting)
     return np.concatenate([np.split(x_s,[halfSample_s])[1],np.split(x_b,[halfSample_b])[1]])
 
-def get_total_test_sample_event_num(x_sig,x_bkg,event_sig,event_bkg):
-    x_s = x_sig[np.where(event_sig%2==0)]
-    x_b = x_bkg[np.where(event_bkg%5==0)]
+def get_total_test_sample_event_num(x_sig,x_bkg,event_sig,event_bkg,sig_frac=2,bkg_frac=5):
+    x_s = x_sig[np.where(event_sig%sig_frac==0)]
+    x_b = x_bkg[np.where(event_bkg%bkg_frac==0)]
     return np.concatenate((x_s,x_b))
 
-def get_total_training_sample_event_num(x_sig,x_bkg,event_sig,event_bkg):
-    x_s = x_sig[np.where(event_sig%2!=0)]
-    x_b = x_bkg[np.where(event_bkg%5!=0)]
+def get_total_training_sample_event_num(x_sig,x_bkg,event_sig,event_bkg,sig_frac=2,bkg_frac=5):
+    x_s = x_sig[np.where(event_sig%sig_frac!=0)]
+    x_b = x_bkg[np.where(event_bkg%bkg_frac!=0)]
     return np.concatenate((x_s,x_b))
 
 
@@ -376,10 +377,38 @@ def set_signals(branch_names,shuffle,cuts='event>=0'):
     for i in range(utils.IO.nSig):
         treeName = utils.IO.signalTreeName[i]
         print "using tree:"+treeName
-        utils.IO.signal_df.append((rpd.read_root(utils.IO.signalName[i],treeName, columns = branch_names)).query(cuts))
-        define_process_weight(utils.IO.signal_df[i],utils.IO.sigProc[i],utils.IO.signalName[i],treeName)
-        utils.IO.signal_df[i]['year'] = (np.ones_like(utils.IO.signal_df[i].index)*utils.IO.sigYear[i] ).astype(np.int8)
-
+        if utils.IO.signalMixOfNodes==False :
+            utils.IO.signal_df.append((rpd.read_root(utils.IO.signalName[i],treeName, columns = branch_names)).query(cuts))
+            define_process_weight(utils.IO.signal_df[i],utils.IO.sigProc[i],utils.IO.signalName[i],treeName)
+            utils.IO.signal_df[i]['year'] = (np.ones_like(utils.IO.signal_df[i].index)*utils.IO.sigYear[i] ).astype(np.int8)
+        else : 
+            node_df = rpd.read_root(utils.IO.signalName[i],treeName, columns = branch_names).query(cuts)
+            year = ''
+            if utils.IO.sigYear[i]==1 : year='2017'
+            elif utils.IO.sigYear[i]==0 : year='2016'
+            node_name = utils.IO.signalWhichMixOfNodes[0]
+            norm_value=utils.IO.signalMixOfNodesNormalizations[year]['benchmark_%s_normalization'%node_name]
+            node_df['nodes_sumWeight']=node_df['benchmark_reweight_%s'%node_name]/norm_value
+            for num_node in range(1,len(utils.IO.signalWhichMixOfNodes)) :
+                node_name = utils.IO.signalWhichMixOfNodes[num_node]
+                norm_value=utils.IO.signalMixOfNodesNormalizations[year]['benchmark_%s_normalization'%node_name]
+                node_df['nodes_sumWeight']+=node_df['benchmark_reweight_%s'%node_name]/norm_value
+            node_df['weight'] *= node_df['nodes_sumWeight']
+            utils.IO.signal_df.append(node_df)
+           # signalMix_dataframes=[]
+           # node_df = rpd.read_root(utils.IO.signalName[i],treeName, columns = branch_names).query(cuts)
+           # for num_node,node in enumerate(utils.IO.signalWhichMixOfNodes) :
+           #     node_df_current = copy.deepcopy(node_df)
+           #     if utils.IO.sigYear[i]==1 : year='2017'
+           #     elif utils.IO.sigYear[i]==0 : year='2016'
+           #     norm_value=utils.IO.signalMixOfNodesNormalizations[year]['benchmark_%s_normalization'%node]
+           #     node_df_current['weight'] = np.multiply(node_df_current['weight'],node_df_current['benchmark_reweight_%s'%node])
+           #     node_df_current['weight'] = np.divide(node_df_current['weight'],norm_value)
+           #     signalMix_dataframes.append(node_df_current)
+           # utils.IO.signal_df.append(pd.concat([signalMix_dataframes[frame] for frame in range(0,len(signalMix_dataframes))],ignore_index=True))
+            
+            define_process_weight(utils.IO.signal_df[i],utils.IO.sigProc[i],utils.IO.signalName[i],treeName)
+            utils.IO.signal_df[i]['year'] = (np.ones_like(utils.IO.signal_df[i].index)*utils.IO.sigYear[i] ).astype(np.int8)
         if shuffle:
             utils.IO.signal_df[i]['random_index'] = np.random.permutation(range(utils.IO.signal_df[i].index.size))
             utils.IO.signal_df[i].sort_values(by='random_index',inplace=True)

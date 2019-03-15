@@ -18,6 +18,9 @@ class IO:
     xdata = "/shome/nchernya//HHbbgg_ETH_devel/Training/output_files/"
     plotFolder = os.path.expanduser("/shome/nchernya//HHbbgg_ETH_devel/Training/plots/")
     signalName = []
+    signalUseMixOfNodes = False
+    signalWhichMixOfNodes = []
+    signalMixOfNodesNormalizations = dict()
     signalTreeName = []
     backgroundName = []
     bkgTreeName = []
@@ -39,12 +42,22 @@ class IO:
     cross_sections = {}
 
     @staticmethod
+    def use_signal_nodes(useNodes,whichNodes,normalizations):
+        if useNodes :
+            IO.signalMixOfNodes = True
+            IO.signalWhichMixOfNodes = whichNodes
+            IO.signalMixOfNodesNormalizations = normalizations
+
+            
+   
+    @staticmethod
     def add_signal(ntuples,sig, proc, treeName,year=0):
         IO.signalName.append(IO.ldata+ntuples+"/"+''.join(sig))
         IO.sigProc.append(proc)
         IO.nSig+=1
         IO.signalTreeName.append(treeName)
         IO.sigYear.append(year)
+
         
     @staticmethod
     def add_background(ntuples,bkg,proc,treeName,year=0):
