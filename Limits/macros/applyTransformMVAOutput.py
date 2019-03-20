@@ -6,7 +6,8 @@ from array import array
 # -----------------------------------------------------------------------------------------------------------
 def main(options,args):
 
-    newWeight = 1.011026
+   # newWeight = 1.011026
+    newWeight = 0.974801  ## (5.0652/1852.6094)*(1./(5.5086/1964.0142))  #with reweighted to SM  
 
     ## setTDRStyle()
     ROOT.gStyle.SetOptStat(0)
@@ -23,9 +24,9 @@ def main(options,args):
    #     processes.append("reducedTree_sig_node_"+str(i))
 
   #  for i in range(0,8):
-    for i in range(0,5):
-        if i == 1: continue #gJets are combined in one, i==2
-        processes.append("reducedTree_bkg_"+str(i))
+ #   for i in range(0,5):
+  #      if i == 1: continue #gJets are combined in one, i==2
+  #      processes.append("reducedTree_bkg_"+str(i))
 
 
 
@@ -51,8 +52,9 @@ def main(options,args):
         for i,event in enumerate(copyTree):
             if i>tree.GetEntries():break
            # mva = event.HHTagger2017
-            mva = event.MVAOutput
-            if 'common_2017' in options.file:
+           # mva = event.MVAOutput
+            mva = event.HHbbggMVA
+            if '2017' in options.file:
                 mva = mva/(mva*(1.-newWeight)+newWeight)
                 transfMVA[0] = cumulativeGraph.Eval(mva)
             else :

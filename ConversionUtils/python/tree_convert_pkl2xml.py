@@ -404,8 +404,8 @@ class BDTxgboost(BDT):
 #        pprint(vars(model))
 
 #        for tree_dump in model.booster().get_dump(): #in some versions it doesn't work 
-        for i in range(3): 
-             print model._Booster.get_dump()[i]
+       # for i in range(3): 
+       #      print model._Booster.get_dump()[i]
         for tree_dump in model._Booster.get_dump(): 
             treeindex+=1
           #  if kind == "multiclass":

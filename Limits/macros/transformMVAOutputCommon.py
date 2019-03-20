@@ -33,10 +33,13 @@ def main(options,args):
     nbins = 80000
     xlow = 0.
     xup = 1.
-    newWeight = 1.011026
+    #newWeight = 1.011026  #with wrong generatd SM
+    newWeight = 0.974801  ## (5.0652/1852.6094)*(1./(5.5086/1964.0142))  #with reweighted to SM  
     histoMVA = ROOT.TH1F("histoMVA","histoMVA",nbins,xlow,xup)
-    tree.Draw("MVAOutput>>histoMVA",ROOT.TCut("weight"))
-    tree2.Draw("MVAOutput/(MVAOutput*(1-%.5f)+%.5f)>>+histoMVA"%(newWeight,newWeight),ROOT.TCut("weight*41.5/35.9"))
+   # MVAname = 'MVAOutput'
+    MVAname = 'HHbbggMVA'
+    tree.Draw("%s>>histoMVA"%MVAname,ROOT.TCut("weight"))
+    tree2.Draw("%s/(%s*(1-%.5f)+%.5f)>>+histoMVA"%(MVAname,MVAname,newWeight,newWeight),ROOT.TCut("weight*41.5/35.9"))
     print 'entries of hist = ',histoMVA.GetEntries()
 
     cumulativeHisto = histoMVA.GetCumulative()

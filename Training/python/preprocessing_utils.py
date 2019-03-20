@@ -395,17 +395,6 @@ def set_signals(branch_names,shuffle,cuts='event>=0'):
                 node_df['nodes_sumWeight']+=node_df['benchmark_reweight_%s'%node_name]/norm_value
             node_df['weight'] *= node_df['nodes_sumWeight']
             utils.IO.signal_df.append(node_df)
-           # signalMix_dataframes=[]
-           # node_df = rpd.read_root(utils.IO.signalName[i],treeName, columns = branch_names).query(cuts)
-           # for num_node,node in enumerate(utils.IO.signalWhichMixOfNodes) :
-           #     node_df_current = copy.deepcopy(node_df)
-           #     if utils.IO.sigYear[i]==1 : year='2017'
-           #     elif utils.IO.sigYear[i]==0 : year='2016'
-           #     norm_value=utils.IO.signalMixOfNodesNormalizations[year]['benchmark_%s_normalization'%node]
-           #     node_df_current['weight'] = np.multiply(node_df_current['weight'],node_df_current['benchmark_reweight_%s'%node])
-           #     node_df_current['weight'] = np.divide(node_df_current['weight'],norm_value)
-           #     signalMix_dataframes.append(node_df_current)
-           # utils.IO.signal_df.append(pd.concat([signalMix_dataframes[frame] for frame in range(0,len(signalMix_dataframes))],ignore_index=True))
             
             define_process_weight(utils.IO.signal_df[i],utils.IO.sigProc[i],utils.IO.signalName[i],treeName)
             utils.IO.signal_df[i]['year'] = (np.ones_like(utils.IO.signal_df[i].index)*utils.IO.sigYear[i] ).astype(np.int8)

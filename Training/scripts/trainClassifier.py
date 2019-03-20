@@ -27,10 +27,10 @@ def main(options,args):
   
     year=options.year
 
-    dirs = ['ntuples_2016_20191303','ntuples_2017_20191303']
+    dirs = ['ntuples_2016_20191803','ntuples_2017_20191803']
     ntuples = dirs[year]
-    SMname = ['GluGluToHHTo2B2G_12nodes_13TeV_madgraph_13TeV_DoubleHTag_0','GluGluToHHTo2B2G_12nodes_13TeV_madgraph_correctedcfg_13TeV_DoubleHTag_0']
-    NodesNormalizationFile = '/work/nchernya/HHbbgg_ETH_devel/root_files/ntuples_2016_20191303/reweighting_normalization_14_03_2019.json'
+    SMname = ['GluGluToHHTo2B2G_nodesPlusSM_13TeV_madgraph_13TeV_DoubleHTag_0','GluGluToHHTo2B2G_nodesPlusSM_13TeV_madgraph_13TeV_DoubleHTag_0']
+    NodesNormalizationFile = '/shome/nchernya/HHbbgg_ETH_devel/root_files/normalizations/reweighting_normalization_18_03_2019.json'
     useMixOfNodes = True
     whichNodes = list(np.arange(0,12,1))
     whichNodes.append('SM')
@@ -40,7 +40,7 @@ def main(options,args):
     status,files = commands.getstatusoutput('! ls $data | sort -t_ -k 3 -n')
     files=files.split('\n')    
     
-    signal = [s for s in files if ("GluGluToHHTo2B2G_12nodes_" in s) and ('merged' in s) ]
+    signal = [s for s in files if ("GluGluToHHTo2B2G_nodesPlusSM_" in s) ]
     diphotonJets = [s for s in files if "DiPhotonJetsBox_" in s]
     #diphotonJets_1B = [s for s in files if "DiPhotonJetsBox1B" in s] # will use for limits
     #diphotonJets_2B = [s for s in files if "DiPhotonJetsBox2B" in s] # will use for limits
@@ -48,8 +48,8 @@ def main(options,args):
     gJets_highPt = [s for s in files if "GJet_Pt-40" in s]
 
     utils.IO.use_signal_nodes(useMixOfNodes,whichNodes,signalMixOfNodesNormalizations)
-    #utils.IO.add_signal(ntuples,signal,1,'tagsDumper/trees/%s'%SMname[year],year)
-    utils.IO.add_signal(ntuples,signal,1,'GluGluToHHTo2B2G_12nodes_13TeV_madgraph',year)
+    utils.IO.add_signal(ntuples,signal,1,'tagsDumper/trees/%s'%SMname[year],year)
+    #utils.IO.add_signal(ntuples,signal,1,'GluGluToHHTo2B2G_12nodes_13TeV_madgraph',year)
     utils.IO.add_background(ntuples,diphotonJets,-1,'tagsDumper/trees/'+diphotonJets[0][diphotonJets[0].find('output_')+7:diphotonJets[0].find('.root')].replace('-','_')+'_13TeV_DoubleHTag_0',year)
     utils.IO.add_background(ntuples,gJets_lowPt,-2,'tagsDumper/trees/'+gJets_lowPt[0][gJets_lowPt[0].find('output_')+7:gJets_lowPt[0].find('.root')].replace('-','_')+'_13TeV_DoubleHTag_0',year)                            
     utils.IO.add_background(ntuples,gJets_highPt,-2,'tagsDumper/trees/'+gJets_highPt[0][gJets_highPt[0].find('output_')+7:gJets_highPt[0].find('.root')].replace('-','_')+'_13TeV_DoubleHTag_0',year)                           
@@ -61,7 +61,7 @@ def main(options,args):
         print "using signal file n."+str(i)+": "+utils.IO.signalName[i]
 
 
-    outstr = "15_03_2019_trainingMjj_year%s"%year
+    outstr = "19_03_2019_trainingMjj_year%s"%year
     utils.IO.plotFolder = '/mnt/t3nfs01/data01/shome/nchernya/HHbbgg_ETH_devel/Training/plots/%s/'%outstr
     if not os.path.exists(utils.IO.plotFolder):
         print utils.IO.plotFolder, "doesn't exist, creating it..."
@@ -189,12 +189,10 @@ def main(options,args):
     fpr_gJets,tpr_gJets = plotting.plot_roc_curve_multiclass_singleBkg(X_total_test,y_total_test,clf,-2,outString=outstr,weights=w_total_test)
 
 
-    roc_curve_file = open(utils.IO.plotFolder+"roc_curves_%s.txt"%outstr,"w") 
-    roc_curve_file.write("fpr_dipho :\n".join(fpr_dipho))
-    roc_curve_file.write("tpr_dipho :\n".join(tpr_dipho))
-    roc_curve_file.write("fpr_gJets: \n".join(fpr_gJets))
-    roc_curve_file.write("tpr_gJets: \n".join(tpr_gJets))
-    roc_curve_file.close()    
+    roc_df_dipho = pd.DataFrame({"fpr_dipho": (fpr_dipho).tolist(),"tpr_dipho": (tpr_dipho).tolist()})
+    roc_df_gJets = pd.DataFrame({"fpr_gJets": (fpr_gJets).tolist(),"tpr_gJets": (tpr_gJets).tolist()})
+    roc_df_dipho.to_hdf(utils.IO.plotFolder+"roc_curves_dipho_%s.h5"%outstr, key='df', mode='w')
+    roc_df_gJets.to_hdf(utils.IO.plotFolder+"roc_curves_gJets_%s.h5"%outstr, key='df', mode='w')
 
 
 if __name__ == "__main__":

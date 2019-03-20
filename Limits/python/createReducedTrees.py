@@ -12,17 +12,26 @@ import postprocessing_utils as postprocessing
 
 import pandas as pd
 import root_pandas as rpd
+import json
 
-
-#samples = ["GluGluToHHTo2B2G_node_SM","DiPhotonJetsBox_","GJet_Pt-20to40","GJet_Pt-40","DiPhotonJetsBox2BJets_","DiPhotonJetsBox1BJet_","GluGluHToGG_","VBFHToGG_","VHToGG_","ttHToGG_"]#
-samples = ["GluGluToHHTo2B2G_node_SM","DiPhotonJetsBox_","GJet_Pt-20to40","GJet_Pt-40","DiPhotonJetsBox2BJets_","DiPhotonJetsBox1BJet_"]#
-#samples = ["GluGluToHHTo2B2G_node_SM","iPhotonJetsBox_"]
 treeDir = 'tagsDumper/trees/'
+#samples = ["GluGluToHHTo2B2G_node_SM","DiPhotonJetsBox_","GJet_Pt-20to40","GJet_Pt-40","DiPhotonJetsBox2BJets_","DiPhotonJetsBox1BJet_","GluGluHToGG_","VBFHToGG_","VHToGG_","ttHToGG_"]#
+#samples = ["GluGluToHHTo2B2G_node_SM","DiPhotonJetsBox_","GJet_Pt-20to40","GJet_Pt-40","DiPhotonJetsBox2BJets_","DiPhotonJetsBox1BJet_"]#
+#samples = ["GluGluToHHTo2B2G_nodesPlusSM","DiPhotonJetsBox_","GJet_Pt-20to40","GJet_Pt-40","DiPhotonJetsBox2BJets_","DiPhotonJetsBox1BJet_"]#
+samples = ["GluGluToHHTo2B2G_nodesPlusSM","DiPhotonJetsBox_","GJet_Pt-20to40","GJet_Pt-40"]#
+#samples = ["GluGluToHHTo2B2G_12nodes","DiPhotonJetsBox_","GJet_Pt-20to40","GJet_Pt-40"]#
+cleanOverlap = True
+
+NodesNormalizationFile = '/work/nchernya/HHbbgg_ETH_devel/root_files/ntuples_2016_20191303/reweighting_normalization_14_03_2019.json'
+useMixOfNodes = True
+#whichNodes = list(np.arange(0,12,1))
+#whichNodes.append('SM')
+whichNodes = ['SM']
+signalMixOfNodesNormalizations = json.loads(open(NodesNormalizationFile).read())
 
 def addSamples():#define here the samples you want to process
     ntuples = options.ntup
     year = options.year
-   # samples = ["GluGluToHHTo2B2G_node_SM","DiPhotonJetsBox_","GJet_Pt-20to40","GJet_Pt-40","GluGluHToGG","VBFHToGG","VHToGG","bbHToGG_M-125_4FS_yb2","bbHToGG_M-125_4FS_ybyt","ttHToGG"]#is bbH correct?
     if options.ldata is not "":
         print("loading files from: "+options.ldata)
         utils.IO.ldata=options.ldata
@@ -34,6 +43,9 @@ def addSamples():#define here the samples you want to process
         process  = [s for s in files if iSample in s]
         if iSample == "GluGluToHHTo2B2G_node_SM":
             utils.IO.add_signal(ntuples,process,1,treeDir+process[0][process[0].find('output_')+7:process[0].find('.root')].replace('-','_')+'_13TeV_DoubleHTag_0',year)
+        elif (iSample == "GluGluToHHTo2B2G_nodesPlusSM") or (iSample == "GluGluToHHTo2B2G_12nodes"):
+            utils.IO.use_signal_nodes(useMixOfNodes,whichNodes,signalMixOfNodesNormalizations)
+            utils.IO.add_signal(ntuples,process,1,treeDir+process[0][process[0].find('output_')+7:process[0].find('.root')].replace('-','_')+'_13TeV_DoubleHTag_0',year)
         elif not "GJet" in str(iSample):
             print str(iSample)
             utils.IO.add_background(ntuples,process,-(samples.index(iSample)-(samples.index(iSample)>2)),treeDir+process[0][process[0].find('output_')+7:process[0].find('.root')].replace('-','_')+'_13TeV_DoubleHTag_0',year)
@@ -43,7 +55,7 @@ def addSamples():#define here the samples you want to process
     
 
     nBkg = len(utils.IO.backgroundName)
-    
+ 
     Data= [s for s in files if "DoubleEG" in s]
     #utils.IO.add_data(ntuples,Data,-10,'tree')
     dataTreeName = 'Data_13TeV_DoubleHTag_0'
@@ -66,9 +78,9 @@ def addSamples():#define here the samples you want to process
         else:
             utils.IO.add_background(ntuples,nodes[i-nBkg],-i,nodesTreeNames[i-nBkg])
 
-    for i in range(len(utils.IO.backgroundName)):        
+    for i in range(utils.IO.nBkg):        
         print "using background file n."+str(i)+": "+utils.IO.backgroundName[i]
-    for i in range(len(utils.IO.signalName)):    
+    for i in range(utils.IO.nSig):    
         print "using signal file n."+str(i)+": "+utils.IO.signalName[i]
     print "using data file: "+ utils.IO.dataName[0]
     
@@ -77,6 +89,7 @@ def addSamples():#define here the samples you want to process
 def main(options,args):
     
 
+    print options.addnodes
     addSamples()
     
     #mva variables, use noexpand for root expressions, it needs this file https://github.com/ibab/root_pandas/blob/master/root_pandas/readwrite.py
@@ -94,6 +107,12 @@ def main(options,args):
     branch_names = 'Mjj,leadingJet_DeepCSV,subleadingJet_DeepCSV,absCosThetaStar_CS,absCosTheta_bb,absCosTheta_gg,diphotonCandidatePtOverdiHiggsM,dijetCandidatePtOverdiHiggsM,customLeadingPhotonIDMVA,customSubLeadingPhotonIDMVA,leadingPhotonSigOverE,subleadingPhotonSigOverE,sigmaMOverM,PhoJetMinDr'.split(",") #set of variables March 2017 but regressed
     branch_names +=['rho']
     branch_names += 'noexpand:(leadingJet_bRegNNResolution*1.4826),noexpand:(subleadingJet_bRegNNResolution*1.4826),noexpand:(sigmaMJets*1.4826)'.split(",")
+    additionalCut_names = 'CMS_hgg_mass,Mjj,MX'.split(',')
+  #  if options.addHHTagger:
+    additionalCut_names += 'HHbbggMVA'.split(",")
+    signal_trainedOn = ['noexpand:(event%2!=0)']
+    bkg_trainedOn = ['noexpand:(event%1==0)'] #to accept all events
+    overlap = ['overlapSave']
     if not options.addData:
         branch_cuts = 'leadingJet_pt,subleadingJet_pt,leadingJet_bRegNNCorr,subleadingJet_bRegNNCorr,noexpand:(leadingJet_pt/leadingJet_bRegNNCorr),noexpand:(subleadingJet_pt/subleadingJet_bRegNNCorr)'.split(',')
         event_branches = ['event','weight','leadingJet_hflav','leadingJet_pflav','subleadingJet_hflav','subleadingJet_pflav']
@@ -104,7 +123,7 @@ def main(options,args):
     if not options.addData:
         cuts = 'leadingJet_pt>0 '
     else:
-        cuts = 'dijetCandidatePtOverdiHiggsM>0'#just because with data we don't save the raw pt (we should)
+        cuts = 'dijetCandidatePtOverdiHiggsM>0'#just because with data we don't save the raw pt (we should)  -->>What  ? (Nadya)
 ######################
 ################################################################
 
@@ -115,9 +134,10 @@ def main(options,args):
     
     
     # no need to shuffle here, we just count events
-   # preprocessing.set_signals_and_backgrounds("bbggSelectionTree",branch_names,shuffle=False)
-    #preprocessing.set_signals_and_backgrounds_drop(branch_names+branch_cuts+event_branches,False,cuts)  #############Temporary fix to drop all NAN events
-    preprocessing.set_signals_and_backgrounds(branch_names+branch_cuts+event_branches,False,cuts) 
+    nodesWeightBranches=[]
+    if utils.IO.signalMixOfNodes : nodesWeightBranches=[ 'benchmark_reweight_%s'%i for i in whichNodes ] 
+    preprocessing.set_signals(branch_names+branch_cuts+event_branches+additionalCut_names+signal_trainedOn+nodesWeightBranches,False,cuts) 
+    preprocessing.set_backgrounds(branch_names+branch_cuts+event_branches+additionalCut_names+bkg_trainedOn,False,cuts) 
    # X_bkg,y_bkg,weights_bkg,X_sig,y_sig,weights_sig=preprocessing.set_variables(branch_names+['year'])  
     X_bkg,y_bkg,weights_bkg,X_sig,y_sig,weights_sig=preprocessing.set_variables(branch_names)  
  
@@ -144,14 +164,16 @@ def main(options,args):
         
     #compute the MVA
     if not options.addHHTagger:
-        loaded_model = joblib.load(os.path.expanduser(options.outputFileDir+options.trainingVersion+'.pkl'))
-        print "loading"+options.outputFileDir+options.trainingVersion+'.pkl'
+        loaded_model = joblib.load(os.path.expanduser(options.trainingDir+options.trainingVersion+'.pkl'))
+        loaded_model._Booster.set_param('nthread', 10)
+        print "loading"+options.trainingDir+options.trainingVersion+'.pkl'
 #        print(loaded_model.get_xgb_params)
         Y_pred_sig = loaded_model.predict_proba(X_sig)[:,loaded_model.n_classes_-1].astype(np.float64)
         Y_pred_bkg = []
-        for i in range(0,len(utils.IO.backgroundName)-1):  
-            print str(i)
-            Y_pred_bkg.append(loaded_model.predict_proba(bkg[i])[:,loaded_model.n_classes_-1].astype(np.float64))
+      #  for i in range(0,len(utils.IO.backgroundName)-1):  
+      #      print str(i)
+      #      loaded_model._Booster.set_param('nthread', 10)
+      #      Y_pred_bkg.append(loaded_model.predict_proba(bkg[i])[:,loaded_model.n_classes_-1].astype(np.float64))
     
     if options.addData:
         Y_pred_data = loaded_model.predict_proba(X_data)[:,loaded_model.n_classes_-1].astype(np.float64)
@@ -163,23 +185,19 @@ def main(options,args):
    # additionalCut_names = 'noexpand:diphotonCandidate.M(),noexpand:dijetCandidate.M(),MX,isSignal,event,noexpand:dijetCandidateCorr.M(),noexpand:(event%2!=0),subleadingJet_genHadronFlavourb,leadingJet_genHadronFlavourb'.split(",")
   #  additionalCut_names = 'CMS_hgg_mass,Mjj,noexpand:(event%2!=0),noexpand:(event%5!=0)'.split(',')
   #  additionalCut_names = 'CMS_hgg_mass,Mjj,MX'.split(',')
-    additionalCut_names = 'CMS_hgg_mass,Mjj,MX,leadingJet_hflav,leadingJet_pflav,subleadingJet_hflav,subleadingJet_pflav'.split(',')
-    signal_trainedOn = ['noexpand:(event%2!=0)']
-    bkg_trainedOn = ['noexpand:(event%1==0)'] #to accept all events
-    overlap = ['overlapSave']
     #mva output
-    if options.addHHTagger:
-        additionalCut_names += 'HHTagger2017,HHTagger2017_transform'.split(",")
     outTag = options.outTag
-    outDir=os.path.expanduser("/t3home/micheli/HHbbgg_ETH_20190128/HHbbgg_ETH/Training/output_files/"+outTag)
+   # outDir=os.path.expanduser("/t3home/micheli/HHbbgg_ETH_20190128/HHbbgg_ETH/Training/output_files/"+outTag)
+    outDir=os.path.expanduser("/shome/nchernya/HHbbgg_ETH_devel/outfiles/"+outTag)
     if not os.path.exists(outDir):
         os.mkdir(outDir)
     
     branch_names+=branch_cuts
     branch_names+=event_branches
     
-    sig_count_df = (rpd.read_root(utils.IO.signalName[0],utils.IO.signalTreeName[0], columns = branch_names+additionalCut_names+signal_trainedOn)).query(cuts)
-    preprocessing.define_process_weight(sig_count_df,utils.IO.sigProc[0],utils.IO.signalName[0],utils.IO.signalTreeName[0],cleanSignal=True,cleanOverlap=True)
+   # sig_count_df = (rpd.read_root(utils.IO.signalName[0],utils.IO.signalTreeName[0], columns = branch_names+additionalCut_names+signal_trainedOn)).query(cuts)
+    sig_count_df = utils.IO.signal_df[0]
+    preprocessing.define_process_weight(sig_count_df,utils.IO.sigProc[0],utils.IO.signalName[0],utils.IO.signalTreeName[0],cleanSignal=True,cleanOverlap=cleanOverlap)
        
  
     #nTot is a multidim vector with all additional variables, dictVar is a dictionary associating a name of the variable
@@ -204,16 +222,18 @@ def main(options,args):
         postprocessing.saveTree(processPath,dictVar,nCleaned,nameTree="reducedTree_sig")
     
     ## do gJets not in the loop since they have two samples for one process, to be fixed
-    bkg_1_count_df = (rpd.read_root(utils.IO.backgroundName[1],utils.IO.bkgTreeName[1], columns = branch_names+additionalCut_names+bkg_trainedOn)).query(cuts)
-    preprocessing.define_process_weight(bkg_1_count_df,utils.IO.bkgProc[1],utils.IO.backgroundName[1],utils.IO.bkgTreeName[1],cleanSignal=True,cleanOverlap=True)
+    bkg_1_count_df = utils.IO.background_df[1]
+    #bkg_1_count_df = (rpd.read_root(utils.IO.backgroundName[1],utils.IO.bkgTreeName[1], columns = branch_names+additionalCut_names+bkg_trainedOn)).query(cuts)
+    preprocessing.define_process_weight(bkg_1_count_df,utils.IO.bkgProc[1],utils.IO.backgroundName[1],utils.IO.bkgTreeName[1],cleanSignal=True,cleanOverlap=cleanOverlap)
     
     crazySF_20=25
     nTot,dictVar = postprocessing.stackFeatures(bkg_1_count_df,branch_names+additionalCut_names+bkg_trainedOn+overlap,SF=crazySF_20)
     
     print nTot.shape
     
-    bkg_2_count_df = (rpd.read_root(utils.IO.backgroundName[2],utils.IO.bkgTreeName[2], columns = branch_names+additionalCut_names+bkg_trainedOn)).query(cuts)
-    preprocessing.define_process_weight(bkg_2_count_df,utils.IO.bkgProc[2],utils.IO.backgroundName[2],utils.IO.bkgTreeName[2],cleanSignal=True,cleanOverlap=True)
+    bkg_2_count_df = utils.IO.background_df[2]
+   # bkg_2_count_df = (rpd.read_root(utils.IO.backgroundName[2],utils.IO.bkgTreeName[2], columns = branch_names+additionalCut_names+bkg_trainedOn)).query(cuts)
+    preprocessing.define_process_weight(bkg_2_count_df,utils.IO.bkgProc[2],utils.IO.backgroundName[2],utils.IO.bkgTreeName[2],cleanSignal=True,cleanOverlap=cleanOverlap)
     
     crazySF_40=3
     nTot_2,dictVar = postprocessing.stackFeatures(bkg_2_count_df,branch_names+additionalCut_names+bkg_trainedOn+overlap,SF=crazySF_40)
@@ -251,8 +271,9 @@ def main(options,args):
             iSample = iProcess-1
         
         print "Processing sample: "+str(iProcess)
-        bkg_count_df = (rpd.read_root(utils.IO.backgroundName[iProcess],utils.IO.bkgTreeName[iProcess], columns = branch_names+additionalCut_names+bkg_trainedOn)).query(cuts)
-        preprocessing.define_process_weight(bkg_count_df,utils.IO.bkgProc[iProcess],utils.IO.backgroundName[iProcess],utils.IO.bkgTreeName[iProcess],cleanSignal=True,cleanOverlap=True)
+        bkg_count_df = utils.IO.background_df[iProcess]
+      #  bkg_count_df = (rpd.read_root(utils.IO.backgroundName[iProcess],utils.IO.bkgTreeName[iProcess], columns = branch_names+additionalCut_names+bkg_trainedOn)).query(cuts)
+        preprocessing.define_process_weight(bkg_count_df,utils.IO.bkgProc[iProcess],utils.IO.backgroundName[iProcess],utils.IO.bkgTreeName[iProcess],cleanSignal=True,cleanOverlap=cleanOverlap)
     
         crazySF=1
         ##scale diphoton + jets
@@ -333,13 +354,17 @@ if __name__ == "__main__":
                         default="allMC_resWeighting_F_noDR_minDRGJet",
                         help="MVA version to apply",
                         ),
+            make_option("-x","--trainingDir",
+                        action="store",type="string",dest="trainingDir",default="/work/nchernya/HHbbgg_ETH_devel/Training/output_files/",
+                        help="directory from where to load pklfile",
+                        ),
             make_option("-o", "--out",
                         action="store", type="string", dest="outTag",
                         default="20180108_test",
                         help="output folder name",
                         ),
             make_option("-k","--nodes",
-                        action="store_true",dest="addnodes",default=False,
+                        action="store_false",dest="addnodes",default=False,
                         help="add or not nodes",
                         ),
             make_option("-w","--reweightednodes",
@@ -360,7 +385,7 @@ if __name__ == "__main__":
                         ),
             make_option("-f","--outputFileDir",
                         action="store",type="string",dest="outputFileDir",default="/shome/nchernya/HHbbgg_ETH_devel/outfiles/",
-                        help="directory from where to load pklfile",
+                        help="directory where to save output trees",
                         ),
             ]
                           )
