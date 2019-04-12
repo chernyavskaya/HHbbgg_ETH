@@ -61,7 +61,7 @@ def main(options,args):
         print "using signal file n."+str(i)+": "+utils.IO.signalName[i]
 
 
-    outstr = "19_03_2019_trainingMjj_year%s"%year
+    outstr = "05_04_2019_trainingMjj_year%s"%year
     utils.IO.plotFolder = '/mnt/t3nfs01/data01/shome/nchernya/HHbbgg_ETH_devel/Training/plots/%s/'%outstr
     if not os.path.exists(utils.IO.plotFolder):
         print utils.IO.plotFolder, "doesn't exist, creating it..."
@@ -170,12 +170,18 @@ def main(options,args):
     n_threads=10
 
     #optimized parameters with Mjj for 2016 done by Francesco
-    clf = xgb.XGBClassifier(base_score=0.5, colsample_bylevel=1, colsample_bytree=1,
-           gamma=0, learning_rate=0.1, max_delta_step=0, max_depth=15,
-           min_child_weight=1e-06,  n_estimators=2000,
-           nthread=n_threads, objective='multi:softprob', reg_alpha=0.0,
-           reg_lambda=0.05, scale_pos_weight=1, seed=None, silent=True,
-           subsample=1)
+    #clf = xgb.XGBClassifier(base_score=0.5, colsample_bylevel=1, colsample_bytree=1,
+    #       gamma=0, learning_rate=0.1, max_delta_step=0, max_depth=15,
+    #       min_child_weight=1e-06,  n_estimators=2000,
+    #       nthread=n_threads, objective='multi:softprob', reg_alpha=0.0,
+    #       reg_lambda=0.05, scale_pos_weight=1, seed=None, silent=True,
+    #       subsample=1)
+    clf = xgb.XGBClassifier(base_score=0.5, booster='gbtree', colsample_bylevel=1,
+       colsample_bytree=1, gamma=0, learning_rate=0.2, max_delta_step=0,
+       max_depth=3, min_child_weight=0.0001, 
+       n_estimators=1000, n_jobs=1, nthread=n_threads, objective='binary:logistic',
+       random_state=0, reg_alpha=0.0, reg_lambda=0.05, scale_pos_weight=1,
+       seed=0, silent=True, subsample=1)
 
     clf.fit(X_total_train,y_total_train, sample_weight=w_total_train)
     

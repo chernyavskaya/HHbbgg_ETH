@@ -8,7 +8,6 @@ import copy
 
 
 def cleanOverlapDiphotons(name,dataframe):
-    dataframe['overlapSave']  = np.ones_like(dataframe.index).astype(np.int8)
     if ('DiPhotonJetsBox_MGG' in name) : 
       #for data this wont be called anyway
       for index, df in dataframe.iterrows(): 
@@ -57,6 +56,7 @@ def define_process_weight(df,proc,name,treename='bbggSelectionTree',cleanSignal=
         else:
             df['weight']=w
 
+    df['overlapSave']  = np.ones_like(df.index).astype(np.int8)
     if cleanOverlap : cleanOverlapDiphotons(name,df)
  
 

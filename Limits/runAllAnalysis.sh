@@ -1,21 +1,21 @@
 #!/bin/bash
 
 # A POSIX variable
-OPTIND=1         # Reset in case getopts has been used previously in the shell.
+OPTIND=0         # Reset in case getopts has been used previously in the shell.
 
 # Initialize our own variables:
-ntup="ntuples_2017_20191303_test"
-#ntup="ntuples_2016_20191303_appliedMVA"
-#ntup="ntuples_2017_20191303_appliedMVA"
+year=1 #0 for 2016, 1 for 2017
+ntup="ntuples_2017_20192103"
+#ntup="ntuples_2017_20192103"
 addHHTagger=0  #0 if you want to add it, 1 if it is already present
 #training="training_with_27_06_2018_newcode_v2"  #new code with fixed selection of jets
 #training="training_with_01_10_2018_deepCSV" #deep CSV
 #training="training_with_10_12_2018_commonTraining_2016" #deep CSV
-training="training_with_15_03_2019_trainingMjj_year1" #deep CSV
 
-#outTag="20190318_2016"
-outTag="20190313_2017_test2"
-year=0 #0 for 2016, 1 for 2017
+#training="training_with_19_03_2019_trainingMjj_year"$year #deep CSV
+training="training_with_05_04_2019_trainingMjj_year"$year #deep CSV
+
+outTag="20190321_2017_smallBDT"
 
 while getopts ":n:at:o:" opt; do
     case "${opt}" in
@@ -35,9 +35,10 @@ shift $((OPTIND-1))
 
 ####create Trees
 if ((addHHTagger)); then
-    python /mnt/t3nfs01/data01/shome/nchernya//HHbbgg_ETH_devel/Limits/python/createReducedTrees.py -n $ntup -t $training  -o $outTag -a -y $year 
+    #python /mnt/t3nfs01/data01/shome/nchernya//HHbbgg_ETH_devel/Limits/python/createReducedTrees.py -n $ntup -t $training  -o $outTag -a -y $year  -d 1  #with data
+    python /mnt/t3nfs01/data01/shome/nchernya//HHbbgg_ETH_devel/Limits/python/createReducedTrees.py -n $ntup -t $training  -o $outTag -a -y $year  
 else
-    python /mnt/t3nfs01/data01/shome/nchernya//HHbbgg_ETH_devel/Limits/python/createReducedTrees.py -n $ntup -t $training  -o $outTag -y $year -k 0
+    python /mnt/t3nfs01/data01/shome/nchernya//HHbbgg_ETH_devel/Limits/python/createReducedTrees.py -n $ntup -t $training  -o $outTag -y $year -k 0 
 fi
     
 ####transform MVA output

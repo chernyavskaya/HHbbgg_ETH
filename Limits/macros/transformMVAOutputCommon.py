@@ -13,8 +13,10 @@ def main(options,args):
     files = options.file.split(',') 
     fin = ROOT.TFile.Open(files[0])
     fin2 = ROOT.TFile.Open(files[1])
-    tree = fin.Get("reducedTree_sig") #2016
-    tree2 = fin2.Get("reducedTree_sig") #2017
+  #  tree = fin.Get("reducedTree_sig") #2016
+  #  tree2 = fin2.Get("reducedTree_sig") #2017
+    tree = fin.Get("reducedTree") #2016
+    tree2 = fin2.Get("reducedTree") #2017
 
     for nameTagPos,s in enumerate(files[0].split("/")):
         print nameTagPos, s
@@ -34,10 +36,10 @@ def main(options,args):
     xlow = 0.
     xup = 1.
     #newWeight = 1.011026  #with wrong generatd SM
-    newWeight = 0.974801  ## (5.0652/1852.6094)*(1./(5.5086/1964.0142))  #with reweighted to SM  
+    newWeight = 1.02309  ## (0.398279/1852.6094)*(1./(0.412699/1964.0142))  #with reweighted to SM  
     histoMVA = ROOT.TH1F("histoMVA","histoMVA",nbins,xlow,xup)
-   # MVAname = 'MVAOutput'
-    MVAname = 'HHbbggMVA'
+    MVAname = 'MVAOutput'   ###BE CAREFUL, Make sure you use the corerct name
+  #  MVAname = 'HHbbggMVA'
     tree.Draw("%s>>histoMVA"%MVAname,ROOT.TCut("weight"))
     tree2.Draw("%s/(%s*(1-%.5f)+%.5f)>>+histoMVA"%(MVAname,MVAname,newWeight,newWeight),ROOT.TCut("weight*41.5/35.9"))
     print 'entries of hist = ',histoMVA.GetEntries()

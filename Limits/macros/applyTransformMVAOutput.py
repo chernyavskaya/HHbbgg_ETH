@@ -7,7 +7,7 @@ from array import array
 def main(options,args):
 
    # newWeight = 1.011026
-    newWeight = 0.974801  ## (5.0652/1852.6094)*(1./(5.5086/1964.0142))  #with reweighted to SM  
+    newWeight = 1.02309  ## (0.398279/1852.6094)*(1./(0.412699/1964.0142))  #with reweighted to SM  
 
     ## setTDRStyle()
     ROOT.gStyle.SetOptStat(0)
@@ -16,8 +16,10 @@ def main(options,args):
     cumulativeGraph = fin_graph.Get("cumulativeGraph")
 
     processes = [
-        "reducedTree_sig" #,
-       # "reducedTree_data"
+      #  "reducedTree" #,
+      #  "reducedTree_sig" #,
+      #  "reducedTree_sig_2017" #,
+        "reducedTree_data"
         ]
 
    # for i in range(2,15): #15 13+box
@@ -25,8 +27,10 @@ def main(options,args):
 
   #  for i in range(0,8):
  #   for i in range(0,5):
+    for i in range(0,0):
   #      if i == 1: continue #gJets are combined in one, i==2
-  #      processes.append("reducedTree_bkg_"+str(i))
+       # processes.append("reducedTree_bkg_"+str(i))
+        processes.append("reducedTree_bkg_"+str(i)+"_2017")
 
 
 
