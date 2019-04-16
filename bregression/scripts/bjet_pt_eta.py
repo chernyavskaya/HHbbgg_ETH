@@ -9,13 +9,13 @@ gStyle.SetPadRightMargin(0.04)
 gStyle.SetPadLeftMargin(0.15)
 
 what ='Jet_pt'
-what ='target'
+#what ='target'
 what_name=''
 if what=='Jet_pt' :  
 	bins=100
 	xmin=0
 	xmax=1200
-	what_name = 'p_{T} (GeV)'
+	what_name = 'p_{T}^{reco} (GeV)'
 if what=='Jet_eta' :
 	bins=50
 	xmin=-5
@@ -68,7 +68,7 @@ t = f.Get("tree")
 hist = ROOT.TH1F("hist","hist",bins,xmin,xmax)
 hist.SetLineWidth(2)
 c = ROOT.TCanvas("c","c",900,900)
-#c.SetLogy() # for pt
+c.SetLogy() # for pt
 #c.SetBottomMargin(0.3)
 #cuts='(Jet_pt > 20) & (Jet_mcFlavour==5 | Jet_mcFlavour==-5) & (Jet_eta<2.5 & Jet_eta>-2.5) & (Jet_mcPt>0) & (Jet_mcPt<6000)'
 cuts='(Jet_pt > 20) & (Jet_mcFlavour==5 | Jet_mcFlavour==-5) & (Jet_mcPt>0) & (Jet_mcPt<6000)'
@@ -81,9 +81,9 @@ frame.GetYaxis().SetTitle("A.U.")
 frame.GetYaxis().SetLabelSize(0.04)
 hist.Scale(1./hist.Integral())
 #frame.GetYaxis().SetRangeUser(1e-01,hist.GetMaximum()*30) #pt
-#frame.GetYaxis().SetRangeUser(1e-08,hist.GetMaximum()*30) #pt norm
+frame.GetYaxis().SetRangeUser(1e-08,hist.GetMaximum()*30) #pt norm
 #frame.GetYaxis().SetRangeUser(1e-01,hist.GetMaximum()*1.05) #target
-frame.GetYaxis().SetRangeUser(1e-03,hist.GetMaximum()*1.05) #target norm
+#frame.GetYaxis().SetRangeUser(1e-03,hist.GetMaximum()*1.05) #target norm
 frame.Draw()
 pCMS1.Draw()
 pCMS12.Draw()
