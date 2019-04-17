@@ -409,7 +409,7 @@ def set_data(branch_names,cuts='event>=0'):
     treeName = utils.IO.dataTreeName[0]
     utils.IO.data_df.append((rpd.read_root(utils.IO.dataName[0],treeName, columns = branch_names)).query(cuts))
     utils.IO.data_df[0]['proc'] =  ( np.ones_like(utils.IO.data_df[0].index)*utils.IO.dataProc[0] ).astype(np.int8)
-    utils.IO.data_df[i]['year'] = (np.ones_like(utils.IO.data_df[i].index)*utils.IO.dataYear[i] ).astype(np.int8)
+    utils.IO.data_df[0]['year'] = (np.ones_like(utils.IO.data_df[0].index)*utils.IO.dataYear[0] ).astype(np.int8)
 
     if treeName=='bbggSelectionTree':
        input_df=rpd.read_root(utils.IO.dataName[0],treeName, columns = ['isSignal'])

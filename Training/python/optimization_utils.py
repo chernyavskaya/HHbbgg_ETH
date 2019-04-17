@@ -64,7 +64,7 @@ def optimize_parameters_randomizedCV(classifier,X_total_train,y_total_train,para
   #  if weights == None: X_train, X_test, y_train, y_test = train_test_split(X_total_train, y_total_train)
   #  else  : X_train, X_test, y_train, y_test, weights_train, weights_test = train_test_split(X_total_train, y_total_train,weights)
     
-    if weights == None:
+    if weights.all() == None:
         clf = model_selection.RandomizedSearchCV(classifier,
                                    param_grid,
                                    n_iter=nIter,
