@@ -20,18 +20,20 @@ treeDir = 'tagsDumper/trees/'
 #samples = ["GluGluToHHTo2B2G_nodesPlusSM","DiPhotonJetsBox_","GJet_Pt-20to40","GJet_Pt-40","DiPhotonJetsBox2BJets_","DiPhotonJetsBox1BJet_"]#
 #samples = ["GluGluToHHTo2B2G_nodesPlusSM"]#
 #samples = ["GluGluToHHTo2B2G_nodesPlusSM","DiPhotonJetsBox_","DiPhotonJetsBox2BJets_","DiPhotonJetsBox1BJet_"]#
-samples = ["GluGluToHHTo2B2G_nodesPlusSM","DiPhotonJetsBox_"]#
+#samples = ["GluGluToHHTo2B2G_nodesPlusSM","DiPhotonJetsBox2BJets_"]#
+samples = ["GluGluToHHTo2B2G_nodesPlusSM","DiPhotonJetsBox1BJet_"]#
+#samples = ["GluGluToHHTo2B2G_nodesPlusSM","DiPhotonJetsBox_"]#
 #samples = ["GluGluToHHTo2B2G_12nodes","DiPhotonJetsBox_","GJet_Pt-20to40","GJet_Pt-40"]#
-cleanOverlap = False   # Do not forget to change it 
+cleanOverlap = True   # Do not forget to change it 
 #treeTag="_2017"
 treeTag=""
 
 NodesNormalizationFile = '/work/nchernya/HHbbgg_ETH_devel/root_files/normalizations/reweighting_normalization_18_03_2019.json'
 useMixOfNodes = True
 #whichNodes = list(np.arange(0,12,1)) 
-#whichNodes = [1,2,3,6,8] #nodes similar to SM in shape of MX, used for categories optimization
-#whichNodes.append('SM')   
-whichNodes = ['SM']  #used to create cumulative on SM only
+whichNodes = [1,2,3,6,8] #nodes similar to SM in shape of MX, used for categories optimization
+whichNodes.append('SM')   
+#whichNodes = ['SM']  #used to create cumulative on SM only
 signalMixOfNodesNormalizations = json.loads(open(NodesNormalizationFile).read())
 
 def addSamples():#define here the samples you want to process
@@ -51,15 +53,19 @@ def addSamples():#define here the samples you want to process
         elif (iSample == "GluGluToHHTo2B2G_nodesPlusSM") or (iSample == "GluGluToHHTo2B2G_12nodes"):
             utils.IO.use_signal_nodes(useMixOfNodes,whichNodes,signalMixOfNodesNormalizations)
             utils.IO.add_signal(ntuples,process,1,treeDir+process[0][process[0].find('output_')+7:process[0].find('.root')].replace('-','_')+'_13TeV_DoubleHTag_0',year)
-        elif not "GJet" in str(iSample):
-            print str(iSample)
-            utils.IO.add_background(ntuples,process,-(samples.index(iSample)-(samples.index(iSample)>2)),treeDir+process[0][process[0].find('output_')+7:process[0].find('.root')].replace('-','_')+'_13TeV_DoubleHTag_0',year)
-        else:
+        elif "GJet" in str(iSample):
             utils.IO.add_background(ntuples,process,-2,treeDir+process[0][process[0].find('output_')+7:process[0].find('.root')].replace('-','_')+'_13TeV_DoubleHTag_0',year)
+        elif "DiPhotonJetsBox" in str(iSample):
+            print str(iSample)
+            utils.IO.add_background(ntuples,process,-1,treeDir+process[0][process[0].find('output_')+7:process[0].find('.root')].replace('-','_')+'_13TeV_DoubleHTag_0',year)
+        else:
+            print str(iSample)
+            utils.IO.add_background(ntuples,process,-(samples.index(iSample)-(samples.index(iSample)>2)),treeDir+process[0][process[0].find('output_')+7:process[0].find('.root')].replace('-','_')+'_13TeV_DoubleHTag_0',year)   ## This was is not perfect, only works if gg jets, g jets are present and after that single higgs. it does not work if bjets present...
 
     
 
     nBkg = len(utils.IO.backgroundName)
+    print utils.IO.backgroundName
  
     Data= [s for s in files if "DoubleEG" in s]
     #utils.IO.add_data(ntuples,Data,-10,'tree')
@@ -167,7 +173,10 @@ def main(options,args):
     from sklearn.externals import joblib
     
     bkg = []
-    for i in range(0,len(utils.IO.backgroundName)-1): 
+   # for i in range(0,len(utils.IO.backgroundName)-1): 
+    numProcs = 1
+    if  (any("GJet" in s for s in samples)) : numProcs = 2  
+    for i in range(0,numProcs):   # -1 : gg+jets, -2 : g +jets 
         bkg.append(X_bkg[y_bkg ==-i-1])
     
         
@@ -181,13 +190,11 @@ def main(options,args):
         if options.addData:
             Y_pred_data = loaded_model.predict_proba(X_data)[:,loaded_model.n_classes_-1].astype(np.float64)
             #print Y_pred_data 
-        Y_pred_sig = loaded_model.predict_proba(X_sig)[:,loaded_model.n_classes_-1].astype(np.float64)
         Y_pred_bkg = []
-        for i in range(0,len(utils.IO.backgroundName)-1):  
+        for i in range(0,len(utils.IO.backgroundName)):  
             print str(i)
-            loaded_model._Booster.set_param('nthread', 10)
             Y_pred_bkg.append(loaded_model.predict_proba(bkg[i])[:,loaded_model.n_classes_-1].astype(np.float64))
-    
+        Y_pred_sig = loaded_model.predict_proba(X_sig)[:,loaded_model.n_classes_-1].astype(np.float64)
     
     
     
@@ -328,19 +335,23 @@ def main(options,args):
         print nCleaned.shape
     
     #    processPath=os.path.expanduser('~/HHbbgg_ETH_devel/output_files/')+outTag+'/'+utils.IO.backgroundName[iProcess].split("/")[len(utils.IO.backgroundName[7].split("/"))-1].replace("output_","").replace(".root","")+"_preselection"+".root"
-        processPath=os.path.expanduser(options.outputFileDir)+outTag+'/'+utils.IO.backgroundName[iProcess].split("/")[len(utils.IO.backgroundName[(len(samples)-3)].split("/"))-1].replace("output_","").replace(".root","")+"_preselection"+".root"
+        bkgName_idx = len(samples)-3
+        print 'bkg Index : ',bkgName_idx 
+        print Y_pred_bkg
+      #  if not (any("GJet" in s for s in samples)):  bkgName_idx = len(samples)-1
+        processPath=os.path.expanduser(options.outputFileDir)+outTag+'/'+utils.IO.backgroundName[iProcess].split("/")[len(utils.IO.backgroundName[bkgName_idx].split("/"))-1].replace("output_","").replace(".root","")+"_preselection"+".root"
         if not options.addHHTagger:
             postprocessing.saveTree(processPath,dictVar,nCleaned,Y_pred_bkg[iSample])
         else:
             postprocessing.saveTree(processPath,dictVar,nCleaned)
         
        # processPath=os.path.expanduser('~/HHbbgg_ETH_devel/output_files/')+outTag+'/'+utils.IO.backgroundName[iProcess].split("/")[len(utils.IO.backgroundName[7].split("/"))-1].replace("output_","").replace(".root","")+"_preselection_diffNaming"+".root"
-        processPath=os.path.expanduser(options.outputFileDir)+outTag+'/'+utils.IO.backgroundName[iProcess].split("/")[len(utils.IO.backgroundName[(len(samples)-3)].split("/"))-1].replace("output_","").replace(".root","")+"_preselection_diffNaming"+".root"
+        processPath=os.path.expanduser(options.outputFileDir)+outTag+'/'+utils.IO.backgroundName[iProcess].split("/")[len(utils.IO.backgroundName[bkgName_idx].split("/"))-1].replace("output_","").replace(".root","")+"_preselection_diffNaming"+".root"
         if options.addrew and "reweighted_nodes"in processPath:
             processPath = processPath.replace("reweighted_nodes_","reweighted_node_"+str(iProcess-(len(samples)-3)))
         if "GluGluToHHTo2B2G_reweighted_node"in processPath and options.addrew:
          #   treeName = "reducedTree_sig_node_"+str(iProcess-7)
-            treeName = "reducedTree_sig_node_"+str(iProcess-(len(samples)-3))+treeTag
+            treeName = "reducedTree_sig_node_"+str(iProcess-(bkgName_idx))+treeTag
         else:
             treeName = "reducedTree_bkg_"+str(iProcess)+treeTag
 

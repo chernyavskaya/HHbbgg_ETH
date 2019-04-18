@@ -18,8 +18,8 @@ def main(options,args):
     processes = [
       #  "reducedTree" #,
       #  "reducedTree_sig" #,
-      #  "reducedTree_sig_2017" #,
-        "reducedTree_data"
+        "reducedTree_sig_2017" #,
+      #  "reducedTree_data"
         ]
 
    # for i in range(2,15): #15 13+box
@@ -27,9 +27,9 @@ def main(options,args):
 
   #  for i in range(0,8):
  #   for i in range(0,5):
-    for i in range(0,0):
+    for i in range(0,1):
   #      if i == 1: continue #gJets are combined in one, i==2
-       # processes.append("reducedTree_bkg_"+str(i))
+      #  processes.append("reducedTree_bkg_"+str(i))
         processes.append("reducedTree_bkg_"+str(i)+"_2017")
 
 
@@ -56,8 +56,8 @@ def main(options,args):
         for i,event in enumerate(copyTree):
             if i>tree.GetEntries():break
            # mva = event.HHTagger2017
-           # mva = event.MVAOutput
-            mva = event.HHbbggMVA
+            mva = event.MVAOutput
+           # mva = event.HHbbggMVA
             if '2017' in options.file:
                 mva = mva/(mva*(1.-newWeight)+newWeight)
                 transfMVA[0] = cumulativeGraph.Eval(mva)
