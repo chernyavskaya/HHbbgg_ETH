@@ -19,7 +19,7 @@ cd $MYBATCHDIR
 
 #xrdfs t3se01.psi.ch rm  /store/user/nchernya/HHbbgg/b_regression/ttbar_2017_nanoAOD_v3_newJEC/${4}_RegressionPerJet_nanoAOD_2017_${3}.root
 
-xrdcp -f $TMPDIR/${4}_RegressionPerJet_nanoAOD_2018_${3}.root  root://t3dcachedb.psi.ch:1094//pnfs/psi.ch/cms/trivcat//store/user/nchernya/HHbbgg/b_regression/ttbar_2018_16April2019/
+xrdcp -f $TMPDIR/${4}_RegressionPerJet_nanoAOD_2018_JECv8_${3}.root  root://t3dcachedb.psi.ch:1094//pnfs/psi.ch/cms/trivcat//store/user/nchernya/HHbbgg/b_regression/ttbar_2018_nanoAOD_JECv8/
 
 #$ -o /mnt/t3nfs01/data01/shome/nchernya/batch_logs/
 #$ -e /mnt/t3nfs01/data01/shome/nchernya/batch_logs/

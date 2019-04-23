@@ -8,8 +8,7 @@ cd $WORKDIR
 #num=1
 #max=1000
 num=1001
-max=1572
-#max=1000
+max=1597
 name=TTbar_nanoAOD
 
 #counter=0
@@ -19,7 +18,7 @@ do
 
 #	num2=$(( $num + 1 ))
 	num2=$(( $num + 10 ))
-	qsub -q all.q batch.sh $num $num2 $counter $name 
+	qsub -q all.q batch_1.sh $num $num2 $counter $name 
 	sleep 2 
 
 	echo $num $counter
