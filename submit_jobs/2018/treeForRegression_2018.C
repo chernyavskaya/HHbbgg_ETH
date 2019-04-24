@@ -50,7 +50,7 @@ TString name = argv[4];
 //	TString inputfilename = "/mnt/t3nfs01/data01/shome/nchernya/HHbbgg_ETH_devel/submit_jobs/2017/";
 //	TString inputfilename = "root://xrootd-cms.infn.it///store/user/arizzi/NanoRegression2/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/RunIIFall17MiniAODV2-NanoRegr2__017_realistic_v14-v1/180506_192512/0000/";
 //	TString inputfilename = "root://xrootd-cms.infn.it////store/user/arizzi/NanoRegression2/TTToHadronic_TuneCP5_13TeV-powheg-pythia8/RunIIFall17MiniAODV2-NanoRegr2__017_realistic_v14-v1/180508_083758/0000/";
-	TString inputfilename = "root://xrootd-cms.infn.it//store/user/legianni/Nanos_regInputs18/TTToHadronic_TuneCP5_13TeV-powheg-pythia8/NANO_withRegInputs/190417_190934/0001/";
+	TString inputfilename = "root://xrootd-cms.infn.it//store/user/legianni/Nanos_regInputs18/TTToHadronic_TuneCP5_13TeV-powheg-pythia8/NANO_withRegInputs/190417_190934/0000/";
 
 	TChain *tree=new TChain("Events");
    TString full_file_name="";
@@ -198,7 +198,7 @@ TString name = argv[4];
 	TString outname ;
    outname.Form("%d",fileout);
 //	TFile *outfile=new TFile(name+"_RegressionPerJet_heppy_energyRings3_forTraining_Large"+outname+"_unweighted.root", "recreate");
-	TFile *outfile=new TFile(name+"_RegressionPerJet_nanoAOD_2018_JECv8"+outname+".root", "recreate");
+	TFile *outfile=new TFile(name+"_RegressionPerJet_nanoAOD_2018_JECv8_"+outname+".root", "recreate");
 	int Jet_vtxNtrk;
 	Int_t Jet_puId_, Jet_id_;
 	float  Jet_mass_,Jet_corr_, Jet_e_, rho_, Jet_pt_,Jet_pt_reg_,Jet_eta_,Jet_phi_, Jet_leptonPtRel_,Jet_leptonPtRelnanoAOD_,Jet_leptonDeltaR_,Jet_leptonPt_, Jet_muEF_, Jet_leadTrackPt_, Jet_chHEF_, Jet_chEmEF_, Jet_neHEF_, Jet_neEmEF_, Jet_vtx3dL_, Jet_vtx3deL_, Jet_chMult_, Jet_nhMult_,Jet_mcPt_, Jet_mcEta_, Jet_mcPhi_, Jet_mcM_,  Jet_csv_, Jet_flavor_,  met_pt_, met_phi_, Jet_mcFlavour_,  Jet_met_dPhi_, Jet_mcE_, Jet_btagCMVA_, Jet_btagDeepC_,Jet_btagDeepB_, Jet_mt_, Jet_vtxMass_, Jet_vtx3dL, Jet_vtx3deL, Jet_vtxPt_, dR_, Jet_mcPtq_, Jet_corr_JER_,Jet_corr_JEC_, Jet_corr_JEC1_,Jet_corr_JEC2_,Jet_corr_JEC3_, Jet_rawPtAfterSmearing_,Jet_ptd_,Jet_axis2_,Jet_leptonPdgId_, Jet_leptonPtRelInv_;
