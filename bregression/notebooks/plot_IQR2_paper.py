@@ -70,8 +70,8 @@ parser = OptionParser(option_list=[
 input_trainings = options.training.split(',')
 
 now = str(datetime.datetime.now()).split(' ')[0]
-#scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/noJEC/March6/'   #for studies
-scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/LegacyJECv11_06_03_2019/March7/'   #for studies
+scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/2018JECv8/April25/'   #for studies
+savetag='April25'
 #scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/February25/'  #for paper
 #dirs=['',input_trainings[0],options.samplename]
 dirs=['',options.samplename]
@@ -79,8 +79,6 @@ for i in range(len(dirs)):
   scratch_plots=scratch_plots+'/'+dirs[i]+'/'
   if not os.path.exists(scratch_plots):
     os.mkdir(scratch_plots)
-#savetag='Feb25'
-savetag='March7'
  
 
 # ## Read test data and model
@@ -112,7 +110,7 @@ where = (options.where).replace(' ','').replace('<','_').replace('>','_').replac
 
 whats = ['p_T (GeV)','\eta','\\rho (GeV)']
 whats_root = ['p_{T} (GeV)','#eta','#rho (GeV)']
-ranges = [[30,400],[-3,3],[0,50]]
+ranges = [[30,400],[-3,3],[0,40]]
 binning =[50,10,20] #[50,20]
 for i in range(0,3):
 #for i in range(2,3):
@@ -218,6 +216,7 @@ for i in range(0,3):
  frame.GetYaxis().SetRangeUser(ymin,ymax*1.1)
  frame.GetYaxis().SetRangeUser(0.85,1.35)
  if ('p_T') in whats[i] and 'HHbbgg' in options.samplename: frame.GetXaxis().SetLimits(30, 350)
+ if ('p_T') in whats[i] and 'ttbar' in options.samplename: frame.GetXaxis().SetLimits(0, 350)
  if ('rho') in whats[i] and 'ttbar' in options.samplename: frame.GetXaxis().SetLimits(0, 45)
  if ('eta') in whats[i] and 'ttbar' in options.samplename: frame.GetXaxis().SetLimits(-3.2, 3.2)
  frame.Draw()
@@ -233,8 +232,8 @@ for i in range(0,3):
 # leg = ROOT.TLegend(0.6,0.75,0.9,0.9)
  leg.AddEntry(gr25,"Baseline" ,"L")
  leg.AddEntry(grcorr25,"DNN" ,"L")
- leg.AddEntry(grmean,"Baseline average" ,"L")
- leg.AddEntry(grcorrmean,"DNN average" ,"L")
+# leg.AddEntry(grmean,"Baseline average" ,"L")
+# leg.AddEntry(grcorrmean,"DNN average" ,"L")
  leg.SetFillStyle(-1)
  leg.SetBorderSize(0)
  leg.SetTextFont(42)

@@ -18,7 +18,7 @@ parser = OptionParser(option_list=[
     make_option("--inp-dir",type='string',dest="inp_dir",default='/work/nchernya/HHbbgg_ETH_devel/bregression/output_files/NN_psi_training/'),
     make_option("--inp-file",type='string',dest='inp_file',default='metrics'),
     #make_option("--out-dir",type='string',dest="out_dir",default='/users/nchernya//HHbbgg_ETH/bregression/plots/NN_epochs/'),
-    make_option("--out-dir",type='string',dest="out_dir",default='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/noJEC/March6/'), 
+    make_option("--out-dir",type='string',dest="out_dir",default='/work/nchernya/HHbbgg_ETH_devel/bregression/plots/2018JECv8/April25/training/'), 
     make_option("--metrics",type='string',dest="metrics",default='loss,mae0,mse0'),
     make_option("--nxval",type='int',dest="nxval",default=1),
 ])
@@ -65,6 +65,8 @@ for idx,met in enumerate(input_metrics):
         dataframe['mean_%i'%idx_nn] = mean[:,dictVar['val_%s'%met]]
         rolling_mean = dataframe['mean_%i'%idx_nn].rolling(window=5).mean()
         rolling_std = dataframe['mean_%i'%idx_nn].rolling(window=5).std()
+      #  rolling_mean = dataframe['mean_%i'%idx_nn].rolling(window=2).mean()
+      #  rolling_std = dataframe['mean_%i'%idx_nn].rolling(window=2).std()
         plt.plot(rolling_mean.index,rolling_mean,linestyle='--',label='',color=colors[idx_nn])
         plt.fill_between(rolling_std.index, rolling_mean-rolling_std, rolling_mean+rolling_std, color=colors[idx_nn], alpha=0.2)
      #   plt.plot(mean[:,dictVar['epoch']],mean[:,dictVar['val_%s'%met]],linestyle='-',label='Validation %s'%nn,color=colors[idx_nn])

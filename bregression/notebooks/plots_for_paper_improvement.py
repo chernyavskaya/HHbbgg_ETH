@@ -73,7 +73,8 @@ input_files = options.inp_file.split(',')
 
 
 now = str(datetime.datetime.now()).split(' ')[0]
-scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/LegacyJECv11_06_03_2019/March7/'   #for studies
+savetag='April25'
+scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/2017JECv32/April25/'   #for studies
 #scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/February25/' #for paper
 #dirs=['',input_trainings[0],options.samplename]
 dirs=['',options.samplename]
@@ -81,8 +82,6 @@ for i in range(len(dirs)):
   scratch_plots=scratch_plots+'/'+dirs[i]+'/'
   if not os.path.exists(scratch_plots):
     os.mkdir(scratch_plots)
-#savetag='March6_noJEC_training'
-savetag='March7'
 
 
 print(options.where)
@@ -178,7 +177,7 @@ for i in range(0,3):
 ########################inclusive#############
     inclusive = np.percentile(y,quantiles*100.,axis=0).reshape(-1,1) 
     sigma_mu_inclusive = np.array(0.5*(inclusive[3]-inclusive[0]))/np.array(inclusive[1])
-    print 'printing inclusive : ',sigma_mu_inclusive,' [0] : ',sigma_mu_inclusive[0]
+  #  print 'printing inclusive : ',sigma_mu_inclusive,' [0] : ',sigma_mu_inclusive[0]
 ##############################################
     improvement_inclusive = (np.array(sigma_mu_corr_inclusive[0])-np.array(sigma_mu_inclusive[0]))/(np.array(sigma_mu_inclusive[0]))
     print('inclusive improvement : ',improvement_inclusive)
@@ -214,9 +213,9 @@ for i in range(0,3):
  #if (i==0) : axes.set_ylim(0.02,0.3)
  if (i==0) : axes.set_ylim(0.02,0.25)
 # if (i==1) : axes.set_ylim(0.06,0.15)
- if (i==1) : axes.set_ylim(0.08,0.16)
-# if (i==2) : axes.set_ylim(0.08,0.17)
- if (i==2) : axes.set_ylim(0.08,0.25)
+ if (i==1) : axes.set_ylim(0.08,0.17)
+ if (i==2) : axes.set_ylim(0.08,0.17)
+# if (i==2) : axes.set_ylim(0.08,0.25)
  axes.set_xlim(ranges[i][0],ranges[i][1])
  if (i==0) : axes.set_xlim(0,ranges[i][1])
  ymin, ymax = (axes).get_ylim()
