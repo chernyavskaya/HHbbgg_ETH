@@ -29,14 +29,17 @@ def main(options,args):
     #$HOME
     fout = ROOT.TFile.Open("./macros/plots/cumulatives/cumulativeTransformation_"+name+".root","recreate")
 
-    nbins = 80000
-    xlow = 0.
-    xup = 1.
+    nbins = 25000
+    xlow = 0.004944568499922752
+    xup = 0.9976179003715515
     histoMVA = ROOT.TH1F("histoMVA","histoMVA",nbins,xlow,xup)
   #  tree.Draw("MVAOutput>>histoMVA")
-    tree.Draw("MVAOutput>>histoMVA",ROOT.TCut("weight"))
+    #tree.Draw("MVAOutput>>histoMVA",ROOT.TCut("weight"))
+    tree.Draw("ClassificationBDT>>histoMVA",ROOT.TCut("weight"))
   #  tree.Draw("HHbbggMVA>>histoMVA")
 #    histoMVA.FillRandom("gaus",1000000)
+
+    #histoMVA.Smooth()
 
     cumulativeHisto = histoMVA.GetCumulative()
     cumulativeHisto.Scale(1./histoMVA.Integral())
@@ -86,16 +89,16 @@ def main(options,args):
 
     processes = [
         "reducedTree_sig",
-        "reducedTree_data"
+        "reducedTree_bkg"
         ]
 
-    for i in range(2,14): #15 13+box
-        processes.append("reducedTree_sig_node_"+str(i))
+  #  for i in range(2,14): #15 13+box
+   #     processes.append("reducedTree_sig_node_"+str(i))
 
   #  for i in range(0,8):
-    for i in range(0,5):
-        if i == 1: continue #gJets are combined in one, i==2
-        processes.append("reducedTree_bkg_"+str(i))
+  #  for i in range(0,5):
+  #      if i == 1: continue #gJets are combined in one, i==2
+  #      processes.append("reducedTree_bkg_"+str(i))
 
 
 
@@ -115,13 +118,15 @@ def main(options,args):
         copyTree.SetTitle(proc)
 
         transfMVA = array( 'f', [ 0. ] )
-        transfBranch = copyTree.Branch("MVAOutputTransformed",transfMVA,"MVAOutputTransformed/F");
+        #transfBranch = copyTree.Branch("MVAOutputTransformed",transfMVA,"MVAOutputTransformed/F");
+        transfBranch = copyTree.Branch("ClassificationBDTTransformed",transfMVA,"ClassificationBDTTransformed/F");
         dummyList = []
         
         for i,event in enumerate(copyTree):
             if i>tree.GetEntries():break
            # mva = event.HHTagger2017
-            mva = event.MVAOutput
+           # mva = event.MVAOutput
+            mva = event.ClassificationBDT
             transfMVA[0] = cumulativeGraph.Eval(mva)
             transfBranch.Fill()
     
