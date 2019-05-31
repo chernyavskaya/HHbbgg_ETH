@@ -70,10 +70,10 @@ parser = OptionParser(option_list=[
 input_trainings = options.training.split(',')
 
 now = str(datetime.datetime.now()).split(' ')[0]
-scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/2018JECv8/April25/'   #for studies
-savetag='April25'
-#scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/February25/'  #for paper
-#dirs=['',input_trainings[0],options.samplename]
+#scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/2018JECv8/April25/'   #for studies
+savetag='May29'
+scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/May29/'  #for paper
+dirs=['',input_trainings[0],options.samplename]
 dirs=['',options.samplename]
 for i in range(len(dirs)):
   scratch_plots=scratch_plots+'/'+dirs[i]+'/'
@@ -94,7 +94,8 @@ region_names = regions_summary['pt_regions']+regions_summary['eta_region_names']
 
 #y = (data['Jet_mcPt']/data['Jet_pt']).values.reshape(-1,1)
 y = (data['Jet_mcPt']/(data['Jet_pt_raw']*data['Jet_corr_JEC'])).values.reshape(-1,1)
-X_pt = (data['Jet_pt_raw']).values.reshape(-1,1)
+#X_pt = (data['Jet_pt_raw']).values.reshape(-1,1) 
+X_pt = (data['Jet_mcPt']).values.reshape(-1,1)  # For D.H.
 X_pt_jec = (data['Jet_pt_raw']*data['Jet_corr_JEC']).values.reshape(-1,1)
 X_pt_gen = (data['Jet_mcPt']).values.reshape(-1,1)
 X_eta = (data['Jet_eta']).values.reshape(-1,1)
@@ -109,7 +110,8 @@ linestyles = ['-.', '--','-', ':']
 where = (options.where).replace(' ','').replace('<','_').replace('>','_').replace('(','').replace(')','')
 
 whats = ['p_T (GeV)','\eta','\\rho (GeV)']
-whats_root = ['p_{T} (GeV)','#eta','#rho (GeV)']
+#whats_root = ['p_{T} (GeV)','#eta','#rho (GeV)']
+whats_root = ['p_{T}^{gen} (GeV)','#eta','#rho (GeV)'] # for D.H.
 ranges = [[30,400],[-3,3],[0,40]]
 binning =[50,10,20] #[50,20]
 for i in range(0,3):

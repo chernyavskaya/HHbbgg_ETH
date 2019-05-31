@@ -73,9 +73,9 @@ input_files = options.inp_file.split(',')
 
 
 now = str(datetime.datetime.now()).split(' ')[0]
-savetag='April25'
-scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/2017JECv32/April25/'   #for studies
-#scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/February25/' #for paper
+savetag='May29'
+#scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/2017JECv32/April25/'   #for studies
+scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/May29/' #for paper
 #dirs=['',input_trainings[0],options.samplename]
 dirs=['',options.samplename]
 for i in range(len(dirs)):
@@ -86,13 +86,15 @@ for i in range(len(dirs)):
 
 print(options.where)
 whats = ['p_T (GeV)','\eta','\\rho (GeV)']
-whats_root = ['p_{T} (GeV)','#eta','#rho (GeV)']
+#whats_root = ['p_{T} (GeV)','#eta','#rho (GeV)']
+whats_root = ['p_{T}^{gen} (GeV)','#eta','#rho (GeV)'] #for D.H.
 #ranges = [[30,400],[-2.5,2.5],[0,50]]
 #binning =[50,10,20] #[50,20]
 #ranges = [[30,400],[0,2.5],[0,50]]
 #binning =[10,10,10] #[50,20]
 #ranges = [[0,400],[0,2.5],[0,50]]
-ranges = [[20,400],[0,2.5],[0,50]]
+#ranges = [[20,400],[0,2.5],[0,50]]
+ranges = [[30,400],[0,2.5],[0,50]] # D.H.
 #binning =[7,10,20] #[50,20]
 binning =[7,10,15] #[50,20]
 linestyles = ['-.', '--','-', ':','-']
@@ -119,7 +121,8 @@ for i in range(0,3):
     region_names = regions_summary['pt_regions']+regions_summary['eta_region_names']
 
     y = (data['Jet_mcPt']/(data['Jet_pt_raw']*data['Jet_corr_JEC'])).values.reshape(-1,1)
-    X_pt = (data['Jet_pt_raw']).values.reshape(-1,1)
+   # X_pt = (data['Jet_pt_raw']).values.reshape(-1,1)
+    X_pt = (data['Jet_mcPt']).values.reshape(-1,1) # for D.H.
     X_pt_jec = (data['Jet_pt']).values.reshape(-1,1) # temp
     X_eta = (abs(data['Jet_eta'])).values.reshape(-1,1)
     X_rho = (data['rho']).values.reshape(-1,1)
@@ -136,7 +139,8 @@ for i in range(0,3):
  
     if (ifile==0) : bins=np.linspace(ranges[i][0],ranges[i][1],binning[i])
    # if ifile==0 and i==0 :  bins = np.array([0,20,40,60,80,100,150,200,250,300,400]) #ttbar
-    if ifile==0 and i==0 :  bins = np.array([20,40,60,80,100,150,200,250,300,400]) #ttbar
+    #if ifile==0 and i==0 :  bins = np.array([20,40,60,80,100,150,200,250,300,400]) #ttbar
+    if ifile==0 and i==0 :  bins = np.array([30,40,60,80,100,150,200,250,300,400]) #ttbar for D.H.
  #   if ifile==0 and i==2 :  bins = np.array([ 0.   ,       6.66732836,  8.11298199,  9.22305012 ,10.14321423, 10.97165012,11.75445137, 12.51883049 ,13.27694359, 14.0332222 , 14.80068302, 15.59469814, 16.44004822, 17.36221085, 18.36169586 ,19.47189522 ,20.77418327 ,22.39320679, 24.55589256 ,27.99963531, 50.]) #ttbar and pt<50 and pt>30 for rho
    ## if ifile==0 and i==0 :   bins = np.array([0,20,40,60,80,100,150,200]) #ZHbbll
  
@@ -317,6 +321,7 @@ for i in range(0,3):
         #  frame2.GetYaxis().SetRangeUser(-0.3,0.)
          # frame2.GetYaxis().SetNDivisions()
     else : frame2.GetYaxis().SetRangeUser(-0.30,0.)
+    frame2.GetYaxis().SetRangeUser(-0.30,0.)  # added for D.H.
     frame2.Draw()
     gr_improvement = TGraph(len(binc),array('d',binc),array('d',improvement))
     gr_improvement.SetMarkerSize(1.9)
