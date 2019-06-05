@@ -70,9 +70,9 @@ parser = OptionParser(option_list=[
 input_trainings = options.training.split(',')
 
 now = str(datetime.datetime.now()).split(' ')[0]
-#scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/2018JECv8/April25/'   #for studies
-savetag='May29'
-scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/May29/'  #for paper
+#scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/2017JECv32/June05/'   #for studies
+savetag='June05Gen'
+scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/June05/'  #for paper
 dirs=['',input_trainings[0],options.samplename]
 dirs=['',options.samplename]
 for i in range(len(dirs)):
@@ -83,7 +83,7 @@ for i in range(len(dirs)):
 
 # ## Read test data and model
 # load data
-data = io.read_data('%s%s'%(options.inp_dir,options.inp_file),columns=None)
+data = io.read_data('%s%s'%(options.inp_dir,options.inp_file),columns=None).query('Jet_pt>20')
 data.describe()
 if options.where!='' : data = data.query(options.where)
 
@@ -112,10 +112,11 @@ where = (options.where).replace(' ','').replace('<','_').replace('>','_').replac
 whats = ['p_T (GeV)','\eta','\\rho (GeV)']
 #whats_root = ['p_{T} (GeV)','#eta','#rho (GeV)']
 whats_root = ['p_{T}^{gen} (GeV)','#eta','#rho (GeV)'] # for D.H.
-ranges = [[30,400],[-3,3],[0,40]]
-binning =[50,10,20] #[50,20]
-for i in range(0,3):
-#for i in range(2,3):
+#ranges = [[30,400],[-3,3],[0,40]]
+ranges = [[150,400],[-3,3],[0,40]]  # gen for Phil
+binning =[10,10,20] #[50,20]
+#for i in range(0,3):
+for i in range(0,1):
  if i==0 : X = X_pt
  elif i==1 : X = X_eta
  elif i==2 : X = X_rho
@@ -219,33 +220,38 @@ for i in range(0,3):
  frame.GetYaxis().SetRangeUser(0.85,1.35)
  if ('p_T') in whats[i] and 'HHbbgg' in options.samplename: frame.GetXaxis().SetLimits(30, 350)
  if ('p_T') in whats[i] and 'ttbar' in options.samplename: frame.GetXaxis().SetLimits(0, 350)
+ if ('p_T') in whats[i] and 'ttbar' in options.samplename: frame.GetXaxis().SetLimits(120, 370)  # for D.H. gen Phil
  if ('rho') in whats[i] and 'ttbar' in options.samplename: frame.GetXaxis().SetLimits(0, 45)
  if ('eta') in whats[i] and 'ttbar' in options.samplename: frame.GetXaxis().SetLimits(-3.2, 3.2)
  frame.Draw()
- for item in [gr25,gr40,gr50,gr75,grcorr25,grcorr40,grcorr50,grcorr75]:
-# for item in [gr25,gr40,gr50,gr75,grcorr25,grcorr40,grcorr50,grcorr75,grmean,grcorrmean]:
+# for item in [gr25,gr40,gr50,gr75,grcorr25,grcorr40,grcorr50,grcorr75]:
+ for item in [gr25,gr40,gr50,gr75,grcorr25,grcorr40,grcorr50,grcorr75,grmean,grcorrmean]:
      item.Draw("Lsame")
 
  
  if i==0: pName.AddText("%s"%samplename)
 
  leg = TLegend()
- leg = ROOT.TLegend(0.75,0.75,0.9,0.9)
-# leg = ROOT.TLegend(0.6,0.75,0.9,0.9)
+# leg = ROOT.TLegend(0.75,0.75,0.9,0.9)
+ leg = ROOT.TLegend(0.6,0.75,0.9,0.9) # D.H.
  leg.AddEntry(gr25,"Baseline" ,"L")
  leg.AddEntry(grcorr25,"DNN" ,"L")
-# leg.AddEntry(grmean,"Baseline average" ,"L")
-# leg.AddEntry(grcorrmean,"DNN average" ,"L")
+ leg.AddEntry(grmean,"Baseline average" ,"L")
+ leg.AddEntry(grcorrmean,"DNN average" ,"L")
  leg.SetFillStyle(-1)
  leg.SetBorderSize(0)
  leg.SetTextFont(42)
  leg.SetTextSize(0.04)
  leg.Draw()
 
- latex_posX_before = [5,-3.,1.]
- latex_posY_before = [[0.87,0.94,0.98,1.14],[0.9,0.955,0.99,1.11],[0.915,0.965,0.994,1.094]]
- latex_posX_after = [310.,2.6,40.]
- latex_posY_after = [[0.95,0.98,1.00,1.06],[.95,1.01,1.05,1.20],[0.95,1.01,1.055,1.205]]
+# latex_posX_before = [5,-3.,1.]
+# latex_posY_before = [[0.87,0.94,0.98,1.14],[0.9,0.955,0.99,1.11],[0.915,0.965,0.994,1.094]]
+# latex_posX_after = [310.,2.6,40.]
+# latex_posY_after = [[0.95,0.98,1.00,1.06],[.95,1.01,1.05,1.20],[0.95,1.01,1.055,1.205]]
+ latex_posX_before = [130,-3.,1.] #for D.H.
+ latex_posY_before = [[0.96,1.,1.05,1.14],[0.9,0.955,0.99,1.11],[0.915,0.965,0.994,1.094]]# D.H
+ latex_posX_after = [340.,2.6,40.] #D.H
+ latex_posY_after = [[0.97,1,1.03,1.1],[.95,1.01,1.05,1.20],[0.95,1.01,1.055,1.205]]# D.H.
  latex = TLatex()
  latex.SetTextFont(72)
  latex.SetTextSize(0.028)

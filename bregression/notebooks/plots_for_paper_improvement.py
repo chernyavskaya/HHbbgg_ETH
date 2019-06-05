@@ -73,9 +73,9 @@ input_files = options.inp_file.split(',')
 
 
 now = str(datetime.datetime.now()).split(' ')[0]
-savetag='May29'
-#scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/2017JECv32/April25/'   #for studies
-scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/May29/' #for paper
+savetag='June05'
+#scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/2017JECv32/June05/'   #for studies
+scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/June05/' #for paper
 #dirs=['',input_trainings[0],options.samplename]
 dirs=['',options.samplename]
 for i in range(len(dirs)):
@@ -88,13 +88,15 @@ print(options.where)
 whats = ['p_T (GeV)','\eta','\\rho (GeV)']
 #whats_root = ['p_{T} (GeV)','#eta','#rho (GeV)']
 whats_root = ['p_{T}^{gen} (GeV)','#eta','#rho (GeV)'] #for D.H.
+#whats_root = ['p_{T}^{gen smeared} (GeV)','#eta','#rho (GeV)'] #for D.H.
 #ranges = [[30,400],[-2.5,2.5],[0,50]]
 #binning =[50,10,20] #[50,20]
 #ranges = [[30,400],[0,2.5],[0,50]]
 #binning =[10,10,10] #[50,20]
 #ranges = [[0,400],[0,2.5],[0,50]]
-#ranges = [[20,400],[0,2.5],[0,50]]
-ranges = [[30,400],[0,2.5],[0,50]] # D.H.
+ranges = [[0,400],[0,2.5],[0,50]]
+#ranges = [[30,400],[0,2.5],[0,50]] # D.H.
+#ranges = [[20,700],[0,2.5],[0,50]] # D.H.
 #binning =[7,10,20] #[50,20]
 binning =[7,10,15] #[50,20]
 linestyles = ['-.', '--','-', ':','-']
@@ -103,15 +105,15 @@ markers=['s','o','^','h','>','<','s','o','o','o','o']
 labels=options.labels.split(',')
 bins_same = []
 
-#for i in range(0,1):
 for i in range(0,3):
+#for i in range(2,3):
  sigma_mu_array = []
  sigma_array = []
  mu_array = []
  for ifile in range(len(input_files)):
     # ## Read test data and model
   # load data
-    data = io.read_data('%s%s'%(options.inp_dir,input_files[ifile]),columns=None)
+    data = io.read_data('%s%s'%(options.inp_dir,input_files[ifile]),columns=None).query("Jet_pt>20")
     if options.where!='' : data = data.query(options.where)
     data.describe()
 
@@ -120,13 +122,23 @@ for i in range(0,3):
     regions_summary = json.loads(file_regions.read())
     region_names = regions_summary['pt_regions']+regions_summary['eta_region_names']
 
+    data.loc[data['Jet_resolution_NN_%s'%input_trainings[ifile]] <= 0., 'Jet_resolution_NN_%s'%input_trainings[ifile] ] = 0.2
+
+    data['Jet_resolution_NN_%s'%input_trainings[ifile]]*=1.4826
+    res  =data['Jet_resolution_NN_%s'%input_trainings[ifile]]
+    data['Jet_res_random'] = np.random.normal(1., res)
+
+    print data['Jet_res_random']
+
     y = (data['Jet_mcPt']/(data['Jet_pt_raw']*data['Jet_corr_JEC'])).values.reshape(-1,1)
-   # X_pt = (data['Jet_pt_raw']).values.reshape(-1,1)
+ #   X_pt = (data['Jet_pt_raw']).values.reshape(-1,1)
+ #   X_pt = (data['Jet_pt_raw']*data['Jet_corr_JEC']).values.reshape(-1,1)
     X_pt = (data['Jet_mcPt']).values.reshape(-1,1) # for D.H.
-    X_pt_jec = (data['Jet_pt']).values.reshape(-1,1) # temp
+ #   X_pt  = (data['Jet_mcPt']*data['Jet_res_random']).values.reshape(-1,1) #for D.H. gen smeared
+
+
     X_eta = (abs(data['Jet_eta'])).values.reshape(-1,1)
     X_rho = (data['rho']).values.reshape(-1,1)
-    res = (data['Jet_resolution_NN_%s'%input_trainings[ifile]])
     y_pred = (data['Jet_pt_reg_NN_%s'%input_trainings[ifile]]) #bad name because it is actually a correction
     y_corr = (y[:,0]/y_pred).values.reshape(-1,1)
 
@@ -139,8 +151,12 @@ for i in range(0,3):
  
     if (ifile==0) : bins=np.linspace(ranges[i][0],ranges[i][1],binning[i])
    # if ifile==0 and i==0 :  bins = np.array([0,20,40,60,80,100,150,200,250,300,400]) #ttbar
-    #if ifile==0 and i==0 :  bins = np.array([20,40,60,80,100,150,200,250,300,400]) #ttbar
-    if ifile==0 and i==0 :  bins = np.array([30,40,60,80,100,150,200,250,300,400]) #ttbar for D.H.
+    #if ifile==0 and i==0 :  bins = np.array([15,15.1,15.3,15.5,15.8,16.0,17,20,22,25,27,30,40,45,50,60,65,70,75,80,85,90,100,150,200,250,300,400]) #ttbar
+    #if ifile==0 and i==0 :  bins = np.array([20,22,25,27,30,40,45,50,60,65,70,75,80,85,90,100,150,200,250,300,400]) #ttbar
+    #if ifile==0 and i==0 :  bins = np.array([0,400]) #ttbar
+    if ifile==0 and i==0 :  bins = np.array([20,40,60,80,100,150,200,250,300,400]) #ttbar for D.H.
+   # if ifile==0 and i==0 :  bins = np.array([20,30,40,50,55,60,65,70,75,80,85,90,100,150,200,250,300,400]) #ttbar for D.H.
+  #  if ifile==0 and i==0 :  bins = np.array([20,40,45,50,55,60,65,70,75,80,85,90,95,100]) #ttbar for D.H.
  #   if ifile==0 and i==2 :  bins = np.array([ 0.   ,       6.66732836,  8.11298199,  9.22305012 ,10.14321423, 10.97165012,11.75445137, 12.51883049 ,13.27694359, 14.0332222 , 14.80068302, 15.59469814, 16.44004822, 17.36221085, 18.36169586 ,19.47189522 ,20.77418327 ,22.39320679, 24.55589256 ,27.99963531, 50.]) #ttbar and pt<50 and pt>30 for rho
    ## if ifile==0 and i==0 :   bins = np.array([0,20,40,60,80,100,150,200]) #ZHbbll
  
@@ -158,6 +174,7 @@ for i in range(0,3):
     y_corr_iqr2_pt =  y_corr_qt_pt[0],y_corr_qt_pt[3]
     err_corr_iqr2 =  0.5*(y_corr_qt_pt[3]-y_corr_qt_pt[0])
     sigma_mu_corr = np.array(err_corr_iqr2)/np.array(y_corr_40_pt)
+    print 'Corrected : max of sigma = ',np.max(err_corr_iqr2),' , max of 40 quantile = ',np.max(y_corr_40_pt),'max of sigma mu corr = ',np.max(sigma_mu_corr),' , postion : ',bins[np.where(sigma_mu_corr==np.max(sigma_mu_corr))]
     sigma_mu_array.append(sigma_mu_corr)
     sigma_array.append(err_corr_iqr2)
     mu_array.append(y_corr_40_pt)
@@ -178,6 +195,7 @@ for i in range(0,3):
     sigma_mu_jec = np.array(err_jec_iqr2)/np.array(y_40_pt)
     sigma_jec = np.array(err_jec_iqr2)
     mu_jec = np.array(y_40_pt)
+    print 'Jec : max of sigma = ',np.max(err_jec_iqr2),' , max of 40 quantile = ',np.max(y_40_pt),'max of sigma mu corr = ',np.max(sigma_mu_jec),' , postion : ',bins[np.where(sigma_mu_jec==np.max(sigma_mu_jec))]
 ########################inclusive#############
     inclusive = np.percentile(y,quantiles*100.,axis=0).reshape(-1,1) 
     sigma_mu_inclusive = np.array(0.5*(inclusive[3]-inclusive[0]))/np.array(inclusive[1])
@@ -215,7 +233,8 @@ for i in range(0,3):
  ax0.grid(alpha=0.2,linestyle='--',markevery=2)
  axes = plt.gca()
  #if (i==0) : axes.set_ylim(0.02,0.3)
- if (i==0) : axes.set_ylim(0.02,0.25)
+ #if (i==0) : axes.set_ylim(0.02,0.25)
+ if (i==0) : axes.set_ylim(0.02,0.17)  #new paper plot with gen
 # if (i==1) : axes.set_ylim(0.06,0.15)
  if (i==1) : axes.set_ylim(0.08,0.17)
  if (i==2) : axes.set_ylim(0.08,0.17)
@@ -224,6 +243,9 @@ for i in range(0,3):
  if (i==0) : axes.set_xlim(0,ranges[i][1])
  ymin, ymax = (axes).get_ylim()
  xmin, xmax = (axes).get_xlim()
+ if (i==2) : xmax = 47
+ ymin=0.05
+ ymax=0.17
  samplename=options.samplename
  if options.samplename=='ttbar' : samplename='$t\\bar{t}$'
  if options.samplename=='ZHbbll' : samplename='$Z(\\to{b\\bar{b}})H(\\to{l^+l^-})$'
@@ -320,17 +342,19 @@ for i in range(0,3):
           frame2.GetYaxis().SetRangeUser(-0.17,0.)
         #  frame2.GetYaxis().SetRangeUser(-0.3,0.)
          # frame2.GetYaxis().SetNDivisions()
-    else : frame2.GetYaxis().SetRangeUser(-0.30,0.)
-    frame2.GetYaxis().SetRangeUser(-0.30,0.)  # added for D.H.
+    else : frame2.GetYaxis().SetRangeUser(-0.20,0.)
+    frame2.GetYaxis().SetRangeUser(-0.2,0.)  # added for D.H.
     frame2.Draw()
     gr_improvement = TGraph(len(binc),array('d',binc),array('d',improvement))
+    print 'max of ratio : ',np.max(improvement),'binc = ',binc[np.where(improvement==np.max(improvement))]
+    print 'min of ratio : ',np.min(improvement),'binc = ',binc[np.where(improvement==np.min(improvement))]
     gr_improvement.SetMarkerSize(1.9)
     gr_improvement.SetMarkerStyle(21)
     gr_improvement.SetMarkerColor(ROOT.kSpring-6)
     gr_improvement.Draw("Psame") 
 
  where = (options.where).replace(' ','').replace('<','_').replace('>','_').replace('(','').replace(')','').replace('=','_').replace('!=','notequal')
- savename='/IQR_compare_%s_%s%s%s'%(whats[i].replace('\\','').replace(' ','').replace('~','').replace(' ','').replace(')','').replace('(','').replace('-','_'),options.samplename,where,savetag)
+ savename='/IQR_compare_%s_%s%s%s'%(whats_root[i].replace('\\','').replace(' ','').replace('~','').replace(' ','').replace(')','').replace('(','').replace('-','_'),options.samplename,where,savetag)
 # plt.savefig(scratch_plots+savename+'.pdf',bbox_extra_artists=(lgd,), bbox_inches='tight')
 # plt.savefig(scratch_plots+savename+'.png',bbox_extra_artists=(lgd,), bbox_inches='tight')
  plt.clf()
