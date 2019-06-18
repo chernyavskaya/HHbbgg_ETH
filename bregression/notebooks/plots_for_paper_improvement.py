@@ -73,9 +73,9 @@ input_files = options.inp_file.split(',')
 
 
 now = str(datetime.datetime.now()).split(' ')[0]
-savetag='June05'
+savetag='June06'
 #scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/2017JECv32/June05/'   #for studies
-scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/June05/' #for paper
+scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/June06/' #for paper
 #dirs=['',input_trainings[0],options.samplename]
 dirs=['',options.samplename]
 for i in range(len(dirs)):
@@ -298,7 +298,8 @@ for i in range(0,3):
  else :
     ax0.text(xmax*0.8,ymax*0.90,r'%s'%samplename, fontsize=30)
     ax1 = plt.subplot(gs[1])
-    improvement = (np.array(sigma_mu_array[ifile])-np.array(sigma_mu_jec))/(np.array(sigma_mu_jec))
+    #improvement = (np.array(sigma_mu_array[ifile])-np.array(sigma_mu_jec))/(np.array(sigma_mu_jec))
+    improvement = (np.array(sigma_mu_jec)-np.array(sigma_mu_array[ifile]))/(np.array(sigma_mu_jec))
     ax1.scatter(binc,improvement,color=colors[ifile],marker=markers[ifile],label='%s'%labels[ifile])
     plt.xlabel(r'$%s$'%whats[i],fontsize=30)
     plt.ylabel(r'$\frac{(\bar{\sigma}_{DNN}-\bar{\sigma}_{baseline})}{\bar{\sigma}_{baseline}}$',fontsize=30)
@@ -335,15 +336,16 @@ for i in range(0,3):
     frame2.GetYaxis().SetLabelSize(0.02)
     frame2.GetXaxis().SetTitle(whats_root[i])
     frame2.GetYaxis().CenterTitle(ROOT.kTRUE)
-    frame2.GetYaxis().SetTitle("#frac{(#bar{#sigma}_{DNN}-#bar{#sigma}_{baseline})}{#bar{#sigma}_{baseline}}")	
-  #  frame2.GetYaxis().SetTitle("#frac{#Delta#sigma}{#sigma_{baseline}}")	 #when sigma only
+  #  frame2.GetYaxis().SetTitle("#frac{(#bar{#sigma}_{DNN}-#bar{#sigma}_{baseline})}{#bar{#sigma}_{baseline}}")	
+   # frame2.GetYaxis().SetTitle("#frac{#Delta#sigma}{#sigma_{baseline}}")	 #when sigma only
+    frame2.GetYaxis().SetTitle("#frac{#Delta#bar{#sigma}}{#bar{#sigma}_{baseline}}")
    # if i==0 : frame2.GetYaxis().SetRangeUser(-0.12,0.)
     if i==0 : 
           frame2.GetYaxis().SetRangeUser(-0.17,0.)
         #  frame2.GetYaxis().SetRangeUser(-0.3,0.)
          # frame2.GetYaxis().SetNDivisions()
     else : frame2.GetYaxis().SetRangeUser(-0.20,0.)
-    frame2.GetYaxis().SetRangeUser(-0.2,0.)  # added for D.H.
+    frame2.GetYaxis().SetRangeUser(0.,0.2)  # added for D.H.
     frame2.Draw()
     gr_improvement = TGraph(len(binc),array('d',binc),array('d',improvement))
     print 'max of ratio : ',np.max(improvement),'binc = ',binc[np.where(improvement==np.max(improvement))]
