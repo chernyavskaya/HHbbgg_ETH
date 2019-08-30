@@ -1,6 +1,23 @@
 Prepare b-jet regerssion training, check perfomance, fit the distibutions, make plots
 
 All notebooks were written only as a starting point, once a notebook is written to some working level , I convert them to python scripts for speed reasons. All code here makes use of functions written in ../python directory 
+### To make plots for paper
+```
+python bjet_pt_eta.py
+```
+
+```
+ipython plot_IQR2_paper.py -- --inp-file applied_res_2018-07-20_ttbar_full_RegressionPerJet_heppy_energyRings_testing_morevar.hd5 --sample-name ttbar
+```
+
+```
+ipython plots_for_paper_improvement.py -- --inp-file applied_res_2018-07-20_ttbar_full_RegressionPerJet_heppy_energyRings_testing_morevar.hd5 --sample-name ttbar --labels DNN
+```
+
+```
+ipython plot_resEstimatorFunc_paper.py -- --inp-file applied_res_2018-07-20_ttbar_full_RegressionPerJet_heppy_energyRings_testing_morevar.hd5
+```
+Info for the plots above :  --inp-dir /scratch/nchernya/HHbbgg/paper/output_root/   --sample-name ttbar —training 2018-04-06_job23_2016 -inp-file applied_res_2018-07-20_ttbar_full_RegressionPerJet_heppy_energyRings_testing_morevar.hd5 --sample-name ttbar
 
 ### Training Regression
 ```
