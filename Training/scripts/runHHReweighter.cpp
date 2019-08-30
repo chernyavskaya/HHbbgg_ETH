@@ -16,16 +16,15 @@ using namespace std;
 //c++ -lm -o runHH runHHReweighter.cpp HHReweight5D.cpp `root-config --glibs --cflags`
 int main ()
 {
-	 TString ending = "04022018";
-    TString inputDir = "/shome/nchernya/HHbbgg_ETH_devel/root_files/HHreweighting_01_02_2018/";
-		TString tag = "2016";
-    TString filename = "output_GluGluToHHTo2B2G_mix12nodes_13TeV-madgraph_2016.root"; //2016
-  //  TString tag = "2017";
-  //  TString filename = "output_GluGluToHHTo2B2G_mix6nodes_13TeV-madgraph_2017.root"; //2017
+	 TString ending = "29082019";
+    TString inputDir = "/shome/nchernya/HHbbgg_ETH_devel/root_files/HHreweighting_29_08_2019/";
+	TString tag = "2016";
+    TString filename = "output_GluGluToHHTo2B2G_node_all_merged_2016.root"; //2016
+  //  TString tag = "2018";
+ //   TString filename = "output_GluGluToHHTo2B2G_node_all_merged_2018.root"; //2017
 
     TFile* fIn = TFile::Open(inputDir+filename);
-	 TTree* ch = (TTree*)fIn->Get("GluGluToHHTo2B2G_mix12nodes_GenAll"); //2016
-	// TTree* ch = (TTree*)fIn->Get("GluGluToHHTo2B2G_mixnodes_GenAll"); //2017
+	 TTree* ch = (TTree*)fIn->Get("GluGluToHHTo2B2G_mixnodes_GenAll"); 
 
     float   leadPho_px, leadPho_py, leadPho_pz, leadPho_e;
     float   subleadPho_px, subleadPho_py, subleadPho_pz, subleadPho_e;
