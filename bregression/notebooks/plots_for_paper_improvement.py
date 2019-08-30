@@ -23,7 +23,8 @@ gROOT.ProcessLineSync(".x /mnt/t3nfs01/data01/shome/nchernya/setTDRStyle.C")
 gROOT.ForceStyle()
 gStyle.SetPadTopMargin(0.06)
 gStyle.SetPadRightMargin(0.04)
-gStyle.SetPadLeftMargin(0.19)
+#gStyle.SetPadLeftMargin(0.19)
+gStyle.SetPadLeftMargin(0.20)
 
 
 right,top   = gStyle.GetPadRightMargin(),gStyle.GetPadTopMargin()
@@ -40,7 +41,7 @@ pCMS12.AddText("Simulation")
 
 pCMS2 = ROOT.TPaveText(0.5,1.-top,1.-right*0.5,1.,"NDC")
 pCMS2.SetTextFont(42)
-pCMS2.AddText("13 TeV")
+pCMS2.AddText("(13 TeV)")
 
 pCMSt = ROOT.TPaveText(0.5,1.-top*4,0.6,1.,"NDC")
 pCMSt.SetTextFont(42)
@@ -73,9 +74,9 @@ input_files = options.inp_file.split(',')
 
 
 now = str(datetime.datetime.now()).split(' ')[0]
-savetag='June06'
+savetag='August30'
 #scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/2017JECv32/June05/'   #for studies
-scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/June06/' #for paper
+scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/August30_2019/' #for paper
 #dirs=['',input_trainings[0],options.samplename]
 dirs=['',options.samplename]
 for i in range(len(dirs)):
@@ -87,8 +88,8 @@ for i in range(len(dirs)):
 print(options.where)
 whats = ['p_T (GeV)','\eta','\\rho (GeV)']
 #whats_root = ['p_{T} (GeV)','#eta','#rho (GeV)']
-whats_root = ['p_{T}^{gen} (GeV)','#eta','#rho (GeV)'] #for D.H.
-#whats_root = ['p_{T}^{gen smeared} (GeV)','#eta','#rho (GeV)'] #for D.H.
+whats_root = ['p_{T}^{gen} (GeV)','|#eta|','#rho (GeV)'] 
+#whats_root = ['p_{T}^{gen smeared} (GeV)','#eta','#rho (GeV)'] #for D.H. test
 #ranges = [[30,400],[-2.5,2.5],[0,50]]
 #binning =[50,10,20] #[50,20]
 #ranges = [[30,400],[0,2.5],[0,50]]
@@ -105,8 +106,8 @@ markers=['s','o','^','h','>','<','s','o','o','o','o']
 labels=options.labels.split(',')
 bins_same = []
 
-for i in range(0,3):
-#for i in range(2,3):
+#for i in range(0,3):
+for i in range(1,3):  #for some reason code crashes if running all 3 together, I ran 0-2, 2-3
  sigma_mu_array = []
  sigma_array = []
  mu_array = []
@@ -128,12 +129,12 @@ for i in range(0,3):
     res  =data['Jet_resolution_NN_%s'%input_trainings[ifile]]
     data['Jet_res_random'] = np.random.normal(1., res)
 
-    print data['Jet_res_random']
+    #print data['Jet_res_random']
 
     y = (data['Jet_mcPt']/(data['Jet_pt_raw']*data['Jet_corr_JEC'])).values.reshape(-1,1)
  #   X_pt = (data['Jet_pt_raw']).values.reshape(-1,1)
  #   X_pt = (data['Jet_pt_raw']*data['Jet_corr_JEC']).values.reshape(-1,1)
-    X_pt = (data['Jet_mcPt']).values.reshape(-1,1) # for D.H.
+    X_pt = (data['Jet_mcPt']).values.reshape(-1,1) #
  #   X_pt  = (data['Jet_mcPt']*data['Jet_res_random']).values.reshape(-1,1) #for D.H. gen smeared
 
 
@@ -154,7 +155,7 @@ for i in range(0,3):
     #if ifile==0 and i==0 :  bins = np.array([15,15.1,15.3,15.5,15.8,16.0,17,20,22,25,27,30,40,45,50,60,65,70,75,80,85,90,100,150,200,250,300,400]) #ttbar
     #if ifile==0 and i==0 :  bins = np.array([20,22,25,27,30,40,45,50,60,65,70,75,80,85,90,100,150,200,250,300,400]) #ttbar
     #if ifile==0 and i==0 :  bins = np.array([0,400]) #ttbar
-    if ifile==0 and i==0 :  bins = np.array([20,40,60,80,100,150,200,250,300,400]) #ttbar for D.H.
+    if ifile==0 and i==0 :  bins = np.array([20,40,60,80,100,150,200,250,300,400]) 
    # if ifile==0 and i==0 :  bins = np.array([20,30,40,50,55,60,65,70,75,80,85,90,100,150,200,250,300,400]) #ttbar for D.H.
   #  if ifile==0 and i==0 :  bins = np.array([20,40,45,50,55,60,65,70,75,80,85,90,95,100]) #ttbar for D.H.
  #   if ifile==0 and i==2 :  bins = np.array([ 0.   ,       6.66732836,  8.11298199,  9.22305012 ,10.14321423, 10.97165012,11.75445137, 12.51883049 ,13.27694359, 14.0332222 , 14.80068302, 15.59469814, 16.44004822, 17.36221085, 18.36169586 ,19.47189522 ,20.77418327 ,22.39320679, 24.55589256 ,27.99963531, 50.]) #ttbar and pt<50 and pt>30 for rho
@@ -223,10 +224,12 @@ for i in range(0,3):
     for item in [gr_baseline,gr_corrected]:
         item.SetMarkerSize(1.9)
     gr_corrected.SetMarkerStyle(21)
-    gr_corrected.SetMarkerColor(ROOT.kSpring-6)
+    #gr_corrected.SetMarkerColor(ROOT.kSpring-6)
+    gr_corrected.SetMarkerColor(ROOT.kRed)
     gr_baseline.SetMarkerStyle(29)
     gr_baseline.SetMarkerSize(2.4)
-    gr_baseline.SetMarkerColor(ROOT.kBlack)
+    #gr_baseline.SetMarkerColor(ROOT.kBlack)
+    gr_baseline.SetMarkerColor(ROOT.kBlue)
 ##########################################
 
 
@@ -327,13 +330,15 @@ for i in range(0,3):
     pad2.SetFillStyle(0)
     pad2.Draw()
     pad2.cd()
+    pad2.SetGrid()
  
     frame2 = ROOT.TH1F("frame_low_%d"%i,"",1,xmin,xmax)
     frame2.SetStats(0)
     frame2.GetXaxis().SetLabelSize(0.04)
-    frame2.GetYaxis().SetTitleSize(0.04)
-    frame2.GetYaxis().SetTitleOffset(2.0)
-    frame2.GetYaxis().SetLabelSize(0.02)
+    #frame2.GetYaxis().SetTitleSize(0.04)
+    frame2.GetYaxis().SetTitleOffset(1.3)
+    #frame2.GetYaxis().SetLabelSize(0.02)
+    frame2.GetYaxis().SetLabelSize(0.035)
     frame2.GetXaxis().SetTitle(whats_root[i])
     frame2.GetYaxis().CenterTitle(ROOT.kTRUE)
   #  frame2.GetYaxis().SetTitle("#frac{(#bar{#sigma}_{DNN}-#bar{#sigma}_{baseline})}{#bar{#sigma}_{baseline}}")	
@@ -345,26 +350,29 @@ for i in range(0,3):
         #  frame2.GetYaxis().SetRangeUser(-0.3,0.)
          # frame2.GetYaxis().SetNDivisions()
     else : frame2.GetYaxis().SetRangeUser(-0.20,0.)
-    frame2.GetYaxis().SetRangeUser(0.,0.2)  # added for D.H.
+    frame2.GetYaxis().SetNdivisions(203)
+    frame2.GetYaxis().SetRangeUser(0.,0.2)  # added 
     frame2.Draw()
     gr_improvement = TGraph(len(binc),array('d',binc),array('d',improvement))
     print 'max of ratio : ',np.max(improvement),'binc = ',binc[np.where(improvement==np.max(improvement))]
     print 'min of ratio : ',np.min(improvement),'binc = ',binc[np.where(improvement==np.min(improvement))]
     gr_improvement.SetMarkerSize(1.9)
     gr_improvement.SetMarkerStyle(21)
-    gr_improvement.SetMarkerColor(ROOT.kSpring-6)
+   # gr_improvement.SetMarkerColor(ROOT.kSpring-6)
+    gr_improvement.SetMarkerColor(ROOT.kRed)
     gr_improvement.Draw("Psame") 
 
  where = (options.where).replace(' ','').replace('<','_').replace('>','_').replace('(','').replace(')','').replace('=','_').replace('!=','notequal')
- savename='/IQR_compare_%s_%s%s%s'%(whats_root[i].replace('\\','').replace(' ','').replace('~','').replace(' ','').replace(')','').replace('(','').replace('-','_'),options.samplename,where,savetag)
+ savename='/IQR_compare_%s_%s%s%s'%(whats_root[i].replace('\\','').replace(' ','').replace('~','').replace(' ','').replace(')','').replace('(','').replace('#','').replace('-','_'),options.samplename,where,savetag)
 # plt.savefig(scratch_plots+savename+'.pdf',bbox_extra_artists=(lgd,), bbox_inches='tight')
 # plt.savefig(scratch_plots+savename+'.png',bbox_extra_artists=(lgd,), bbox_inches='tight')
  plt.clf()
 
  ROOT.gPad.Update()
  ROOT.gPad.RedrawAxis()
- c2.SaveAs(scratch_plots+savename+savetag+"_root.png"  )
+ c2.SaveAs(scratch_plots+savename+savetag+"_root.C"  )
  c2.SaveAs(scratch_plots+savename+savetag+"_root.pdf"  )
+ c2.SaveAs(scratch_plots+savename+savetag+"_root.root"  )
 
 #########
 # difference = 2*(np.array(sigma_mu_array[0])-np.array(sigma_mu_array[1]))/(np.array(sigma_mu_array[0])+np.array(sigma_mu_array[1]))

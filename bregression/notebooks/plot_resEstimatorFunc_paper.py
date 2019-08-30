@@ -40,7 +40,7 @@ pName.SetTextFont(42)
 
 pCMS2 = ROOT.TPaveText(0.5,1.-top,1.-right*0.5,1.,"NDC")
 pCMS2.SetTextFont(42)
-pCMS2.AddText("13 TeV")
+pCMS2.AddText("(13 TeV)")
 
 pCMSt = ROOT.TPaveText(0.5,1.-top*4,0.6,1.,"NDC")
 pCMSt.SetTextFont(42)
@@ -69,7 +69,7 @@ parser = OptionParser(option_list=[
 input_trainings = options.training.split(',')
 
 now = str(datetime.datetime.now()).split(' ')[0]
-scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/February25/'
+scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/August30_2019/'
 #dirs=['',input_trainings[0],options.samplename]
 dirs=['',options.samplename]
 for i in range(len(dirs)):
@@ -81,7 +81,7 @@ savetag='Feb25'
 
 # ## Read test data and model
 # load data
-data = io.read_data('%s%s'%(options.inp_dir,options.inp_file),columns=None)
+data = io.read_data('%s%s'%(options.inp_dir,options.inp_file),columns=None).query('Jet_mcPt>30')
 data.describe()
 if options.where!='' : data = data.query(options.where)
 
@@ -204,5 +204,6 @@ gr.Draw("Psame")
 leg.Draw()
 ROOT.gPad.Update()
 ROOT.gPad.RedrawAxis()
-c.SaveAs(scratch_plots+savename+"_additional_pt_root.png"  )
+c.SaveAs(scratch_plots+savename+"_additional_pt_root.C"  )
+c.SaveAs(scratch_plots+savename+"_additional_pt_root.root"  )
 c.SaveAs(scratch_plots+savename+"_additional_pt_root.pdf"  )

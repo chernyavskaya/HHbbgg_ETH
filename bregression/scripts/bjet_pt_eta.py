@@ -8,8 +8,9 @@ gStyle.SetPadTopMargin(0.06)
 gStyle.SetPadRightMargin(0.04)
 gStyle.SetPadLeftMargin(0.15)
 
-what ='Jet_pt'
-#what ='target'
+#what ='Jet_pt'
+#what ='Jet_eta'
+what ='target'
 what_name=''
 if what=='Jet_pt' :  
 	bins=100
@@ -44,7 +45,7 @@ pCMS12.AddText("Simulation")
 
 pCMS2 = ROOT.TPaveText(0.5,1.-top,1.-right*0.5,1.,"NDC")
 pCMS2.SetTextFont(42)
-pCMS2.AddText("13 TeV")
+pCMS2.AddText("(13 TeV)")
 
 
 pCMSt = ROOT.TPaveText(0.8,1.-top*4,0.85,1,"NDC")
@@ -68,7 +69,7 @@ t = f.Get("tree")
 hist = ROOT.TH1F("hist","hist",bins,xmin,xmax)
 hist.SetLineWidth(2)
 c = ROOT.TCanvas("c","c",900,900)
-c.SetLogy() # for pt
+#c.SetLogy() # for pt
 #c.SetBottomMargin(0.3)
 #cuts='(Jet_pt > 20) & (Jet_mcFlavour==5 | Jet_mcFlavour==-5) & (Jet_eta<2.5 & Jet_eta>-2.5) & (Jet_mcPt>0) & (Jet_mcPt<6000)'
 cuts='(Jet_pt > 20) & (Jet_mcFlavour==5 | Jet_mcFlavour==-5) & (Jet_mcPt>0) & (Jet_mcPt<6000)'
@@ -77,13 +78,13 @@ frame = ROOT.TH1F("hframe", "hframe", 1000, xmin,xmax)
 frame.SetStats(0)
 frame.GetXaxis().SetLabelSize(0.04)
 frame.GetXaxis().SetTitle("%s"%what_name)
-frame.GetYaxis().SetTitle("A.U.")
+frame.GetYaxis().SetTitle("Normalized to Unity")
 frame.GetYaxis().SetLabelSize(0.04)
 hist.Scale(1./hist.Integral())
 #frame.GetYaxis().SetRangeUser(1e-01,hist.GetMaximum()*30) #pt
-frame.GetYaxis().SetRangeUser(1e-08,hist.GetMaximum()*30) #pt norm
+#frame.GetYaxis().SetRangeUser(1e-08,hist.GetMaximum()*30) #pt norm
 #frame.GetYaxis().SetRangeUser(1e-01,hist.GetMaximum()*1.05) #target
-#frame.GetYaxis().SetRangeUser(1e-03,hist.GetMaximum()*1.05) #target norm
+frame.GetYaxis().SetRangeUser(1e-03,hist.GetMaximum()*1.05) #target norm
 frame.Draw()
 pCMS1.Draw()
 pCMS12.Draw()
@@ -92,5 +93,6 @@ pCMSt.Draw()
 ROOT.gPad.Update()
 ROOT.gPad.RedrawAxis()
 hist.Draw("same")
-c.SaveAs("../plots/paper/bjet_spectrum_%s_paper.pdf"%what_name.replace(' ','').replace('{','').replace('}','').replace('^','').replace('/',''))
-c.SaveAs("../plots/paper/bjet_spectrum_%s_paper.png"%what_name.replace(' ','').replace('{','').replace('}','').replace('^','').replace('/',''))
+c.SaveAs("../plots/paper/bjet_spectrum_%s_paper.pdf"%what_name.replace(' ','').replace('{','').replace('}','').replace('^','').replace('/','').replace('#',''))
+c.SaveAs("../plots/paper/bjet_spectrum_%s_paper.C"%what_name.replace(' ','').replace('{','').replace('}','').replace('^','').replace('/','').replace('#',''))
+c.SaveAs("../plots/paper/bjet_spectrum_%s_paper.root"%what_name.replace(' ','').replace('{','').replace('}','').replace('^','').replace('/','').replace('#',''))
