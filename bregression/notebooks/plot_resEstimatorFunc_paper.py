@@ -26,13 +26,16 @@ gStyle.SetPadLeftMargin(0.19)
 right,top   = gStyle.GetPadRightMargin(),gStyle.GetPadTopMargin()
 left,bottom = gStyle.GetPadLeftMargin(),gStyle.GetPadBottomMargin()
 
-pCMS1 = ROOT.TPaveText(left*1.1,1.-top*4,0.4,1.,"NDC")
+#pCMS1 = ROOT.TPaveText(left*1.1,1.-top*4,0.4,1.,"NDC") #without Preliminary
+pCMS1 = ROOT.TPaveText(left*1.05,1.-top*3.85,0.4,1.,"NDC") #with Preliminary
 pCMS1.SetTextFont(62)
 pCMS1.AddText("CMS")
 
-pCMS12 = ROOT.TPaveText(left*1.1+0.1,1.-top*4,0.57,1.,"NDC")
+#pCMS12 = ROOT.TPaveText(left*1.1+0.1,1.-top*4,0.57,1.,"NDC") #without Preliminary
+pCMS12 = ROOT.TPaveText(left*1.1+0.09,1.-top*4,0.57,1.,"NDC") #with Preliminary
 pCMS12.SetTextFont(52)
-pCMS12.AddText("Simulation")
+#pCMS12.AddText("Simulation")
+pCMS12.AddText("Simulation Preliminary")
 
 
 pName = ROOT.TPaveText(left*1.1,1.-top*6,0.6,1.,"NDC")
@@ -69,7 +72,7 @@ parser = OptionParser(option_list=[
 input_trainings = options.training.split(',')
 
 now = str(datetime.datetime.now()).split(' ')[0]
-scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/August30_2019/'
+scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/September20_2019/'
 #dirs=['',input_trainings[0],options.samplename]
 dirs=['',options.samplename]
 for i in range(len(dirs)):

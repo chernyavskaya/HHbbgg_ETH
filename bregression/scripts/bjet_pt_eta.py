@@ -33,13 +33,15 @@ if what=='target' :
 right,top   = gStyle.GetPadRightMargin(),gStyle.GetPadTopMargin()
 left,bottom = gStyle.GetPadLeftMargin(),gStyle.GetPadBottomMargin()
 
-pCMS1 = ROOT.TPaveText(left*1.1,1.-top*4,0.4,1.,"NDC")
+pCMS1 = ROOT.TPaveText(left*1.1,1.-top*3.85,0.4,1.,"NDC") #with Preliminary
+#pCMS1 = ROOT.TPaveText(left*1.1,1.-top*4,0.4,1.,"NDC") #without Preliminary
 pCMS1.SetTextFont(62)
 pCMS1.AddText("CMS")
 
 pCMS12 = ROOT.TPaveText(left*1.1+0.1,1.-top*4,0.57,1.,"NDC")
 pCMS12.SetTextFont(52)
-pCMS12.AddText("Simulation")
+#pCMS12.AddText("Simulation")
+pCMS12.AddText("Simulation Preliminary")
 
 
 
@@ -48,7 +50,7 @@ pCMS2.SetTextFont(42)
 pCMS2.AddText("(13 TeV)")
 
 
-pCMSt = ROOT.TPaveText(0.8,1.-top*4,0.85,1,"NDC")
+pCMSt = ROOT.TPaveText(0.84,1.-top*3.7,0.9,1,"NDC")
 pCMSt.SetTextFont(42)
 pCMSt.AddText("t#bar{t}")
 
@@ -82,9 +84,11 @@ frame.GetYaxis().SetTitle("Normalized to Unity")
 frame.GetYaxis().SetLabelSize(0.04)
 hist.Scale(1./hist.Integral())
 #frame.GetYaxis().SetRangeUser(1e-01,hist.GetMaximum()*30) #pt
-#frame.GetYaxis().SetRangeUser(1e-08,hist.GetMaximum()*30) #pt norm
+#frame.GetYaxis().SetRangeUser(1e-08,hist.GetMaximum()*30) #pt norm without preliminary
+#frame.GetYaxis().SetRangeUser(1e-08,hist.GetMaximum()*30) #pt norm with preliminary
 #frame.GetYaxis().SetRangeUser(1e-01,hist.GetMaximum()*1.05) #target
-frame.GetYaxis().SetRangeUser(1e-03,hist.GetMaximum()*1.05) #target norm
+frame.GetYaxis().SetRangeUser(1e-03,hist.GetMaximum()*1.15) #target norm with preliminary
+#frame.GetYaxis().SetRangeUser(1e-03,hist.GetMaximum()*1.05) #target norm without preliminary
 frame.Draw()
 pCMS1.Draw()
 pCMS12.Draw()
@@ -93,6 +97,7 @@ pCMSt.Draw()
 ROOT.gPad.Update()
 ROOT.gPad.RedrawAxis()
 hist.Draw("same")
-c.SaveAs("../plots/paper/bjet_spectrum_%s_paper.pdf"%what_name.replace(' ','').replace('{','').replace('}','').replace('^','').replace('/','').replace('#',''))
-c.SaveAs("../plots/paper/bjet_spectrum_%s_paper.C"%what_name.replace(' ','').replace('{','').replace('}','').replace('^','').replace('/','').replace('#',''))
-c.SaveAs("../plots/paper/bjet_spectrum_%s_paper.root"%what_name.replace(' ','').replace('{','').replace('}','').replace('^','').replace('/','').replace('#',''))
+name="../plots/paper/bjet_spectrum_%s_paper"%what_name.replace(' ','').replace('{','').replace('}','').replace('^','').replace('/','').replace('#','').replace('(','').replace(')','')
+c.SaveAs(name+'.pdf')
+c.SaveAs(name+'.C')
+c.SaveAs(name+'.root')

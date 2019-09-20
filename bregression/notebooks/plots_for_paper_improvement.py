@@ -30,14 +30,16 @@ gStyle.SetPadLeftMargin(0.20)
 right,top   = gStyle.GetPadRightMargin(),gStyle.GetPadTopMargin()
 left,bottom = gStyle.GetPadLeftMargin(),gStyle.GetPadBottomMargin()
 
-pCMS1 = ROOT.TPaveText(left*1.1,1.-top*4,0.4,1.,"NDC")
+#pCMS1 = ROOT.TPaveText(left*1.1,1.-top*4,0.4,1.,"NDC") #without Preliminary
+pCMS1 = ROOT.TPaveText(left*1.1,1.-top*3.85,0.4,1.,"NDC") #with Preliminary
 pCMS1.SetTextFont(62)
 pCMS1.AddText("CMS")
 
 
 pCMS12 = ROOT.TPaveText(left*1.1+0.1,1.-top*4,0.57,1.,"NDC")
 pCMS12.SetTextFont(52)
-pCMS12.AddText("Simulation")
+#pCMS12.AddText("Simulation")
+pCMS12.AddText("Simulation Preliminary")
 
 pCMS2 = ROOT.TPaveText(0.5,1.-top,1.-right*0.5,1.,"NDC")
 pCMS2.SetTextFont(42)
@@ -76,7 +78,7 @@ input_files = options.inp_file.split(',')
 now = str(datetime.datetime.now()).split(' ')[0]
 savetag='August30'
 #scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/2017JECv32/June05/'   #for studies
-scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/August30_2019/' #for paper
+scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/September20_2019/' #for paper
 #dirs=['',input_trainings[0],options.samplename]
 dirs=['',options.samplename]
 for i in range(len(dirs)):
@@ -248,7 +250,8 @@ for i in range(1,3):  #for some reason code crashes if running all 3 together, I
  xmin, xmax = (axes).get_xlim()
  if (i==2) : xmax = 47
  ymin=0.05
- ymax=0.17
+ #ymax=0.17 #without Preliminary
+ ymax=0.18 #with preliminary
  samplename=options.samplename
  if options.samplename=='ttbar' : samplename='$t\\bar{t}$'
  if options.samplename=='ZHbbll' : samplename='$Z(\\to{b\\bar{b}})H(\\to{l^+l^-})$'
@@ -270,7 +273,8 @@ for i in range(1,3):  #for some reason code crashes if running all 3 together, I
  frame.GetYaxis().SetRangeUser(ymin,ymax)
 
  leg = TLegend()
- leg = ROOT.TLegend(0.75,0.75,0.9,0.9)
+ #leg = ROOT.TLegend(0.75,0.75,0.9,0.9) #without preliminary
+ leg = ROOT.TLegend(0.75,0.7,0.9,0.85) #with preliminary
  leg.AddEntry(gr_baseline,"Baseline" ,"P")
  leg.AddEntry(gr_corrected,'%s'%labels[ifile] ,"P")
  leg.SetFillStyle(-1)

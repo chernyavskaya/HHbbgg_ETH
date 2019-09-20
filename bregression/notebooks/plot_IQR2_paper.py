@@ -27,13 +27,15 @@ gStyle.SetPadLeftMargin(0.19)
 right,top   = gStyle.GetPadRightMargin(),gStyle.GetPadTopMargin()
 left,bottom = gStyle.GetPadLeftMargin(),gStyle.GetPadBottomMargin()
 
-pCMS1 = ROOT.TPaveText(left*1.1,1.-top*4,0.4,1.,"NDC")
+#pCMS1 = ROOT.TPaveText(left*1.1,1.-top*4,0.4,1.,"NDC") #without Preliminary
+pCMS1 = ROOT.TPaveText(left*1.1,1.-top*3.85,0.4,1.,"NDC") #with Preliminary
 pCMS1.SetTextFont(62)
 pCMS1.AddText("CMS")
 
 pCMS12 = ROOT.TPaveText(left*1.1+0.1,1.-top*4,0.57,1.,"NDC")
 pCMS12.SetTextFont(52)
-pCMS12.AddText("Simulation")
+#pCMS12.AddText("Simulation")
+pCMS12.AddText("Simulation Preliminary")
 
 
 pName = ROOT.TPaveText(left*1.1,1.-top*6,0.6,1.,"NDC")
@@ -72,7 +74,7 @@ input_trainings = options.training.split(',')
 now = str(datetime.datetime.now()).split(' ')[0]
 #scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/2017JECv32/June05/'   #for studies
 savetag='August30_2019'
-scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/August30_2019/'  #for paper
+scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/September20_2019/'  #for paper
 dirs=['',input_trainings[0],options.samplename]
 dirs=['',options.samplename]
 for i in range(len(dirs)):
@@ -217,7 +219,8 @@ for i in range(0,3):
  frame.GetYaxis().SetTitle("p_{T}^{gen} / p_{T}^{reco}")
  frame.GetXaxis().SetTitle(whats_root[i])
  frame.GetYaxis().SetRangeUser(ymin,ymax*1.1)
- frame.GetYaxis().SetRangeUser(0.85,1.35)
+ #frame.GetYaxis().SetRangeUser(0.85,1.35) #without Preliminary
+ frame.GetYaxis().SetRangeUser(0.85,1.39) #with Preliminary
  if ('p_T') in whats[i] and 'HHbbgg' in options.samplename: frame.GetXaxis().SetLimits(30, 350)
  if ('p_T') in whats[i] and 'ttbar' in options.samplename: frame.GetXaxis().SetLimits(-20, 360)
 # if ('p_T') in whats[i] and 'ttbar' in options.samplename: frame.GetXaxis().SetLimits(120, 370)  # for D.H. gen Phil test
@@ -232,7 +235,8 @@ for i in range(0,3):
  if i==0: pName.AddText("%s"%samplename)
 
  leg = TLegend()
- leg = ROOT.TLegend(0.75,0.75,0.9,0.9)
+ #leg = ROOT.TLegend(0.75,0.75,0.9,0.9) #without Preliminary
+ leg = ROOT.TLegend(0.75,0.7,0.9,0.85) #with Preliminary
 # leg = ROOT.TLegend(0.6,0.75,0.9,0.9) # D.H. test
  leg.AddEntry(gr25,"Baseline" ,"L")
  leg.AddEntry(grcorr25,"DNN" ,"L")
