@@ -21,19 +21,21 @@ treeDir = 'tagsDumper/trees/'
 #samples = ["GluGluToHHTo2B2G_nodesPlusSM"]#
 #samples = ["GluGluToHHTo2B2G_nodesPlusSM","DiPhotonJetsBox_","DiPhotonJetsBox2BJets_","DiPhotonJetsBox1BJet_"]#
 #samples = ["GluGluToHHTo2B2G_nodesPlusSM","DiPhotonJetsBox2BJets_"]#
-samples = ["GluGluToHHTo2B2G_nodesPlusSM","DiPhotonJetsBox1BJet_"]#
+#samples = ["GluGluToHHTo2B2G_nodesPlusSM","DiPhotonJetsBox1BJet_"]#
 #samples = ["GluGluToHHTo2B2G_nodesPlusSM","DiPhotonJetsBox_"]#
 #samples = ["GluGluToHHTo2B2G_12nodes","DiPhotonJetsBox_","GJet_Pt-20to40","GJet_Pt-40"]#
+samples = ["GluGluToHHTo2B2G","DiPhotonJetsBox2BJets_"]#
+signal_name = "GluGluToHHTo2B2G"
 cleanOverlap = True   # Do not forget to change it 
 #treeTag="_2017"
 treeTag=""
 
-NodesNormalizationFile = '/work/nchernya/HHbbgg_ETH_devel/root_files/normalizations/reweighting_normalization_18_03_2019.json'
+NodesNormalizationFile = '/work/nchernya/HHbbgg_ETH_devel/root_files/ntuples_20190209/reweighting_normalization_19_09_2019.json'
 useMixOfNodes = True
-#whichNodes = list(np.arange(0,12,1)) 
-whichNodes = [1,2,3,6,8] #nodes similar to SM in shape of MX, used for categories optimization
-whichNodes.append('SM')   
-#whichNodes = ['SM']  #used to create cumulative on SM only
+#whichNodes = list(np.arange(0,12,1))   #all nodes are used to train. 
+#whichNodes = [1,2,3,6,8] #nodes similar to SM in shape of MX, used for categories optimization, considered as signal for the category optimization
+#whichNodes.append('SM')   
+whichNodes = ['SM']  #used to create cumulative on SM only
 signalMixOfNodesNormalizations = json.loads(open(NodesNormalizationFile).read())
 
 def addSamples():#define here the samples you want to process
@@ -48,11 +50,14 @@ def addSamples():#define here the samples you want to process
    # for iSample in samples:
     for num,iSample in enumerate(samples):
         process  = [s for s in files if iSample in s]
-        if iSample == "GluGluToHHTo2B2G_node_SM":
-            utils.IO.add_signal(ntuples,process,1,treeDir+process[0][process[0].find('output_')+7:process[0].find('.root')].replace('-','_')+'_13TeV_DoubleHTag_0',year)
-        elif (iSample == "GluGluToHHTo2B2G_nodesPlusSM") or (iSample == "GluGluToHHTo2B2G_12nodes"):
+        if (iSample == "GluGluToHHTo2B2G") and (useMixOfNodes==False):
+            #utils.IO.add_signal(ntuples,process,1,treeDir+process[0][process[0].find('output_')+7:process[0].find('.root')].replace('-','_')+'_13TeV_DoubleHTag_0',year)
+            utils.IO.add_signal(ntuples,process,1,treeDir+signal_name+'_13TeV_DoubleHTag_0',year)
+        #elif (iSample == "GluGluToHHTo2B2G_nodesPlusSM") or (iSample == "GluGluToHHTo2B2G_12nodes"):
+        elif (iSample == "GluGluToHHTo2B2G") and (useMixOfNodes==True) :
             utils.IO.use_signal_nodes(useMixOfNodes,whichNodes,signalMixOfNodesNormalizations)
-            utils.IO.add_signal(ntuples,process,1,treeDir+process[0][process[0].find('output_')+7:process[0].find('.root')].replace('-','_')+'_13TeV_DoubleHTag_0',year)
+            #utils.IO.add_signal(ntuples,process,1,treeDir+process[0][process[0].find('output_')+7:process[0].find('.root')].replace('-','_')+'_13TeV_DoubleHTag_0',year)
+            utils.IO.add_signal(ntuples,process,1,treeDir+signal_name+'_13TeV_DoubleHTag_0',year)
         elif "GJet" in str(iSample):
             utils.IO.add_background(ntuples,process,-2,treeDir+process[0][process[0].find('output_')+7:process[0].find('.root')].replace('-','_')+'_13TeV_DoubleHTag_0',year)
         elif "DiPhotonJetsBox" in str(iSample):

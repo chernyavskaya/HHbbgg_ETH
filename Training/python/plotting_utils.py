@@ -57,7 +57,7 @@ def plot_classifier_output(clf,X_total_train,X_total_test,y_total_train,y_total_
     ErrorBar_testing_S = np.sqrt(Histo_testing_S[0]/Y_pred_sig_test.size)
     ErrorBar_testing_B = np.sqrt(Histo_testing_B[0]/Y_pred_bkg_test.size)
     
-
+    plt.clf() 
     # Draw objects
     ax1 = plt.subplot(111)
     
@@ -208,7 +208,8 @@ def plot_roc_curve(x,y,clf,outString=None):
     # Compute ROC curve and area under the curve
     fpr, tpr, thresholds = roc_curve(y, decisions)
     roc_auc = auc(fpr, tpr)
-    
+   
+    plt.clf() 
     plt.plot(fpr, tpr, lw=1, label='ROC (area = %0.2f)'%(roc_auc))
     
     plt.xlim([-0.05, 1.05])
@@ -233,6 +234,8 @@ def plot_roc_curve_multiclass(x,y,clf,classesSchema=[-2,-1,1],classNumber=2,outS
     # Compute ROC curve and area under the curve
     fpr, tpr, thresholds = roc_curve(y[:,classNumber].ravel(), decisions.ravel())
     roc_auc = auc(fpr, tpr)
+
+    plt.clf()
     plt.plot(fpr, tpr, lw=1, label='ROC (area = %0.2f)'%(roc_auc))
     
     plt.xlim([-0.05, 1.05])
@@ -273,6 +276,7 @@ def plot_roc_curve_multiclass_singleBkg(x,y,clf,backgroundClassOutput,signalClas
         
     roc_auc = auc(fpr, tpr,reorder=True)
         
+    plt.clf()
     plt.plot(fpr, tpr, lw=1, label='ROC (area = %0.3f)'%(roc_auc))
     
     plt.xlim([-0.05, 1.05])

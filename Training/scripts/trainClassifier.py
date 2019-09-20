@@ -1,5 +1,9 @@
 import os
 import sys; sys.path.append("~/HHbbgg_ETH_devel/Training/python") # to load packages
+
+import matplotlib
+matplotlib.use('Agg')
+
 import training_utils as utils
 import numpy as np
 reload(utils)
@@ -23,14 +27,18 @@ import time
 import datetime
 start_time = time.time()
 
+
+
 def main(options,args):
   
     year=options.year
 
-    dirs = ['ntuples_2016_20191803','ntuples_2017_20191803']
+    outstr = "03_09_2019_training%s"%year
+
+    dirs = ['ntuples_20190209/ntuples_2016_20190209','ntuples_20190209/ntuples_2017_20190209','ntuples_20190209/ntuples_2018_20190209']
     ntuples = dirs[year]
-    SMname = ['GluGluToHHTo2B2G_nodesPlusSM_13TeV_madgraph_13TeV_DoubleHTag_0','GluGluToHHTo2B2G_nodesPlusSM_13TeV_madgraph_13TeV_DoubleHTag_0']
-    NodesNormalizationFile = '/shome/nchernya/HHbbgg_ETH_devel/root_files/normalizations/reweighting_normalization_18_03_2019.json'
+    SMname = ['GluGluToHHTo2B2G_13TeV_DoubleHTag_0','GluGluToHHTo2B2G_13TeV_DoubleHTag_0','GluGluToHHTo2B2G_13TeV_DoubleHTag_0']
+    NodesNormalizationFile = '/work/nchernya/HHbbgg_ETH_devel/root_files/ntuples_20190209/reweighting_normalization_19_09_2019.json'
     useMixOfNodes = True
     whichNodes = list(np.arange(0,12,1))
     whichNodes.append('SM')
@@ -40,7 +48,7 @@ def main(options,args):
     status,files = commands.getstatusoutput('! ls $data | sort -t_ -k 3 -n')
     files=files.split('\n')    
     
-    signal = [s for s in files if ("GluGluToHHTo2B2G_nodesPlusSM_" in s) ]
+    signal = [s for s in files if ("GluGluToHHTo2B2G_node_all_" in s) ]
     diphotonJets = [s for s in files if "DiPhotonJetsBox_" in s]
     #diphotonJets_1B = [s for s in files if "DiPhotonJetsBox1B" in s] # will use for limits
     #diphotonJets_2B = [s for s in files if "DiPhotonJetsBox2B" in s] # will use for limits
@@ -51,7 +59,7 @@ def main(options,args):
     utils.IO.add_signal(ntuples,signal,1,'tagsDumper/trees/%s'%SMname[year],year)
     #utils.IO.add_signal(ntuples,signal,1,'GluGluToHHTo2B2G_12nodes_13TeV_madgraph',year)
     utils.IO.add_background(ntuples,diphotonJets,-1,'tagsDumper/trees/'+diphotonJets[0][diphotonJets[0].find('output_')+7:diphotonJets[0].find('.root')].replace('-','_')+'_13TeV_DoubleHTag_0',year)
-    utils.IO.add_background(ntuples,gJets_lowPt,-2,'tagsDumper/trees/'+gJets_lowPt[0][gJets_lowPt[0].find('output_')+7:gJets_lowPt[0].find('.root')].replace('-','_')+'_13TeV_DoubleHTag_0',year)                            
+    if (year!=0) : utils.IO.add_background(ntuples,gJets_lowPt,-2,'tagsDumper/trees/'+gJets_lowPt[0][gJets_lowPt[0].find('output_')+7:gJets_lowPt[0].find('.root')].replace('-','_')+'_13TeV_DoubleHTag_0',year)                            
     utils.IO.add_background(ntuples,gJets_highPt,-2,'tagsDumper/trees/'+gJets_highPt[0][gJets_highPt[0].find('output_')+7:gJets_highPt[0].find('.root')].replace('-','_')+'_13TeV_DoubleHTag_0',year)                           
 
 
@@ -61,13 +69,12 @@ def main(options,args):
         print "using signal file n."+str(i)+": "+utils.IO.signalName[i]
 
 
-    outstr = "05_04_2019_trainingMjj_year%s"%year
     utils.IO.plotFolder = '/mnt/t3nfs01/data01/shome/nchernya/HHbbgg_ETH_devel/Training/plots/%s/'%outstr
     if not os.path.exists(utils.IO.plotFolder):
         print utils.IO.plotFolder, "doesn't exist, creating it..."
         os.makedirs(utils.IO.plotFolder)
 
-    doReweight2017 = False #reweight signal from 2017 to match 2016 (mix of nodes reweight with HH_mass at gen level)
+    doReweight = False #reweight signal from 2017 to match 2016 (mix of nodes reweight with HH_mass at gen level)
 
 
     #use noexpand for root expressions, it needs this file https://github.com/ibab/root_pandas/blob/master/root_pandas/readwrite.py
@@ -95,7 +102,7 @@ def main(options,args):
     print branch_names
 
     event_bkg,event_sig = None,None
-    if (year==1 and doReweight2017 == True):
+    if (year>=1 and doReweight == True):
         preprocessing.set_signals(branch_names+event_branches+branch_cuts+['genMhh'],True,cuts)
         preprocessing.set_backgrounds(branch_names+event_branches+branch_cuts,True,cuts)
     else :
@@ -129,9 +136,11 @@ def main(options,args):
         for i in range(utils.IO.nBkg):
             if 'DiPhotonJetsBox_MGG' in utils.IO.bkgTreeName[i] : preprocessing.cleanOverlapDiphotons(utils.IO.bkgTreeName[i],utils.IO.background_df[i])        
 
-    if (year==1 and doReweight2017 == True):
+    if (year==1 and doReweight == True):
         preprocessing.reweight_gen_mhh('mhh',genFrame2016,genFrame2017,utils.IO.signal_df[0],'genMhh')
 
+    if (year==2 and doReweight == True):
+        preprocessing.reweight_gen_mhh('mhh',genFrame2016,genFrame2018,utils.IO.signal_df[0],'genMhh')
 
     X_bkg,y_bkg,weights_bkg,event_bkg,X_sig,y_sig,weights_sig,event_sig=preprocessing.set_variables(branch_names,use_event_num=True)
 
@@ -170,18 +179,18 @@ def main(options,args):
     n_threads=10
 
     #optimized parameters with Mjj for 2016 done by Francesco
-    #clf = xgb.XGBClassifier(base_score=0.5, colsample_bylevel=1, colsample_bytree=1,
-    #       gamma=0, learning_rate=0.1, max_delta_step=0, max_depth=15,
-    #       min_child_weight=1e-06,  n_estimators=2000,
-    #       nthread=n_threads, objective='multi:softprob', reg_alpha=0.0,
-    #       reg_lambda=0.05, scale_pos_weight=1, seed=None, silent=True,
-    #       subsample=1)
-    clf = xgb.XGBClassifier(base_score=0.5, booster='gbtree', colsample_bylevel=1,
-       colsample_bytree=1, gamma=0, learning_rate=0.2, max_delta_step=0,
-       max_depth=3, min_child_weight=0.0001, 
-       n_estimators=1000, n_jobs=1, nthread=n_threads, objective='binary:logistic',
-       random_state=0, reg_alpha=0.0, reg_lambda=0.05, scale_pos_weight=1,
-       seed=0, silent=True, subsample=1)
+    clf = xgb.XGBClassifier(base_score=0.5, colsample_bylevel=1, colsample_bytree=1,
+           gamma=0, learning_rate=0.1, max_delta_step=0, max_depth=15,
+           min_child_weight=1e-06,  n_estimators=2000,
+           nthread=n_threads, objective='multi:softprob', reg_alpha=0.0,
+           reg_lambda=0.05, scale_pos_weight=1, seed=None, silent=True,
+           subsample=1)
+    #clf = xgb.XGBClassifier(base_score=0.5, booster='gbtree', colsample_bylevel=1,
+    #   colsample_bytree=1, gamma=0, learning_rate=0.2, max_delta_step=0,
+    #   max_depth=3, min_child_weight=0.0001, 
+    #   n_estimators=1000, n_jobs=1, nthread=n_threads, objective='binary:logistic',
+    #   random_state=0, reg_alpha=0.0, reg_lambda=0.05, scale_pos_weight=1,
+    #   seed=0, silent=True, subsample=1)
 
     clf.fit(X_total_train,y_total_train, sample_weight=w_total_train)
     

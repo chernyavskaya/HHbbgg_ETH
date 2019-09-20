@@ -16,8 +16,8 @@ using namespace std;
 //c++ -lm -o runHH runHHReweighter.cpp HHReweight5D.cpp `root-config --glibs --cflags`
 int main ()
 {
-	 TString ending = "29082019";
-    TString inputDir = "/shome/nchernya/HHbbgg_ETH_devel/root_files/HHreweighting_29_08_2019/";
+	 TString ending = "18092019";
+    TString inputDir = "/shome/nchernya/HHbbgg_ETH_devel/root_files/HHreweighting_18_09_2019/";
 	TString tag = "2016";
     TString filename = "output_GluGluToHHTo2B2G_node_all_merged_2016.root"; //2016
   //  TString tag = "2018";

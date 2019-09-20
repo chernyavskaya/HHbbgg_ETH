@@ -386,6 +386,7 @@ def set_signals(branch_names,shuffle,cuts='event>=0'):
             year = ''
             if utils.IO.sigYear[i]==1 : year='2017'
             elif utils.IO.sigYear[i]==0 : year='2016'
+            elif utils.IO.sigYear[i]==2 : year='2018'
             node_name = utils.IO.signalWhichMixOfNodes[0]
             norm_value=utils.IO.signalMixOfNodesNormalizations[year]['benchmark_%s_normalization'%node_name]
             node_df['nodes_sumWeight']=node_df['benchmark_reweight_%s'%node_name]/norm_value
