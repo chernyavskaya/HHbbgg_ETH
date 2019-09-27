@@ -26,16 +26,16 @@ gStyle.SetPadLeftMargin(0.19)
 right,top   = gStyle.GetPadRightMargin(),gStyle.GetPadTopMargin()
 left,bottom = gStyle.GetPadLeftMargin(),gStyle.GetPadBottomMargin()
 
-#pCMS1 = ROOT.TPaveText(left*1.1,1.-top*4,0.4,1.,"NDC") #without Preliminary
-pCMS1 = ROOT.TPaveText(left*1.05,1.-top*3.85,0.4,1.,"NDC") #with Preliminary
+pCMS1 = ROOT.TPaveText(left*1.1,1.-top*4,0.4,1.,"NDC") #without Preliminary
+#pCMS1 = ROOT.TPaveText(left*1.05,1.-top*3.85,0.4,1.,"NDC") #with Preliminary
 pCMS1.SetTextFont(62)
 pCMS1.AddText("CMS")
 
-#pCMS12 = ROOT.TPaveText(left*1.1+0.1,1.-top*4,0.57,1.,"NDC") #without Preliminary
-pCMS12 = ROOT.TPaveText(left*1.1+0.09,1.-top*4,0.57,1.,"NDC") #with Preliminary
+pCMS12 = ROOT.TPaveText(left*1.1+0.1,1.-top*4,0.57,1.,"NDC") #without Preliminary
+#pCMS12 = ROOT.TPaveText(left*1.1+0.09,1.-top*4,0.57,1.,"NDC") #with Preliminary
 pCMS12.SetTextFont(52)
-#pCMS12.AddText("Simulation")
-pCMS12.AddText("Simulation Preliminary")
+pCMS12.AddText("Simulation")
+#pCMS12.AddText("Simulation Preliminary")
 
 
 pName = ROOT.TPaveText(left*1.1,1.-top*6,0.6,1.,"NDC")
@@ -162,7 +162,7 @@ frame = ROOT.TH1F("frame","",1,0,0.30)
 frame.SetStats(0)
 frame.GetXaxis().SetLabelSize(0.04)
 frame.GetYaxis().SetLabelSize(0.04)
-frame.GetYaxis().SetTitle("#bar{#sigma}")
+frame.GetYaxis().SetTitle("#sigma")
 frame.GetXaxis().SetTitle("<#hat{#sigma}>")
 frame.GetYaxis().SetRangeUser(0.,0.30)
 frame.Draw()
@@ -207,6 +207,6 @@ gr.Draw("Psame")
 leg.Draw()
 ROOT.gPad.Update()
 ROOT.gPad.RedrawAxis()
-c.SaveAs(scratch_plots+savename+"_additional_pt_root.C"  )
-c.SaveAs(scratch_plots+savename+"_additional_pt_root.root"  )
-c.SaveAs(scratch_plots+savename+"_additional_pt_root.pdf"  )
+c.SaveAs(scratch_plots+savename+"_additional_pt_root_paper.C"  )
+c.SaveAs(scratch_plots+savename+"_additional_pt_root_paper.root"  )
+c.SaveAs(scratch_plots+savename+"_additional_pt_root_paper.pdf"  )
