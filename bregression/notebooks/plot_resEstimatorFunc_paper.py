@@ -133,6 +133,7 @@ markers=[29,33,34,21,22,23,24]
 
 
 n_points = 200
+print 'fit results of linar dependence : ',par0,par1
 resolution_array = array('d',np.linspace(0,0.40,n_points))
 err_iqr2_incl_array_up = array('d',map(lambda x: 1.2*(par0+par1*x), resolution_array))
 err_iqr2_incl_array_down = array('d',map(lambda x: 0.8*(par0+par1*x), resolution_array))
