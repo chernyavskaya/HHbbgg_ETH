@@ -3,7 +3,7 @@
 import string
 
 input = open("done.txt","rt")
-output = open("present.txt","wt")
+output = open("present2.txt","wt")
 lines = input.readlines()
 max_num = 140
 for i in range(0,max_num+1) :
