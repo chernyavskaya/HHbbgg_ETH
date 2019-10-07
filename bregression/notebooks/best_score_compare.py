@@ -13,13 +13,13 @@ import matplotlib.offsetbox as offsetbox
 import numpy as np
 
 parser = OptionParser(option_list=[
-    make_option("--training",type='string',dest="training",default='2018-02-03_17_57_53_job'),
+    make_option("--training",type='string',dest="training",default='2016_04_10_2019'),
     make_option("--njobs",type='int',dest="njobs",default=0),
     make_option("--inp-dir",type='string',dest="inp_dir",default='/work/nchernya/HHbbgg_ETH_devel/bregression/output_files/NN_psi_training/'),
     make_option("--inp-file",type='string',dest='inp_file',default='metrics'),
     #make_option("--out-dir",type='string',dest="out_dir",default='/users/nchernya//HHbbgg_ETH/bregression/plots/NN_epochs/'),
-    make_option("--out-dir",type='string',dest="out_dir",default='/work/nchernya/HHbbgg_ETH_devel/bregression/plots/2018JECv8/April25/training/'), 
-    make_option("--metrics",type='string',dest="metrics",default='loss,mae0,mse0'),
+    make_option("--out-dir",type='string',dest="out_dir",default='/work/nchernya/HHbbgg_ETH_devel/bregression/plots/2016JECv11_04_10_2019/'), 
+    make_option("--metrics",type='string',dest="metrics",default='loss,mae0,mse0,r2_score0,mse100,mae100,mse50,mae50,mse200,mae200'),
     make_option("--nxval",type='int',dest="nxval",default=1),
 ])
 

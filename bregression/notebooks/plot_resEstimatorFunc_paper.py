@@ -72,7 +72,8 @@ parser = OptionParser(option_list=[
 input_trainings = options.training.split(',')
 
 now = str(datetime.datetime.now()).split(' ')[0]
-scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/September20_2019/'
+#scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/September20_2019/'
+scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/October06_2019_2016nanoAOD/'
 #dirs=['',input_trainings[0],options.samplename]
 dirs=['',options.samplename]
 for i in range(len(dirs)):

@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 
+import tensorflow as tf
+from keras import backend as K
+
 import numpy as np
 
 import bregnn.ffwd as ffwd 
@@ -83,6 +86,11 @@ if options.features == '':
     options.features = ','.join(features)
 else:
     features = options.features.split(',')
+
+print("-------------------------------------------")
+print("GPU available: ", tf.test.is_gpu_available())
+print("Keras backend: ", K.backend())
+print("-------------------------------------------")
 
 print(features)
 

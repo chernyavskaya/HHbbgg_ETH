@@ -56,6 +56,7 @@ for idx,name in enumerate(input_trainings):
   #  print(X[0])
     
     model = keras.models.load_model(models[0],compile=False)
+    #model = keras.models.load_model(models[0])
     y_pred = model.predict(X)
   
     # *Note*: the target is typically normalized in the training y = (y-mu)/sigma

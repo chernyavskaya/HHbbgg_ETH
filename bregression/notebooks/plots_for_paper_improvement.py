@@ -78,7 +78,8 @@ input_files = options.inp_file.split(',')
 now = str(datetime.datetime.now()).split(' ')[0]
 savetag='August30'
 #scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/2017JECv32/June05/'   #for studies
-scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/September20_2019/' #for paper
+#scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/October06_2019_2016nanoAOD/' #for paper
+scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/October06_2019_2016nanoAOD/' #for paper
 #dirs=['',input_trainings[0],options.samplename]
 dirs=['',options.samplename]
 for i in range(len(dirs)):
@@ -109,7 +110,7 @@ labels=options.labels.split(',')
 bins_same = []
 
 #for i in range(0,3):
-for i in range(1,3):  #for some reason code crashes if running all 3 together, I ran 0-2, 2-3
+for i in range(0,2):  #for some reason code crashes if running all 3 together, I ran 0-2, 2-3
  sigma_mu_array = []
  sigma_array = []
  mu_array = []

@@ -73,8 +73,9 @@ input_trainings = options.training.split(',')
 
 now = str(datetime.datetime.now()).split(' ')[0]
 #scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/2017JECv32/June05/'   #for studies
-savetag='August30_2019'
-scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/September20_2019/'  #for paper
+savetag='October06_2019_2016nanoAOD'
+#scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/September20_2019/'  #for paper
+scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/October06_2019_2016nanoAOD/'  #for paper
 dirs=['',input_trainings[0],options.samplename]
 dirs=['',options.samplename]
 for i in range(len(dirs)):
