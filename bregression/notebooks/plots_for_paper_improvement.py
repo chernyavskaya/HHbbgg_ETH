@@ -109,7 +109,7 @@ labels=options.labels.split(',')
 bins_same = []
 
 #for i in range(0,3):
-for i in range(1,3):  #for some reason code crashes if running all 3 together, I ran 0-2, 2-3
+for i in range(0,1):  #for some reason code crashes if running all 3 together, I ran 0-2, 2-3
  sigma_mu_array = []
  sigma_array = []
  mu_array = []
@@ -268,7 +268,7 @@ for i in range(1,3):  #for some reason code crashes if running all 3 together, I
  frame.SetStats(0)
  frame.GetXaxis().SetLabelSize(0.04)
  frame.GetYaxis().SetLabelSize(0.04)
- frame.GetYaxis().SetTitle("#bar{#sigma}")
+ frame.GetYaxis().SetTitle("#bar{s}")
 # frame.GetYaxis().SetTitle("#sigma")  #when sigma only
  frame.GetYaxis().SetRangeUser(ymin,ymax)
 
@@ -347,7 +347,7 @@ for i in range(1,3):  #for some reason code crashes if running all 3 together, I
     frame2.GetYaxis().CenterTitle(ROOT.kTRUE)
   #  frame2.GetYaxis().SetTitle("#frac{(#bar{#sigma}_{DNN}-#bar{#sigma}_{baseline})}{#bar{#sigma}_{baseline}}")	
    # frame2.GetYaxis().SetTitle("#frac{#Delta#sigma}{#sigma_{baseline}}")	 #when sigma only
-    frame2.GetYaxis().SetTitle("#frac{#Delta#bar{#sigma}}{#bar{#sigma}_{baseline}}")
+    frame2.GetYaxis().SetTitle("#frac{#Delta#bar{s}}{#bar{s}_{baseline}}")
    # if i==0 : frame2.GetYaxis().SetRangeUser(-0.12,0.)
     if i==0 : 
           frame2.GetYaxis().SetRangeUser(-0.17,0.)
