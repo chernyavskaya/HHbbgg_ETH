@@ -6,7 +6,7 @@ OPTIND=0         # Reset in case getopts has been used previously in the shell.
 # Initialize our own variables:
 year=0 #0 for 2016, 1 for 2017
 ntup="ntuples_20190209/ntuples_2016_20190209/"
-outTag="20190903_2016"
+outTag="20191007_2016"
 
 addHHTagger=0  #0 if you want to add it, 1 if it is already present
 #training="training_with_27_06_2018_newcode_v2"  #new code with fixed selection of jets
@@ -14,7 +14,7 @@ addHHTagger=0  #0 if you want to add it, 1 if it is already present
 #training="training_with_10_12_2018_commonTraining_2016" #deep CSV
 
 #training="training_with_19_03_2019_trainingMjj_year"$year #deep CSV
-training="training_with_03_09_2019_training"$year #first full run 2 training
+training="training_with_07_10_2019_training"$year #first full run 2 training
 
 
 while getopts ":n:at:o:" opt; do
