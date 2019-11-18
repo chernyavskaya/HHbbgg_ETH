@@ -24,7 +24,8 @@ treeDir = 'tagsDumper/trees/'
 #samples = ["GluGluToHHTo2B2G_nodesPlusSM","DiPhotonJetsBox1BJet_"]#
 #samples = ["GluGluToHHTo2B2G_nodesPlusSM","DiPhotonJetsBox_"]#
 #samples = ["GluGluToHHTo2B2G_12nodes","DiPhotonJetsBox_","GJet_Pt-20to40","GJet_Pt-40"]#
-samples = ["GluGluToHHTo2B2G","DiPhotonJetsBox_","DiPhotonJetsBox2BJets_","DiPhotonJetsBox1BJet_"]#
+#samples = ["GluGluToHHTo2B2G","DiPhotonJetsBox_","DiPhotonJetsBox2BJets_","DiPhotonJetsBox1BJet_"]#
+samples = ["GluGluToHHTo2B2G","DiPhotonJetsBox_"]#
 signal_name = "GluGluToHHTo2B2G"
 cleanOverlap = True   # Do not forget to change it 
 #treeTag="_2017"
@@ -63,9 +64,12 @@ def addSamples():#define here the samples you want to process
         elif "DiPhotonJetsBox" in str(iSample):
             print str(iSample)
             utils.IO.add_background(ntuples,process,-1,treeDir+process[0][process[0].find('output_')+7:process[0].find('.root')].replace('-','_')+'_13TeV_DoubleHTag_0',year)
-        else:
+        elif len([b for b in samples if 'GJet' in b])==2:
             print str(iSample)
             utils.IO.add_background(ntuples,process,-(samples.index(iSample)-(samples.index(iSample)>2)),treeDir+process[0][process[0].find('output_')+7:process[0].find('.root')].replace('-','_')+'_13TeV_DoubleHTag_0',year)   ## This was is not perfect, only works if gg jets, g jets are present and after that single higgs. it does not work if bjets present...
+        else :
+            print str(iSample)
+            utils.IO.add_background(ntuples,process,-(samples.index(iSample)),treeDir+process[0][process[0].find('output_')+7:process[0].find('.root')].replace('-','_')+'_13TeV_DoubleHTag_0',year)   ## This was is not perfect, only works if gg jets, g jets are present and after that single higgs. it does not work if bjets present...
 
     
 
@@ -179,13 +183,24 @@ def main(options,args):
     
     bkg = []
    # for i in range(0,len(utils.IO.backgroundName)-1): 
-    numProcs = 1
-    if  (any("GJet" in s for s in samples)) : numProcs = 2  
-    for i in range(0,numProcs):   # -1 : gg+jets, -2 : g +jets 
-        bkg.append(X_bkg[y_bkg ==-i-1])
+   # numProcs = 1
+   # if  (any("GJet" in s for s in samples)) : numProcs = 2  
+   # for i in range(0,numProcs):   # -1 : gg+jets, -2 : g +jets 
+    bkg.append(X_bkg[y_bkg ==-1])
+    if len([b for b in samples if 'GJet' in b])==2:
+        bkg.append(X_bkg[y_bkg ==-2])
+    for i in range(1,len(utils.IO.backgroundName)-1): 
+        if 'GJet' in  utils.IO.backgroundName[i]:
+             continue
+        elif len([b for b in samples if 'GJet' in b])==2:
+            bkg.append(X_bkg[y_bkg ==-i-1-(i>2)])
+        else :
+            bkg.append(X_bkg[y_bkg ==-i-1])
+        print utils.IO.backgroundName
     
         
     #compute the MVA
+    Y_pred_bkg = []
     if not options.addHHTagger:
         print 'Adding tagger output'
         loaded_model = joblib.load(os.path.expanduser(options.trainingDir+options.trainingVersion+'.pkl'))
@@ -195,8 +210,8 @@ def main(options,args):
         if options.addData:
             Y_pred_data = loaded_model.predict_proba(X_data)[:,loaded_model.n_classes_-1].astype(np.float64)
             #print Y_pred_data 
-        Y_pred_bkg = []
         for i in range(0,len(utils.IO.backgroundName)):  
+        #for i in range(0,numProcs):  
             print str(i)
             Y_pred_bkg.append(loaded_model.predict_proba(bkg[i])[:,loaded_model.n_classes_-1].astype(np.float64))
         Y_pred_sig = loaded_model.predict_proba(X_sig)[:,loaded_model.n_classes_-1].astype(np.float64)
@@ -316,7 +331,7 @@ def main(options,args):
     for iProcess in range(0,len(utils.IO.backgroundName)):
         ##gJets which are two samples for one process are skipped
         iSample=iProcess
-        if 'GJets' in utils.IO.backgroundName: 
+        if len([b for b in samples if 'GJet' in b])==2:
              if iProcess == 1 or iProcess ==2:
                  continue
              if iProcess > 2:
@@ -340,7 +355,9 @@ def main(options,args):
         print nCleaned.shape
     
     #    processPath=os.path.expanduser('~/HHbbgg_ETH_devel/output_files/')+outTag+'/'+utils.IO.backgroundName[iProcess].split("/")[len(utils.IO.backgroundName[7].split("/"))-1].replace("output_","").replace(".root","")+"_preselection"+".root"
-        bkgName_idx = len(samples)-3
+        bkgName_idx = len(samples)-1
+        if 'GJets' in utils.IO.backgroundName: 
+            bkgName_idx = len(samples)-3
         print 'bkg Index : ',bkgName_idx 
         print Y_pred_bkg
       #  if not (any("GJet" in s for s in samples)):  bkgName_idx = len(samples)-1

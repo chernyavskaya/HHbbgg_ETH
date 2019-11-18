@@ -5,10 +5,10 @@ OPTIND=0         # Reset in case getopts has been used previously in the shell.
 
 # Initialize our own variables:
 year=0 #0 for 2016, 1 for 2017
-ntup="ntuples_20190209/ntuples_2016_20190209/"
-outTag="20191007_2016"
+ntup="ntuples_20190209/ntuples_2017_20190209/"
+outTag="20191007_2017"
 
-addHHTagger=0  #0 if you want to add it, 1 if it is already present
+addHHTagger=1  #0 if you want to add it, 1 if it is already present
 #training="training_with_27_06_2018_newcode_v2"  #new code with fixed selection of jets
 #training="training_with_01_10_2018_deepCSV" #deep CSV
 #training="training_with_10_12_2018_commonTraining_2016" #deep CSV

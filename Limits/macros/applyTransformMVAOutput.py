@@ -6,8 +6,15 @@ from array import array
 # -----------------------------------------------------------------------------------------------------------
 def main(options,args):
 
-   # newWeight = 1.011026
-    newWeight = 1.02309  ## (0.398279/1852.6094)*(1./(0.412699/1964.0142))  #with reweighted to SM  
+### Reweight to match S/B for 2017 since 2017 is the best year. Take as bkg diphoton(cleaned from overlap)+diphoton+bjets. We did not take gJets here because in 2016 and 2018 right now we have ~8k events which is too small to estimate properly the bkg. 
+    newWeight2016 = 1.089  #(B_2017/S_2017)/(B_2016/S_2016) = (9.69362182617187500e+02/4.18241828651538472e-01)/(8.29695556640625000e+02/0.39000478) 
+    newWeight2017 = 1.
+    newWeight2018 = 1.024  #(B_2017/S_2017)/(B_2018/S_2018) = (9.69362182617187500e+02/4.18241828651538472e-01)/(9.25812927246093750e+02/4.08981237703397726e-01)
+
+    lumi2016=35.92
+    lumi2017=41.53
+    lumi2018=59.74
+      
 
     ## setTDRStyle()
     ROOT.gStyle.SetOptStat(0)
@@ -16,9 +23,9 @@ def main(options,args):
     cumulativeGraph = fin_graph.Get("cumulativeGraph")
 
     processes = [
-      #  "reducedTree" #,
-      #  "reducedTree_sig" #,
-        "reducedTree_sig_2017" #,
+        "reducedTree" #,
+        #"reducedTree_sig" #,
+      #  "reducedTree_sig_2017" #,
       #  "reducedTree_data"
         ]
 
@@ -27,10 +34,10 @@ def main(options,args):
 
   #  for i in range(0,8):
  #   for i in range(0,5):
-    for i in range(0,1):
+    for i in range(0,0):
   #      if i == 1: continue #gJets are combined in one, i==2
-      #  processes.append("reducedTree_bkg_"+str(i))
-        processes.append("reducedTree_bkg_"+str(i)+"_2017")
+        processes.append("reducedTree_bkg_"+str(i))
+      #  processes.append("reducedTree_bkg_"+str(i)+"_2017")
 
 
 
@@ -51,6 +58,8 @@ def main(options,args):
 
         transfMVA = array( 'f', [ 0. ] )
         transfBranch = copyTree.Branch("MVAOutputTransformed",transfMVA,"MVAOutputTransformed/F");
+        lumi = array( 'f', [ 0. ] )
+        lumiBranch = copyTree.Branch("lumi",lumi,"lumi/F");
         dummyList = []
         
         for i,event in enumerate(copyTree):
@@ -58,12 +67,19 @@ def main(options,args):
            # mva = event.HHTagger2017
             mva = event.MVAOutput
            # mva = event.HHbbggMVA
-            if '2017' in options.file:
-                mva = mva/(mva*(1.-newWeight)+newWeight)
+            if '2016' in options.file:
+                mva = mva/(mva*(1.-newWeight2016)+newWeight2016)
                 transfMVA[0] = cumulativeGraph.Eval(mva)
-            else :
+                lumi[0] = lumi2016
+            elif '2017' in options.file:
                 transfMVA[0] = cumulativeGraph.Eval(mva)
+                lumi[0] = lumi2017
+            elif '2018' in options.file:
+                mva = mva/(mva*(1.-newWeight2018)+newWeight2018)
+                transfMVA[0] = cumulativeGraph.Eval(mva)
+                lumi[0] = lumi2018
             transfBranch.Fill()
+            lumiBranch.Fill()
     
     
     fTransformed.Write()
