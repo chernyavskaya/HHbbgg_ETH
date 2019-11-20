@@ -8,9 +8,9 @@ gStyle.SetPadTopMargin(0.06)
 gStyle.SetPadRightMargin(0.04)
 gStyle.SetPadLeftMargin(0.15)
 
-#what ='Jet_pt'
+what ='Jet_pt'
 #what ='Jet_eta'
-what ='target'
+#what ='target'
 what_name=''
 if what=='Jet_pt' :  
 	bins=100
@@ -33,15 +33,15 @@ if what=='target' :
 right,top   = gStyle.GetPadRightMargin(),gStyle.GetPadTopMargin()
 left,bottom = gStyle.GetPadLeftMargin(),gStyle.GetPadBottomMargin()
 
-pCMS1 = ROOT.TPaveText(left*1.1,1.-top*3.85,0.4,1.,"NDC") #with Preliminary
-#pCMS1 = ROOT.TPaveText(left*1.1,1.-top*4,0.4,1.,"NDC") #without Preliminary
+#pCMS1 = ROOT.TPaveText(left*1.1,1.-top*3.85,0.4,1.,"NDC") #with Preliminary
+pCMS1 = ROOT.TPaveText(left*1.1,1.-top*4,0.4,1.,"NDC") #without Preliminary
 pCMS1.SetTextFont(62)
 pCMS1.AddText("CMS")
 
 pCMS12 = ROOT.TPaveText(left*1.1+0.1,1.-top*4,0.57,1.,"NDC")
 pCMS12.SetTextFont(52)
-#pCMS12.AddText("Simulation")
-pCMS12.AddText("Simulation Preliminary")
+pCMS12.AddText("Simulation")
+#pCMS12.AddText("Simulation Preliminary")
 
 
 
@@ -70,8 +70,12 @@ f = TFile.Open(name, "read")
 t = f.Get("tree")
 hist = ROOT.TH1F("hist","hist",bins,xmin,xmax)
 hist.SetLineWidth(2)
+hist.SetLineColor(ROOT.kAzure-3)
+hist.SetFillColor(ROOT.kAzure+7)
+hist.SetFillStyle(3005)
+
 c = ROOT.TCanvas("c","c",900,900)
-#c.SetLogy() # for pt
+c.SetLogy() # for pt
 #c.SetBottomMargin(0.3)
 #cuts='(Jet_pt > 20) & (Jet_mcFlavour==5 | Jet_mcFlavour==-5) & (Jet_eta<2.5 & Jet_eta>-2.5) & (Jet_mcPt>0) & (Jet_mcPt<6000)'
 cuts='(Jet_pt > 20) & (Jet_mcFlavour==5 | Jet_mcFlavour==-5) & (Jet_mcPt>0) & (Jet_mcPt<6000)'
@@ -84,20 +88,20 @@ frame.GetYaxis().SetTitle("Normalized to Unity")
 frame.GetYaxis().SetLabelSize(0.04)
 hist.Scale(1./hist.Integral())
 #frame.GetYaxis().SetRangeUser(1e-01,hist.GetMaximum()*30) #pt
-#frame.GetYaxis().SetRangeUser(1e-08,hist.GetMaximum()*30) #pt norm without preliminary
+frame.GetYaxis().SetRangeUser(1e-08,hist.GetMaximum()*30) #pt norm without preliminary
 #frame.GetYaxis().SetRangeUser(1e-08,hist.GetMaximum()*30) #pt norm with preliminary
 #frame.GetYaxis().SetRangeUser(1e-01,hist.GetMaximum()*1.05) #target
-frame.GetYaxis().SetRangeUser(1e-03,hist.GetMaximum()*1.15) #target norm with preliminary
+#frame.GetYaxis().SetRangeUser(1e-03,hist.GetMaximum()*1.15) #target norm with preliminary
 #frame.GetYaxis().SetRangeUser(1e-03,hist.GetMaximum()*1.05) #target norm without preliminary
 frame.Draw()
+hist.Draw("same")
 pCMS1.Draw()
 pCMS12.Draw()
 pCMS2.Draw()
 pCMSt.Draw()
 ROOT.gPad.Update()
 ROOT.gPad.RedrawAxis()
-hist.Draw("same")
-name="../plots/paper/bjet_spectrum_%s_paper"%what_name.replace(' ','').replace('{','').replace('}','').replace('^','').replace('/','').replace('#','').replace('(','').replace(')','')
+name="../plots/paper/bjet_spectrum_%s_filled_paper"%what_name.replace(' ','').replace('{','').replace('}','').replace('^','').replace('/','').replace('#','').replace('(','').replace(')','')
 c.SaveAs(name+'.pdf')
 c.SaveAs(name+'.C')
 c.SaveAs(name+'.root')
