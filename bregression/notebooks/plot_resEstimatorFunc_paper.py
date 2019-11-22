@@ -128,7 +128,7 @@ par0 = func.GetParameter(0)
 par1 = func.GetParameter(1)
 #par0=0
 #par1=1.
-colors=[ROOT.kRed,ROOT.kOrange-3,ROOT.kSpring+9,3,4,5,6]
+colors=[ROOT.kRed,ROOT.kOrange-3,ROOT.kGreen+2,3,4,5,6]
 markers=[29,33,34,21,22,23,24]
 
 
@@ -143,8 +143,8 @@ gr_up = TGraph(2*n_points)
 for i in range(n_points):
 	gr_up.SetPoint(i,resolution_array[i],err_iqr2_incl_array_up[i])
 	gr_up.SetPoint(n_points+i,resolution_array[n_points-i-1],err_iqr2_incl_array_down[n_points-i-1])
-gr_up.SetLineColor(ROOT.kCyan-10)
-gr_up.SetFillColor(ROOT.kCyan-10)
+gr_up.SetLineColor(ROOT.kAzure-9)
+gr_up.SetFillColor(ROOT.kAzure-9)
 
 #pt_bins=["(Jet_mcPt>=60 & Jet_mcPt<70) ","(Jet_mcPt>=80 & Jet_mcPt<90)", "(Jet_mcPt>=100 & Jet_mcPt<110)"]
 #pt_bins=["(Jet_mcPt>=30 & Jet_mcPt<50)", "(Jet_mcPt>=50 & Jet_mcPt<70) ","(Jet_mcPt>=70 & Jet_mcPt<100)"]
