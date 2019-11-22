@@ -16,7 +16,8 @@ import json
 
 treeDir = 'tagsDumper/trees/'
 #samples = ["GluGluToHHTo2B2G","DiPhotonJetsBox_","DiPhotonJetsBox2BJets_","DiPhotonJetsBox1BJet_"]#
-samples = ["GluGluToHHTo2B2G","ttH"]#
+samples = ["GluGluToHHTo2B2G","DiPhotonJetsBox_","DiPhotonJetsBox2BJets_","DiPhotonJetsBox1BJet_","ttH"]#
+#samples = ["GluGluToHHTo2B2G","ttH"]#
 #samples = ["GluGluToHHTo2B2G","DiPhotonJetsBox_"]#
 signal_name = "GluGluToHHTo2B2G"
 cleanOverlap = True   # Do not forget to change it 
@@ -97,7 +98,8 @@ def main(options,args):
     print options.addnodes
     addSamples()
     
-    branch_names = 'Mjj,leadingJet_DeepFlavour,subleadingJet_DeepFlavour,absCosThetaStar_CS,absCosTheta_bb,absCosTheta_gg,diphotonCandidatePtOverdiHiggsM,dijetCandidatePtOverdiHiggsM,customLeadingPhotonIDMVA,customSubLeadingPhotonIDMVA,leadingPhotonSigOverE,subleadingPhotonSigOverE,sigmaMOverM,PhoJetMinDr'.split(",") #set of variables March 2017 but regressed
+    #branch_names = 'Mjj,leadingJet_DeepFlavour,subleadingJet_DeepFlavour,absCosThetaStar_CS,absCosTheta_bb,absCosTheta_gg,diphotonCandidatePtOverdiHiggsM,dijetCandidatePtOverdiHiggsM,customLeadingPhotonIDMVA,customSubLeadingPhotonIDMVA,leadingPhotonSigOverE,subleadingPhotonSigOverE,sigmaMOverM,PhoJetMinDr'.split(",") #set of variables March 2017 but regressed
+    branch_names = 'leadingJet_DeepFlavour,subleadingJet_DeepFlavour,absCosThetaStar_CS,absCosTheta_bb,absCosTheta_gg,diphotonCandidatePtOverdiHiggsM,dijetCandidatePtOverdiHiggsM,customLeadingPhotonIDMVA,customSubLeadingPhotonIDMVA,leadingPhotonSigOverE,subleadingPhotonSigOverE,sigmaMOverM,PhoJetMinDr'.split(",") #set of variables March 2017 but regressed
     branch_names +=['rho']
     branch_names += 'noexpand:(leadingJet_bRegNNResolution*1.4826),noexpand:(subleadingJet_bRegNNResolution*1.4826),noexpand:(sigmaMJets*1.4826)'.split(",")
     additionalCut_names = 'CMS_hgg_mass,Mjj,MX,ttHScore'.split(',')
@@ -171,11 +173,11 @@ def main(options,args):
         if options.addData:
             Y_pred_data = loaded_model.predict_proba(X_data)[:,loaded_model.n_classes_-1].astype(np.float64)
             #print Y_pred_data 
-        for i in range(0,len(utils.IO.backgroundName)):  
-        #for i in range(0,0):   #not to apply MVA on bkg
+        #for i in range(0,len(utils.IO.backgroundName)):  
+        for i in range(0,0):   #not to apply MVA on bkg
             print 'evaluating MVA for bkg : ',str(i)
             Y_pred_bkg.append(loaded_model.predict_proba(bkg[i])[:,loaded_model.n_classes_-1].astype(np.float64))
-    #    Y_pred_sig = loaded_model.predict_proba(X_sig)[:,loaded_model.n_classes_-1].astype(np.float64)
+        Y_pred_sig = loaded_model.predict_proba(X_sig)[:,loaded_model.n_classes_-1].astype(np.float64)
     
     
     
@@ -221,36 +223,36 @@ def main(options,args):
 
  
 ###########################  signal  block starts  ################################################################ 
-#    sig_count_df = utils.IO.signal_df[0]
-#    preprocessing.define_process_weight(sig_count_df,utils.IO.sigProc[0],utils.IO.signalName[0],utils.IO.signalTreeName[0],cleanSignal=True,cleanOverlap=cleanOverlap)
-#
-# 
-#    #nTot is a multidim vector with all additional variables, dictVar is a dictionary associating a name of the variable
-#    #to a position in the vector
-#    nTot,dictVar = postprocessing.stackFeatures(sig_count_df,branch_names+additionalCut_names+signal_trainedOn+overlap+nodesWeightBranches)
-#    #apply isSignal cleaning
-# #   nCleaned = nTot[np.where(nTot[:,dictVar['weight']]!=0),:][0]
-#    nCleaned = nTot 
-#    
-#    processPath=os.path.expanduser(options.outputFileDir)+outTag+'/'+utils.IO.signalName[0].split("/")[len(utils.IO.signalName[0].split("/"))-1].replace("output_","").replace(".root","")+"_preselection"+".root"
-#
-#
-#    if not options.addHHTagger:
-#        postprocessing.saveTree(processPath,dictVar,nCleaned,Y_pred_sig)
-#    else:
-#        postprocessing.saveTree(processPath,dictVar,nCleaned)        
-#    
-#    processPath=os.path.expanduser(options.outputFileDir)+outTag+'/'+utils.IO.signalName[0].split("/")[len(utils.IO.signalName[0].split("/"))-1].replace("output_","").replace(".root","")+"_preselection_diffNaming"+".root"
-#
-#    if not options.addHHTagger:
-#        postprocessing.saveTree(processPath,dictVar,nCleaned,Y_pred_sig,nameTree="reducedTree_sig%s"%treeTag)
-#    else:    
-#        postprocessing.saveTree(processPath,dictVar,nCleaned,nameTree="reducedTree_sig%s"%treeTag)
+    sig_count_df = utils.IO.signal_df[0]
+    preprocessing.define_process_weight(sig_count_df,utils.IO.sigProc[0],utils.IO.signalName[0],utils.IO.signalTreeName[0],cleanSignal=True,cleanOverlap=cleanOverlap)
+
+ 
+    #nTot is a multidim vector with all additional variables, dictVar is a dictionary associating a name of the variable
+    #to a position in the vector
+    nTot,dictVar = postprocessing.stackFeatures(sig_count_df,branch_names+additionalCut_names+signal_trainedOn+overlap+nodesWeightBranches)
+    #apply isSignal cleaning
+ #   nCleaned = nTot[np.where(nTot[:,dictVar['weight']]!=0),:][0]
+    nCleaned = nTot 
+    
+    processPath=os.path.expanduser(options.outputFileDir)+outTag+'/'+utils.IO.signalName[0].split("/")[len(utils.IO.signalName[0].split("/"))-1].replace("output_","").replace(".root","")+"_preselection"+".root"
+
+
+    if not options.addHHTagger:
+        postprocessing.saveTree(processPath,dictVar,nCleaned,Y_pred_sig)
+    else:
+        postprocessing.saveTree(processPath,dictVar,nCleaned)        
+    
+    processPath=os.path.expanduser(options.outputFileDir)+outTag+'/'+utils.IO.signalName[0].split("/")[len(utils.IO.signalName[0].split("/"))-1].replace("output_","").replace(".root","")+"_preselection_diffNaming"+".root"
+
+    if not options.addHHTagger:
+        postprocessing.saveTree(processPath,dictVar,nCleaned,Y_pred_sig,nameTree="reducedTree_sig%s"%treeTag)
+    else:    
+        postprocessing.saveTree(processPath,dictVar,nCleaned,nameTree="reducedTree_sig%s"%treeTag)
    
 ###########################  signal  block ends  ################################################################ 
     
-    for iProcess in range(0,len(utils.IO.backgroundName)):
-   # for iProcess in range(0,0):  #not to run on bkg
+   # for iProcess in range(0,len(utils.IO.backgroundName)):
+    for iProcess in range(0,0):  #not to run on bkg
         
         print "Processing sample: "+str(iProcess)
         bkg_count_df = utils.IO.background_df[iProcess]
