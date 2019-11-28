@@ -33,15 +33,17 @@ def main(options,args):
   
     year=options.year
 
-    outstr = "10_10_2019_wo_Mjj_training%s"%year
+   # outstr = "26_11_2019_wo_Mjj_training%s"%year
+    outstr = "26_11_2019_training%s"%year
 
-    dirs = ['ntuples_20190209/ntuples_2016_20190209','ntuples_20190209/ntuples_2017_20190209','ntuples_20190209/ntuples_2018_20190209']
+    dirs = ['ntuples_20192611/ntuples_2016_20192611/','ntuples_20192611/ntuples_2017_20192611/','ntuples_20192611/ntuples_2018_20192611/']
     ntuples = dirs[year]
-    SMname = ['GluGluToHHTo2B2G_13TeV_DoubleHTag_0','GluGluToHHTo2B2G_13TeV_DoubleHTag_0','GluGluToHHTo2B2G_13TeV_DoubleHTag_0']
-    NodesNormalizationFile = '/work/nchernya/HHbbgg_ETH_devel/root_files/ntuples_20190209/reweighting_normalization_19_09_2019.json'
+    SMname = ['hh2016_13TeV_125_13TeV_DoubleHTag_0','hh2017_13TeV_125_13TeV_DoubleHTag_0','hh2018_13TeV_125_13TeV_DoubleHTag_0']
+    NodesNormalizationFile = '/work/nchernya/HHbbgg_ETH_devel/root_files/ntuples_20192611/reweighting_normalization_26_11_2019.json'
     useMixOfNodes = True
     whichNodes = list(np.arange(0,12,1))
     whichNodes.append('SM')
+    whichNodes.append('box')
     signalMixOfNodesNormalizations = json.loads(open(NodesNormalizationFile).read())
     # "%" sign allows to interpret the rest as a system command
     get_ipython().magic(u'env data=$utils.IO.ldata$ntuples')
@@ -57,7 +59,6 @@ def main(options,args):
 
     utils.IO.use_signal_nodes(useMixOfNodes,whichNodes,signalMixOfNodesNormalizations)
     utils.IO.add_signal(ntuples,signal,1,'tagsDumper/trees/%s'%SMname[year],year)
-    #utils.IO.add_signal(ntuples,signal,1,'GluGluToHHTo2B2G_12nodes_13TeV_madgraph',year)
     utils.IO.add_background(ntuples,diphotonJets,-1,'tagsDumper/trees/'+diphotonJets[0][diphotonJets[0].find('output_')+7:diphotonJets[0].find('.root')].replace('-','_')+'_13TeV_DoubleHTag_0',year)
     utils.IO.add_background(ntuples,gJets_lowPt,-2,'tagsDumper/trees/'+gJets_lowPt[0][gJets_lowPt[0].find('output_')+7:gJets_lowPt[0].find('.root')].replace('-','_')+'_13TeV_DoubleHTag_0',year)                            
     utils.IO.add_background(ntuples,gJets_highPt,-2,'tagsDumper/trees/'+gJets_highPt[0][gJets_highPt[0].find('output_')+7:gJets_highPt[0].find('.root')].replace('-','_')+'_13TeV_DoubleHTag_0',year)                           
@@ -79,8 +80,7 @@ def main(options,args):
 
     #use noexpand for root expressions, it needs this file https://github.com/ibab/root_pandas/blob/master/root_pandas/readwrite.py
     ########################new code branches############################
-    #branch_names = 'Mjj,leadingJet_DeepFlavour,subleadingJet_DeepFlavour,absCosThetaStar_CS,absCosTheta_bb,absCosTheta_gg,diphotonCandidatePtOverdiHiggsM,dijetCandidatePtOverdiHiggsM,customLeadingPhotonIDMVA,customSubLeadingPhotonIDMVA,leadingPhotonSigOverE,subleadingPhotonSigOverE,sigmaMOverM,PhoJetMinDr'.split(",") #set of variables March 2017 but regressed
-    branch_names = 'leadingJet_DeepFlavour,subleadingJet_DeepFlavour,absCosThetaStar_CS,absCosTheta_bb,absCosTheta_gg,diphotonCandidatePtOverdiHiggsM,dijetCandidatePtOverdiHiggsM,customLeadingPhotonIDMVA,customSubLeadingPhotonIDMVA,leadingPhotonSigOverE,subleadingPhotonSigOverE,sigmaMOverM,PhoJetMinDr'.split(",") #set of variables March 2017 but regressed
+    branch_names = 'Mjj,leadingJet_DeepFlavour,subleadingJet_DeepFlavour,absCosThetaStar_CS,absCosTheta_bb,absCosTheta_gg,diphotonCandidatePtOverdiHiggsM,dijetCandidatePtOverdiHiggsM,customLeadingPhotonIDMVA,customSubLeadingPhotonIDMVA,leadingPhotonSigOverE,subleadingPhotonSigOverE,sigmaMOverM,noexpand:(leadingPhoton_pt/CMS_hgg_mass),noexpand:(subleadingPhoton_pt/CMS_hgg_mass),noexpand:(leadingJet_pt/Mjj),noexpand:(subleadingJet_pt/Mjj)'.split(",") 
     b_reg_branches = 'noexpand:(leadingJet_bRegNNResolution*1.4826),noexpand:(subleadingJet_bRegNNResolution*1.4826),noexpand:(sigmaMJets*1.4826)'.split(",")
     branch_cuts = 'leadingJet_pt,subleadingJet_pt,leadingJet_bRegNNCorr,subleadingJet_bRegNNCorr,noexpand:(leadingJet_pt/leadingJet_bRegNNCorr),noexpand:(subleadingJet_pt/subleadingJet_bRegNNCorr)'.split(',')
     cuts = 'leadingJet_pt>0'
@@ -89,8 +89,9 @@ def main(options,args):
     #cuts = 'subleadingJet_pt>25'
     ######################
 
-    #event_branches = ['event','sigmaMOverM','noexpand:(dijetSigmaMOverM*1.4826)']
-    event_branches = ['event','weight','MX','leadingJet_hflav','leadingJet_pflav','subleadingJet_hflav','subleadingJet_pflav']
+    event_branches = ['event','weight','MX','leadingJet_hflav','leadingJet_pflav','subleadingJet_hflav','subleadingJet_pflav','CMS_hgg_mass'] #,'Mjj'  #for the training without Mjj
+    event_branches+=['leadingJet_phi','leadingJet_eta','subleadingJet_phi','subleadingJet_eta']
+    event_branches+=['leadingPhoton_eta','leadingPhoton_phi','subleadingPhoton_eta','subleadingPhoton_phi']
 
     branch_names = branch_names + ['rho']
     branch_names = branch_names+b_reg_branches
@@ -102,13 +103,25 @@ def main(options,args):
     print branch_names
 
     event_bkg,event_sig = None,None
-    if (year>=1 and doReweight == True):
+    if (year>=1 and doReweight == True): #not used anymore
         preprocessing.set_signals(branch_names+event_branches+branch_cuts+['genMhh'],True,cuts)
         preprocessing.set_backgrounds(branch_names+event_branches+branch_cuts,True,cuts)
     else :
         preprocessing.set_signals(branch_names+event_branches+branch_cuts+nodesWeightBranches,True,cuts)
         preprocessing.set_backgrounds(branch_names+event_branches+branch_cuts,True,cuts)
 
+############################ Do THIS ONLY FOR THE CURRENT G Jet 40 for 2017 ########
+    if year==1:
+       preprocessing.scale_weight(utils.IO.background_df[2],1.3) # because not all jobs finished
+##################################################################################
+
+    #### Adding new deltaR (photon,jet) branches ####
+    for i in range(utils.IO.nBkg):
+       preprocessing.add_deltaR_branches(utils.IO.background_df[i])
+    for i in range(utils.IO.nSig):
+       preprocessing.add_deltaR_branches(utils.IO.signal_df[i])
+    branch_names = branch_names + ['photJetdRmin','photJetdRmin2'] 
+   ##### New photon + jet branches added  above #####
 
     info_file = open(utils.IO.plotFolder+"info_%s.txt"%outstr,"w") 
     info_file.write("\n".join(branch_names))

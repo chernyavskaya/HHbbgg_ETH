@@ -38,9 +38,11 @@ def cleanOverlapDiphotons(name,dataframe):
   #  dataframe["weight"] *= dataframe['overlapSave']
 
     
-        
-
-
+def scale_weight(dataframe, sf):
+    print 'Weighting with SF : '
+    dataframe['weight'] *= sf
+    
+    
 def define_process_weight(df,proc,name,treename='bbggSelectionTree',cleanSignal=True,cleanOverlap=False):
     df['proc'] = ( np.ones_like(df.index)*proc ).astype(np.int8)
     if treename=='bbggSelectionTree':
@@ -58,8 +60,23 @@ def define_process_weight(df,proc,name,treename='bbggSelectionTree',cleanSignal=
 
     df['overlapSave']  = np.ones_like(df.index).astype(np.int8)
     if cleanOverlap : cleanOverlapDiphotons(name,df)
- 
 
+        
+def add_deltaR_branches(df):
+    jets = 'leadingJet,subleadingJet'.split(',')
+    gammas = 'leadingPhoton,subleadingPhoton'.split(',')
+    c=0
+    for ij in range(0,len(jets)):
+        for ig in range(0,len(gammas)):
+            df['phoJetDr%d'%c] =  utils.deltaR_pandas(df['%s_eta'%jets[ij]],df['%s_phi'%jets[ij]],df['%s_eta'%gammas[ig]],df['%s_phi'%gammas[ig]])
+            c+=1     
+    df['combinePhoJetDr'] = df[['phoJetDr0', 'phoJetDr1','phoJetDr2','phoJetDr3']].values.tolist()
+    df['dRminIndex'] = utils.dr_min_index(df['combinePhoJetDr'])
+    df['dRminIndex2'] = df['dRminIndex'].apply(utils.dr_second_pair_index)
+    df['mergedMinMin2Dr'] = (df.apply(lambda x: utils.dr_by_2_indices(x.combinePhoJetDr,x.dRminIndex, x.dRminIndex2), axis=1))
+    df['photJetdRmin'] = df['mergedMinMin2Dr'].str[0]
+    df['photJetdRmin2'] = df['mergedMinMin2Dr'].str[1]
+        
         
 def reweight_MX():
     df0, df1 = utils.IO.signal_df

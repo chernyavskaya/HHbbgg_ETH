@@ -100,7 +100,7 @@ def main(options,args):
     branch_names = 'Mjj,leadingJet_DeepFlavour,subleadingJet_DeepFlavour,absCosThetaStar_CS,absCosTheta_bb,absCosTheta_gg,diphotonCandidatePtOverdiHiggsM,dijetCandidatePtOverdiHiggsM,customLeadingPhotonIDMVA,customSubLeadingPhotonIDMVA,leadingPhotonSigOverE,subleadingPhotonSigOverE,sigmaMOverM,PhoJetMinDr'.split(",") #set of variables March 2017 but regressed
     branch_names +=['rho']
     branch_names += 'noexpand:(leadingJet_bRegNNResolution*1.4826),noexpand:(subleadingJet_bRegNNResolution*1.4826),noexpand:(sigmaMJets*1.4826)'.split(",")
-    additionalCut_names = 'CMS_hgg_mass,Mjj,MX,ttHScore'.split(',')
+    additionalCut_names = 'CMS_hgg_mass,Mjj,MX,ttHScore,btagReshapeWeight'.split(',')
  #   additionalCut_names = 'CMS_hgg_mass,Mjj,MX'.split(',')
   #  if options.addHHTagger:
     additionalCut_names += 'HHbbggMVA'.split(",")
