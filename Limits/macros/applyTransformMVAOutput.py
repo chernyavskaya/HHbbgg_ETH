@@ -6,10 +6,10 @@ from array import array
 # -----------------------------------------------------------------------------------------------------------
 def main(options,args):
 
-### Reweight to match S/B for 2017 since 2017 is the best year. Take as bkg diphoton(cleaned from overlap)+diphoton+bjets. We did not take gJets here because in 2016 and 2018 right now we have ~8k events which is too small to estimate properly the bkg. 
-    newWeight2016 = 1.089  #(B_2017/S_2017)/(B_2016/S_2016) = (9.69362182617187500e+02/4.18241828651538472e-01)/(8.29695556640625000e+02/0.39000478) 
-    newWeight2017 = 1.
-    newWeight2018 = 1.024  #(B_2017/S_2017)/(B_2018/S_2018) = (9.69362182617187500e+02/4.18241828651538472e-01)/(9.25812927246093750e+02/4.08981237703397726e-01)
+### Reweight to match S/B for 2016 since 2016 is the best year. Take as bkg diphoton(cleaned from overlap)+diphoton+bjets. 
+    newWeight2016 = 1.   
+    newWeight2017 = 0.816
+    newWeight2018 = 0.864  
 
     lumi2016=35.92
     lumi2017=41.53
@@ -23,9 +23,12 @@ def main(options,args):
     cumulativeGraph = fin_graph.Get("cumulativeGraph")
 
     processes = [
-        "reducedTree" #,
-        #"reducedTree_sig" #,
-      #  "reducedTree_sig_2017" #,
+        "reducedTree" ,
+        "reducedTree_sig",
+        "reducedTree_bkg_TTTo2L2Nu",
+        "reducedTree_bkg_ttH",
+        "reducedTree_bkg_TTGJets",
+        "reducedTree_bkg_TTGG_0Jets"
       #  "reducedTree_data"
         ]
 

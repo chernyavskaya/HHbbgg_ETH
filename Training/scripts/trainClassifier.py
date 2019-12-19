@@ -1,5 +1,5 @@
 import os
-import sys; sys.path.append("~/HHbbgg_ETH_devel/Training/python") # to load packages
+import sys; sys.path.append("/work/nchernya//HHbbgg_ETH_devel/Training/python") # to load packages
 
 import matplotlib
 matplotlib.use('Agg')
@@ -33,10 +33,10 @@ def main(options,args):
   
     year=options.year
 
-   # outstr = "26_11_2019_wo_Mjj_training%s"%year
-    outstr = "26_11_2019_training%s"%year
+   # outstr = "18_12_2019_training%s"%year
+    outstr = "18_12_2019_wo_Mjj_training%s"%year
 
-    dirs = ['ntuples_20192611/ntuples_2016_20192611/','ntuples_20192611/ntuples_2017_20192611/','ntuples_20192611/ntuples_2018_20192611/']
+    dirs = ['ntuples_20191812/ntuples_2016_20191812/','ntuples_20191812/ntuples_2017_20191812/','ntuples_20191812/ntuples_2018_20191812/']
     ntuples = dirs[year]
     SMname = ['hh2016_13TeV_125_13TeV_DoubleHTag_0','hh2017_13TeV_125_13TeV_DoubleHTag_0','hh2018_13TeV_125_13TeV_DoubleHTag_0']
     NodesNormalizationFile = '/work/nchernya/HHbbgg_ETH_devel/root_files/ntuples_20192611/reweighting_normalization_26_11_2019.json'
@@ -48,7 +48,8 @@ def main(options,args):
     # "%" sign allows to interpret the rest as a system command
     get_ipython().magic(u'env data=$utils.IO.ldata$ntuples')
     status,files = commands.getstatusoutput('! ls $data | sort -t_ -k 3 -n')
-    files=files.split('\n')    
+    files=files.split('\n')   
+    print files    
     
     signal = [s for s in files if ("GluGluToHHTo2B2G_node_all_" in s) ]
     diphotonJets = [s for s in files if "DiPhotonJetsBox_" in s]
@@ -70,7 +71,7 @@ def main(options,args):
         print "using signal file n."+str(i)+": "+utils.IO.signalName[i]
 
 
-    utils.IO.plotFolder = '/mnt/t3nfs01/data01/shome/nchernya/HHbbgg_ETH_devel/Training/plots/%s/'%outstr
+    utils.IO.plotFolder = '/work/nchernya/HHbbgg_ETH_devel/Training/plots/%s/'%outstr
     if not os.path.exists(utils.IO.plotFolder):
         print utils.IO.plotFolder, "doesn't exist, creating it..."
         os.makedirs(utils.IO.plotFolder)
@@ -80,8 +81,8 @@ def main(options,args):
 
     #use noexpand for root expressions, it needs this file https://github.com/ibab/root_pandas/blob/master/root_pandas/readwrite.py
     ########################new code branches############################
-    branch_names = 'Mjj,leadingJet_DeepFlavour,subleadingJet_DeepFlavour,absCosThetaStar_CS,absCosTheta_bb,absCosTheta_gg,diphotonCandidatePtOverdiHiggsM,dijetCandidatePtOverdiHiggsM,customLeadingPhotonIDMVA,customSubLeadingPhotonIDMVA,leadingPhotonSigOverE,subleadingPhotonSigOverE,sigmaMOverM,noexpand:(leadingPhoton_pt/CMS_hgg_mass),noexpand:(subleadingPhoton_pt/CMS_hgg_mass),noexpand:(leadingJet_pt/Mjj),noexpand:(subleadingJet_pt/Mjj)'.split(",") 
-    b_reg_branches = 'noexpand:(leadingJet_bRegNNResolution*1.4826),noexpand:(subleadingJet_bRegNNResolution*1.4826),noexpand:(sigmaMJets*1.4826)'.split(",")
+    #branch_names = 'Mjj,leadingJet_DeepFlavour,subleadingJet_DeepFlavour,absCosThetaStar_CS,absCosTheta_bb,absCosTheta_gg,diphotonCandidatePtOverdiHiggsM,dijetCandidatePtOverdiHiggsM,customLeadingPhotonIDMVA,customSubLeadingPhotonIDMVA,leadingPhotonSigOverE,subleadingPhotonSigOverE,sigmaMOverM,noexpand:(leadingPhoton_pt/CMS_hgg_mass),noexpand:(subleadingPhoton_pt/CMS_hgg_mass),noexpand:(leadingJet_pt/Mjj),noexpand:(subleadingJet_pt/Mjj),rho,noexpand:(leadingJet_bRegNNResolution*1.4826),noexpand:(subleadingJet_bRegNNResolution*1.4826),noexpand:(sigmaMJets*1.4826),PhoJetMinDr,PhoJetOtherDr'.split(",")
+    branch_names = 'leadingJet_DeepFlavour,subleadingJet_DeepFlavour,absCosThetaStar_CS,absCosTheta_bb,absCosTheta_gg,diphotonCandidatePtOverdiHiggsM,dijetCandidatePtOverdiHiggsM,customLeadingPhotonIDMVA,customSubLeadingPhotonIDMVA,leadingPhotonSigOverE,subleadingPhotonSigOverE,sigmaMOverM,noexpand:(leadingPhoton_pt/CMS_hgg_mass),noexpand:(subleadingPhoton_pt/CMS_hgg_mass),noexpand:(leadingJet_pt/Mjj),noexpand:(subleadingJet_pt/Mjj),rho,noexpand:(leadingJet_bRegNNResolution*1.4826),noexpand:(subleadingJet_bRegNNResolution*1.4826),noexpand:(sigmaMJets*1.4826),PhoJetMinDr,PhoJetOtherDr'.split(",")
     branch_cuts = 'leadingJet_pt,subleadingJet_pt,leadingJet_bRegNNCorr,subleadingJet_bRegNNCorr,noexpand:(leadingJet_pt/leadingJet_bRegNNCorr),noexpand:(subleadingJet_pt/subleadingJet_bRegNNCorr)'.split(',')
     cuts = 'leadingJet_pt>0'
     nodesWeightBranches=[]
@@ -89,12 +90,10 @@ def main(options,args):
     #cuts = 'subleadingJet_pt>25'
     ######################
 
-    event_branches = ['event','weight','MX','leadingJet_hflav','leadingJet_pflav','subleadingJet_hflav','subleadingJet_pflav','CMS_hgg_mass'] #,'Mjj'  #for the training without Mjj
+    event_branches = ['event','weight','btagReshapeWeight','MX','leadingJet_hflav','leadingJet_pflav','subleadingJet_hflav','subleadingJet_pflav','CMS_hgg_mass','Mjj'] #,'Mjj'  #for the training without Mjj
     event_branches+=['leadingJet_phi','leadingJet_eta','subleadingJet_phi','subleadingJet_eta']
     event_branches+=['leadingPhoton_eta','leadingPhoton_phi','subleadingPhoton_eta','subleadingPhoton_phi']
 
-    branch_names = branch_names + ['rho']
-    branch_names = branch_names+b_reg_branches
     resolution_weighting = 'ggbb' # None, gg or ggbb
     doOverlapRemoval=False   #diphotons overlap removal if using b-enriched samples
 
@@ -110,17 +109,13 @@ def main(options,args):
         preprocessing.set_signals(branch_names+event_branches+branch_cuts+nodesWeightBranches,True,cuts)
         preprocessing.set_backgrounds(branch_names+event_branches+branch_cuts,True,cuts)
 
-############################ Do THIS ONLY FOR THE CURRENT G Jet 40 for 2017 ########
-    if year==1:
-       preprocessing.scale_weight(utils.IO.background_df[2],1.3) # because not all jobs finished
-##################################################################################
 
     #### Adding new deltaR (photon,jet) branches ####
-    for i in range(utils.IO.nBkg):
-       preprocessing.add_deltaR_branches(utils.IO.background_df[i])
-    for i in range(utils.IO.nSig):
-       preprocessing.add_deltaR_branches(utils.IO.signal_df[i])
-    branch_names = branch_names + ['photJetdRmin','photJetdRmin2'] 
+  #  for i in range(utils.IO.nBkg):
+  #     preprocessing.add_deltaR_branches(utils.IO.background_df[i])
+  #  for i in range(utils.IO.nSig):
+  #     preprocessing.add_deltaR_branches(utils.IO.signal_df[i])
+  #  branch_names = branch_names + ['photJetdRmin','photJetdRmin2'] 
    ##### New photon + jet branches added  above #####
 
     info_file = open(utils.IO.plotFolder+"info_%s.txt"%outstr,"w") 
@@ -210,7 +205,7 @@ def main(options,args):
     
     print 'Training is done. It took', time.time()-start_time, 'seconds.'
     
-    joblib.dump(clf, os.path.expanduser('/shome/nchernya/HHbbgg_ETH_devel/Training/output_files/training_with_%s.pkl'%outstr), compress=9)
+    joblib.dump(clf, os.path.expanduser('/work/nchernya/HHbbgg_ETH_devel/Training/output_files/training_with_%s.pkl'%outstr), compress=9)
 
     plot_classifier = plotting.plot_classifier_output(clf,X_total_train,X_total_test,y_total_train,y_total_test,outString=outstr)
     fpr_dipho,tpr_dipho = plotting.plot_roc_curve_multiclass_singleBkg(X_total_test,y_total_test,clf,-1,outString=outstr,weights=w_total_test)

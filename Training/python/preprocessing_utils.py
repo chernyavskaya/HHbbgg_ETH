@@ -61,6 +61,16 @@ def define_process_weight(df,proc,name,treename='bbggSelectionTree',cleanSignal=
     df['overlapSave']  = np.ones_like(df.index).astype(np.int8)
     if cleanOverlap : cleanOverlapDiphotons(name,df)
 
+def calc_normalization(dataframe,weight='weight',norm='btagReshapeWeight'):
+   dataframe['normalization']  = sum(dataframe[weight]/dataframe[norm])
+
+def calc_sumWeight(dataframe,weight='weight'):
+   dataframe['SumWeighe']  = sum(dataframe[weight])
+
+def restore_normalization(dataframe,weight='weight',norm='btagReshapeWeight'):
+   integral_denom  = sum(dataframe[weight])
+   integral_nominator  = sum(dataframe[weight]/dataframe[norm])
+   dataframe['weight'] *= integral_nominator/integral_denom
         
 def add_deltaR_branches(df):
     jets = 'leadingJet,subleadingJet'.split(',')
@@ -120,7 +130,7 @@ def reweight_gen_mhh(what,df0,df1,df_reweight,what2):
 
 def reweight_MX_old(dataframe):
     dataframe['tmp']  = np.ones_like(dataframe.index).astype(np.int8)
-    file = TFile("/mnt/t3nfs01/data01/shome/nchernya/HHbbgg_ETH_devel/root_files/ntuples_2017data_20181023/Node_reweighting_hist.root")
+    file = TFile("/work/nchernya/HHbbgg_ETH_devel/root_files/ntuples_2017data_20181023/Node_reweighting_hist.root")
     hist = file.Get("ratio")
     integral_before = dataframe['weight'].sum()
     for index, df in dataframe.iterrows(): 
@@ -416,6 +426,7 @@ def set_signals(branch_names,shuffle,cuts='event>=0'):
             
             define_process_weight(utils.IO.signal_df[i],utils.IO.sigProc[i],utils.IO.signalName[i],treeName)
             utils.IO.signal_df[i]['year'] = (np.ones_like(utils.IO.signal_df[i].index)*utils.IO.sigYear[i] ).astype(np.int8)
+            restore_normalization(utils.IO.signal_df[i],weight='weight',norm='btagReshapeWeight')
         if shuffle:
             utils.IO.signal_df[i]['random_index'] = np.random.permutation(range(utils.IO.signal_df[i].index.size))
             utils.IO.signal_df[i].sort_values(by='random_index',inplace=True)
@@ -432,6 +443,7 @@ def set_backgrounds(branch_names,shuffle,cuts='event>=0'):
         utils.IO.background_df.append((rpd.read_root(utils.IO.backgroundName[i],treeName, columns = branch_names)).query(cuts))
         define_process_weight(utils.IO.background_df[i],utils.IO.bkgProc[i],utils.IO.backgroundName[i],treeName)
         utils.IO.background_df[i]['year'] = (np.ones_like(utils.IO.background_df[i].index)*utils.IO.bkgYear[i] ).astype(np.int8)
+        restore_normalization(utils.IO.background_df[i],weight='weight',norm='btagReshapeWeight')
 
         if shuffle:
             utils.IO.background_df[i]['random_index'] = np.random.permutation(range(utils.IO.background_df[i].index.size))

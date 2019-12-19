@@ -31,7 +31,6 @@ def stackFeatures(df,additionalCut_names,rounding=6,SF=1,isData=0):
         else:
             totalVec = np.column_stack((totalVec,vec[i]))
 
-
     return totalVec,dictVar
 
 
@@ -66,16 +65,8 @@ def saveTree(processPath,dictVar,vector,MVAVector=None,SF=1,nameTree="reducedTre
         v=(np.asarray(vector[:,dictVar[key]]))
         name = key
 
-        if key == 'diphotonCandidate.M()':
+        if key=='CMS_hgg_mass':
             name = 'Mgg'
-        elif 'CMS_hgg_mass' in key:
-            name = 'Mgg'
-        elif key == 'dijetCandidate.M()':
-            name = 'Mjj'
-        elif key == 'HHTagger2017':
-            name = 'MVAOutput'
-        elif key == 'dijetCandicateCorr.M()':
-            name = 'MjjCorr'
         elif '*1.4826' in key:
             name = key.replace('*1.4826','_gauss')
     #    elif 'event%2!=0' in key:
@@ -89,7 +80,8 @@ def saveTree(processPath,dictVar,vector,MVAVector=None,SF=1,nameTree="reducedTre
             if key == 'weight':
                 v = (np.multiply(np.asarray(v),SF))
 
-        v.dtype = [(name.replace(".","").replace("(","").replace(")","").replace("/","_Over_").replace("_","").replace("Candidate",""), np.float64)]
+        name = name.replace(".","").replace("(","").replace(")","").replace("/","_Over_").replace("_","").replace("Candidate","")
+        v.dtype = [(name, np.float64)]
 
 
         array2root(v, processPath, nameTree, mode = writeMode)

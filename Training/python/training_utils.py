@@ -1,4 +1,4 @@
-import sys; sys.path.append("~/HHbbgg_ETH_devel/Training/python")
+import sys; sys.path.append("/work/$USER//HHbbgg_ETH_devel/Training/python")
 import matplotlib.pyplot as plt
 import os
 import math
@@ -38,9 +38,9 @@ def dr_min_index(series):
     
 # ---------------------------------------------------------------------------------------------------
 class IO:
-    ldata = os.path.expanduser("/shome/nchernya/HHbbgg_ETH_devel/root_files/")
-    xdata = "/shome/nchernya//HHbbgg_ETH_devel/Training/output_files/"
-    plotFolder = os.path.expanduser("/shome/nchernya//HHbbgg_ETH_devel/Training/plots/")
+    ldata = os.path.expanduser("/work/nchernya/HHbbgg_ETH_devel/root_files/")
+    xdata = "/work/nchernya/HHbbgg_ETH_devel/Training/output_files/"
+    plotFolder = os.path.expanduser("/work/nchernya/HHbbgg_ETH_devel/Training/plots/")
     signalName = []
     signalUseMixOfNodes = False
     signalWhichMixOfNodes = []
