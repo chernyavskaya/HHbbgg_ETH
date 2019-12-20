@@ -23,12 +23,14 @@ def main(options,args):
     cumulativeGraph = fin_graph.Get("cumulativeGraph")
 
     processes = [
-        "reducedTree" ,
-        "reducedTree_sig",
-        "reducedTree_bkg_TTTo2L2Nu",
-        "reducedTree_bkg_ttH",
-        "reducedTree_bkg_TTGJets",
-        "reducedTree_bkg_TTGG_0Jets"
+      #  "reducedTree" ,
+      #  "reducedTree_sig",
+      #  "reducedTree_bkg_TTTo2L2Nu",
+      #  "reducedTree_bkg_ttH",
+      #  "reducedTree_bkg_TTGJets",
+      #  "reducedTree_bkg_TTGG_0Jets",
+        "reducedTree_bkg_GJet_Pt_40toInf",
+        "reducedTree_bkg_GJet_Pt_20to40",
       #  "reducedTree_data"
         ]
 

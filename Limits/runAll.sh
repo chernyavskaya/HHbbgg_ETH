@@ -6,7 +6,7 @@ OPTIND=0         # Reset in case getopts has been used previously in the shell.
 # Initialize our own variables:
 year=$1 #0 for 2016, 1 for 2017
 ntup=ntuples_20191812/ntuples_${year}_20191812/
-outTag=20191218_${year}
+outTag=20191218_wo_Mjj_${year}
 
 addHHTagger=0  #0 if you want to add it, 1 if it is already present
 
@@ -21,7 +21,8 @@ if [ $year = 2018 ]; then
 	training_year=2
 fi
 
-training="training_with_18_12_2019_training"$training_year #christmas full run 2 training
+#training="training_with_18_12_2019_training"$training_year #christmas full run 2 training
+training="training_with_18_12_2019_wo_Mjj_training"$training_year #christmas full run 2 training
 
 echo $year,$training_year,$ntup,$outTag,$training
 
