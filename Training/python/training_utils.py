@@ -42,7 +42,7 @@ class IO:
     xdata = "/work/nchernya/HHbbgg_ETH_devel/Training/output_files/"
     plotFolder = os.path.expanduser("/work/nchernya/HHbbgg_ETH_devel/Training/plots/")
     signalName = []
-    signalUseMixOfNodes = False
+    signalMixOfNodes = False
     signalWhichMixOfNodes = []
     signalMixOfNodesNormalizations = dict()
     signalTreeName = []

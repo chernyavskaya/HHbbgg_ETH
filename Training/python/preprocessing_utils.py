@@ -170,7 +170,8 @@ def clean_signal_events(x_b, y_b, w_b,x_s,y_s,w_s,event_num_bkg = None, event_nu
     
     
 def clean_signal_events_single_dataset(x_b, y_b, w_b):#some trees include also the control region,select only good events
-    return x_b[np.where(w_b!=0),:][0],np.asarray(y_b)[np.where(w_b!=0)],np.asarray(w_b)[np.where(w_b!=0)]
+    #return x_b[np.where(w_b!=0),:][0],np.asarray(y_b)[np.where(w_b!=0)],np.asarray(w_b)[np.where(w_b!=0)]
+    return x_b[np.where(w_b>-100000),:][0],np.asarray(y_b)[np.where(w_b>-100000)],np.asarray(w_b)[np.where(w_b>-100000)]
 
    
     
@@ -426,7 +427,7 @@ def set_signals(branch_names,shuffle,cuts='event>=0'):
             
             define_process_weight(utils.IO.signal_df[i],utils.IO.sigProc[i],utils.IO.signalName[i],treeName)
             utils.IO.signal_df[i]['year'] = (np.ones_like(utils.IO.signal_df[i].index)*utils.IO.sigYear[i] ).astype(np.int8)
-            restore_normalization(utils.IO.signal_df[i],weight='weight',norm='btagReshapeWeight')
+        #restore_normalization(utils.IO.signal_df[i],weight='weight',norm='btagReshapeWeight')
         if shuffle:
             utils.IO.signal_df[i]['random_index'] = np.random.permutation(range(utils.IO.signal_df[i].index.size))
             utils.IO.signal_df[i].sort_values(by='random_index',inplace=True)
@@ -443,7 +444,7 @@ def set_backgrounds(branch_names,shuffle,cuts='event>=0'):
         utils.IO.background_df.append((rpd.read_root(utils.IO.backgroundName[i],treeName, columns = branch_names)).query(cuts))
         define_process_weight(utils.IO.background_df[i],utils.IO.bkgProc[i],utils.IO.backgroundName[i],treeName)
         utils.IO.background_df[i]['year'] = (np.ones_like(utils.IO.background_df[i].index)*utils.IO.bkgYear[i] ).astype(np.int8)
-        restore_normalization(utils.IO.background_df[i],weight='weight',norm='btagReshapeWeight')
+        #restore_normalization(utils.IO.background_df[i],weight='weight',norm='btagReshapeWeight')
 
         if shuffle:
             utils.IO.background_df[i]['random_index'] = np.random.permutation(range(utils.IO.background_df[i].index.size))
