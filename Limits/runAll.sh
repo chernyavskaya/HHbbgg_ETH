@@ -5,10 +5,16 @@ OPTIND=0         # Reset in case getopts has been used previously in the shell.
 
 # Initialize our own variables:
 year=$1 #0 for 2016, 1 for 2017
-ntup=ntuples_20191812/ntuples_${year}_20191812/
-outTag=20191218_wo_Mjj_${year}
+#ntup=ntuples_20191501/ntuples_${year}_20191501/
+ntup=ntuples_20192401/ntuples_${year}_20192401/
+#outTag=20191218_wo_Mjj_${year}
+#outTag=20191812_btag_upd_${year}
+#outTag=20191812_btag_wo_Mjj_upd_${year}
+outTag=20192401_wo_Mjj_leptonveto_flashgg_${year}
 
 addHHTagger=0  #0 if you want to add it, 1 if it is already present
+#addHHTagger=1  #0 if you want to add it, 1 if it is already present
+flashggNames=1
 
 training_year=0
 if [ $year -eq "2016" ]; then
@@ -45,9 +51,10 @@ shift $((OPTIND-1))
 ####create Trees
 if ((addHHTagger)); then
    # #python /work/nchernya//HHbbgg_ETH_devel/Limits/python/createReducedTrees.py -n $ntup -t $training  -o $outTag -a -y $year  -d 1  #with data
-    python /work/nchernya//HHbbgg_ETH_devel/Limits/python/cleanCreateReducedTrees.py -n $ntup -t $training  -o $outTag -a -y $training_year  
+    python /work/nchernya//HHbbgg_ETH_devel/Limits/python/cleanCreateReducedTrees.py -n $ntup -t $training  -o $outTag -a -y $training_year  --flashggNames  $flashggNames
+
 else
-    python /work/nchernya//HHbbgg_ETH_devel/Limits/python/cleanCreateReducedTrees.py -n $ntup -t $training  -o $outTag -y $training_year -k 0 
+    python /work/nchernya//HHbbgg_ETH_devel/Limits/python/cleanCreateReducedTrees.py -n $ntup -t $training  -o $outTag -y $training_year -k 0 --flashggNames  $flashggNames    #with data add -d 1
 fi
     
 ####transform MVA output

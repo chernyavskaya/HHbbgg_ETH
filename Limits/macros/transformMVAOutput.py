@@ -6,6 +6,10 @@ from array import array
 # -----------------------------------------------------------------------------------------------------------
 def main(options,args):
 
+    lumi2016=35.92
+    lumi2017=41.53
+    lumi2018=59.74
+
     ## setTDRStyle()
     ROOT.gStyle.SetOptStat(0)
         
@@ -29,13 +33,13 @@ def main(options,args):
     #$HOME
     fout = ROOT.TFile.Open("./macros/plots/cumulatives/cumulativeTransformation_"+name+".root","recreate")
 
-    nbins = 25000
-    xlow = 0.004944568499922752
-    xup = 0.9976179003715515
+    nbins = 80000
+    xlow = 0.
+    xup = 1. 
     histoMVA = ROOT.TH1F("histoMVA","histoMVA",nbins,xlow,xup)
   #  tree.Draw("MVAOutput>>histoMVA")
     #tree.Draw("MVAOutput>>histoMVA",ROOT.TCut("weight"))
-    tree.Draw("ClassificationBDT>>histoMVA",ROOT.TCut("weight"))
+    tree.Draw("MVAOutput>>histoMVA",ROOT.TCut("weight"))
   #  tree.Draw("HHbbggMVA>>histoMVA")
 #    histoMVA.FillRandom("gaus",1000000)
 
@@ -89,7 +93,15 @@ def main(options,args):
 
     processes = [
         "reducedTree_sig",
-        "reducedTree_bkg"
+        "reducedTree_bkg_DiPhotonJetsBox_",
+			"reducedTree_bkg_DiPhotonJetsBox1BJet",
+			"reducedTree_bkg_DiPhotonJetsBox2BJets",
+			"reducedTree_bkg_GJet_Pt_20to40",
+			"reducedTree_bkg_GJet_Pt_40toInf",
+			"reducedTree_bkg_tth", #H",
+	#		"reducedTree_bkg_TTGJets",
+	#		"reducedTree_bkg_TTTo2L2Nu",
+	#		"reducedTree_bkg_TTGG_0Jets"
         ]
 
   #  for i in range(2,14): #15 13+box
@@ -118,17 +130,26 @@ def main(options,args):
         copyTree.SetTitle(proc)
 
         transfMVA = array( 'f', [ 0. ] )
-        #transfBranch = copyTree.Branch("MVAOutputTransformed",transfMVA,"MVAOutputTransformed/F");
-        transfBranch = copyTree.Branch("ClassificationBDTTransformed",transfMVA,"ClassificationBDTTransformed/F");
+        transfBranch = copyTree.Branch("MVAOutputTransformed",transfMVA,"MVAOutputTransformed/F");
+        #transfBranch = copyTree.Branch("ClassificationBDTTransformed",transfMVA,"ClassificationBDTTransformed/F");
+        lumi = array( 'f', [ 0. ] )
+        lumiBranch = copyTree.Branch("lumi",lumi,"lumi/F");
         dummyList = []
         
         for i,event in enumerate(copyTree):
             if i>tree.GetEntries():break
            # mva = event.HHTagger2017
-           # mva = event.MVAOutput
-            mva = event.ClassificationBDT
+            mva = event.MVAOutput
+           # mva = event.ClassificationBDT
             transfMVA[0] = cumulativeGraph.Eval(mva)
+            if '2016' in options.file:
+                lumi[0] = lumi2016
+            elif '2017' in options.file:
+                lumi[0] = lumi2017
+            elif '2018' in options.file:
+                lumi[0] = lumi2018
             transfBranch.Fill()
+            lumiBranch.Fill()
     
     
     fTransformed.Write()
