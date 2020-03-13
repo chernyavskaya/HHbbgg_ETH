@@ -65,8 +65,8 @@ def saveTree(processPath,dictVar,vector,MVAVector=None,SF=1,nameTree="reducedTre
         v=(np.asarray(vector[:,dictVar[key]]))
         name = key
 
-        #if key=='CMS_hgg_mass':
-        #    name = 'Mgg'
+    #    if key=='CMS_hgg_mass':
+    #        name = 'Mgg'
         #elif '*1.4826' in key:
         if '*1.4826' in key:
             name = key.replace('*1.4826','_gauss')
@@ -74,8 +74,8 @@ def saveTree(processPath,dictVar,vector,MVAVector=None,SF=1,nameTree="reducedTre
     #        name = key.replace('event%2!=0','event_odd')
     #    elif 'event%5!=0' in key:
     #        name = key.replace('event%5!=0','event_odd5')
-     #   elif 'event%' in key:
-     #       name = 'eventTrainedOn'
+        elif 'event%' in key:
+            name = 'eventTrainedOn'
 
         if SF != 1:
             if key == 'weight':

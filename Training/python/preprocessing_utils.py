@@ -550,6 +550,7 @@ def set_variables(branch_names,use_event_num=False):
                     X_bkg_2 = np.concatenate([X_bkg_2,utils.IO.background_df[i][[branch_names[j].replace('noexpand:','')]]],axis=1)
             X_bkg=np.concatenate((X_bkg,X_bkg_2))
 
+    print np.round(X_sig,5)[0]
     if not use_event_num :  return np.round(X_bkg,5),y_bkg,w_bkg,np.round(X_sig,5),y_sig,w_sig
     else :   return np.round(X_bkg,5),y_bkg,w_bkg,event_bkg,np.round(X_sig,5),y_sig,w_sig,event_sig
 

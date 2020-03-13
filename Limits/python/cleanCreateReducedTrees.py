@@ -18,7 +18,8 @@ treeDir = 'tagsDumper/trees/'
 #samples = ["GluGluToHHTo2B2G","DiPhotonJetsBox_","DiPhotonJetsBox2BJets_","DiPhotonJetsBox1BJet_"]#
 #samples = ["GluGluToHHTo2B2G_node_all","DiPhotonJetsBox_","DiPhotonJetsBox2BJets","DiPhotonJetsBox1BJet","ttH","TTGJets","TTTo2L2Nu","TTGG_0Jets","GJet_Pt-20to40","GJet_Pt-40toInf"]#
 #samples = ["hh_","DiPhotonJetsBox_","DiPhotonJetsBox2BJets","DiPhotonJetsBox1BJet","GJet_Pt-20to40","GJet_Pt-40toInf","tth","ggh","qqh","vh"]#
-samples = ["hh_","tth","ggh","qqh","vh"]#
+#samples = ["hh_","tth","ggh","qqh","vh"]#
+samples = ["hh_","vh"]#
 #samples = ["hh_","GJet_Pt-20to40"]#
 #samples = ["hh_","tth"]#
 #samples = ["GluGluToHHTo2B2G_node_all","ttH","TTGJets","TTTo2L2Nu","TTGG_0Jets"]#
@@ -34,10 +35,11 @@ cleanOverlap = True   # Do not forget to change it
 treeTag=""
 
 NodesNormalizationFile = '/work/nchernya/HHbbgg_ETH_devel/root_files/ntuples_20191812/reweighting_normalization_18_12_2019.json'
-useMixOfNodes = False
+useMixOfNodes = True  #to create flashgg trees
 #whichNodes = list(np.arange(0,12,1))   #all nodes are used to train. 
 #whichNodes = [3,'box','SM'] #nodes similar to SM in shape of MX, used for categories optimization, considered as signal for the category optimization
 whichNodes = ['SM']  #used to create cumulative on SM only
+#whichNodes = ['11']  #used to create cumulative on SM only
 signalMixOfNodesNormalizations = json.loads(open(NodesNormalizationFile).read())
 
 #just a list of all nodes to add weight branches in the trees
@@ -131,7 +133,7 @@ def main(options,args):
     
 
     print options.addnodes
-    if options.flashggNames : useMixOfNodes = False
+    #if options.flashggNames : useMixOfNodes = False
     addSamples()
     
     #branch_names = 'Mjj,leadingJet_DeepFlavour,subleadingJet_DeepFlavour,absCosThetaStar_CS,absCosTheta_bb,absCosTheta_gg,diphotonCandidatePtOverdiHiggsM,dijetCandidatePtOverdiHiggsM,customLeadingPhotonIDMVA,customSubLeadingPhotonIDMVA,leadingPhotonSigOverE,subleadingPhotonSigOverE,sigmaMOverM,noexpand:(leadingPhoton_pt/CMS_hgg_mass),noexpand:(subleadingPhoton_pt/CMS_hgg_mass),noexpand:(leadingJet_pt/Mjj),noexpand:(subleadingJet_pt/Mjj),rho,noexpand:(leadingJet_bRegNNResolution*1.4826),noexpand:(subleadingJet_bRegNNResolution*1.4826),noexpand:(sigmaMJets*1.4826),PhoJetMinDr,PhoJetOtherDr'.split(",")
@@ -149,6 +151,7 @@ def main(options,args):
     additionalCut_names+=['leadingJet_phi','leadingJet_eta','subleadingJet_phi','subleadingJet_eta']
     additionalCut_names+=['leadingPhoton_eta','leadingPhoton_phi','subleadingPhoton_eta','subleadingPhoton_phi']
     additionalCut_names+=['nElectrons2018','nMuons2018','ntagMuons','ntagElectrons']
+    gen_info=['genAbsCosThetaStar_CS','genMhh']
     branch_cuts = 'leadingJet_pt,subleadingJet_pt,leadingJet_bRegNNCorr,subleadingJet_bRegNNCorr,noexpand:(leadingJet_pt/leadingJet_bRegNNCorr),noexpand:(subleadingJet_pt/subleadingJet_bRegNNCorr)'.split(',')
     #branch_cuts = []
     event_branches = ['leadingJet_hflav','leadingJet_pflav','subleadingJet_hflav','subleadingJet_pflav','btagReshapeWeight']
@@ -169,7 +172,7 @@ def main(options,args):
     # no need to shuffle here, we just count events
     nodesWeightBranches=[]
     nodesWeightBranches=[ 'benchmark_reweight_%s'%i for i in nodes_branches ] 
-    preprocessing.set_signals(branch_names+branch_cuts+event_branches+additionalCut_names+signal_trainedOn+nodesWeightBranches,False,cuts) 
+    preprocessing.set_signals(branch_names+branch_cuts+event_branches+additionalCut_names+gen_info+signal_trainedOn+nodesWeightBranches,False,cuts) 
     preprocessing.set_backgrounds(branch_names+branch_cuts+event_branches+additionalCut_names+bkg_trainedOn,False,cuts) 
 
     #### Adding new deltaR (photon,jet) branches ####
@@ -239,11 +242,13 @@ def main(options,args):
         if options.addData:
             Y_pred_data = loaded_model.predict_proba(X_data)[:,loaded_model.n_classes_-1].astype(np.float64)
             #print Y_pred_data 
-        for i in range(0,len(utils.IO.backgroundName)):  
-      #  for i in range(0,0):   #not to apply MVA on bkg
+     #   for i in range(0,len(utils.IO.backgroundName)):  
+        for i in range(0,0):   #not to apply MVA on bkg
             print 'evaluating MVA for bkg : ',str(i)
             Y_pred_bkg.append(loaded_model.predict_proba(bkg[i])[:,loaded_model.n_classes_-1].astype(np.float64))
-    #    Y_pred_sig = loaded_model.predict_proba(X_sig)[:,loaded_model.n_classes_-1].astype(np.float64)
+        print X_sig[0]
+        print loaded_model.predict_proba(([el for el in X_sig[0]]))[:,loaded_model.n_classes_-1].astype(np.float64)
+        Y_pred_sig = loaded_model.predict_proba(X_sig)[:,loaded_model.n_classes_-1].astype(np.float64)
     
     
     
@@ -288,38 +293,38 @@ def main(options,args):
 
  
 ###########################  signal  block starts  ################################################################
-#    sig_count_df = utils.IO.signal_df[0]
-#    preprocessing.define_process_weight(sig_count_df,utils.IO.sigProc[0],utils.IO.signalName[0],utils.IO.signalTreeName[0],cleanSignal=True,cleanOverlap=cleanOverlap)
-#
-# 
-#    #nTot is a multidim vector with all additional variables, dictVar is a dictionary associating a name of the variable
-#    #to a position in the vector
-#    nTot,dictVar = postprocessing.stackFeatures(sig_count_df,branch_names+additionalCut_names+signal_trainedOn+overlap+nodesWeightBranches+event_branches)
-#    #apply isSignal cleaning
-#    nCleaned = nTot[np.where(nTot[:,dictVar['weight']]!=0),:][0]
-#    
-#    processPath=os.path.expanduser(options.outputFileDir)+outTag+'/'+utils.IO.signalName[0].split("/")[len(utils.IO.signalName[0].split("/"))-1].replace("output_","").replace(".root","")+"_preselection"+".root"
-#
-#
-#    if not options.addHHTagger:
-#        postprocessing.saveTree(processPath,dictVar,nCleaned,Y_pred_sig)
-#    else:
-#        postprocessing.saveTree(processPath,dictVar,nCleaned)        
-#    
-#    processPath=os.path.expanduser(options.outputFileDir)+outTag+'/'+utils.IO.signalName[0].split("/")[len(utils.IO.signalName[0].split("/"))-1].replace("output_","").replace(".root","")+"_preselection_diffNaming"+".root"
-#
-#    outtreename = "reducedTree_sig%s"%treeTag
-#    if options.flashggNames : 
-#       outtreename = flashgg_signal_names[0]
-#    if not options.addHHTagger:
-#        postprocessing.saveTree(processPath,dictVar,nCleaned,Y_pred_sig,nameTree=outtreename)
-#    else:    
-#        postprocessing.saveTree(processPath,dictVar,nCleaned,nameTree=outtreename)
-# 
+    sig_count_df = utils.IO.signal_df[0]
+    preprocessing.define_process_weight(sig_count_df,utils.IO.sigProc[0],utils.IO.signalName[0],utils.IO.signalTreeName[0],cleanSignal=True,cleanOverlap=cleanOverlap)
+
+ 
+    #nTot is a multidim vector with all additional variables, dictVar is a dictionary associating a name of the variable
+    #to a position in the vector
+    nTot,dictVar = postprocessing.stackFeatures(sig_count_df,branch_names+additionalCut_names+gen_info+signal_trainedOn+overlap+nodesWeightBranches+event_branches)
+    #apply isSignal cleaning
+    nCleaned = nTot[np.where(nTot[:,dictVar['weight']]!=0),:][0]
+    
+    processPath=os.path.expanduser(options.outputFileDir)+outTag+'/'+utils.IO.signalName[0].split("/")[len(utils.IO.signalName[0].split("/"))-1].replace("output_","").replace(".root","")+"_preselection"+".root"
+
+
+    if not options.addHHTagger:
+        postprocessing.saveTree(processPath,dictVar,nCleaned,Y_pred_sig)
+    else:
+        postprocessing.saveTree(processPath,dictVar,nCleaned)        
+    
+    processPath=os.path.expanduser(options.outputFileDir)+outTag+'/'+utils.IO.signalName[0].split("/")[len(utils.IO.signalName[0].split("/"))-1].replace("output_","").replace(".root","")+"_preselection_diffNaming"+".root"
+
+    outtreename = "reducedTree_sig%s"%treeTag
+    if options.flashggNames : 
+       outtreename = flashgg_signal_names[0]
+    if not options.addHHTagger:
+        postprocessing.saveTree(processPath,dictVar,nCleaned,Y_pred_sig,nameTree=outtreename)
+    else:    
+        postprocessing.saveTree(processPath,dictVar,nCleaned,nameTree=outtreename)
+ 
 ############################  signal  block ends  ################################################################ 
     
-    for iProcess in range(0,len(utils.IO.backgroundName)):
-   # for iProcess in range(0,0):  #not to run on bkg
+   # for iProcess in range(0,len(utils.IO.backgroundName)):
+    for iProcess in range(0,0):  #not to run on bkg
         
         print "Processing sample: "+str(iProcess)
         bkg_count_df = utils.IO.background_df[iProcess]
@@ -412,7 +417,7 @@ if __name__ == "__main__":
                         help="decide if you want to process or not data",
                         ),
             make_option("--flashggNames",
-                        action="store_true",dest="flashggNames",default=False,
+                        action="store",type='int',dest="flashggNames",default=0,
                         help="decide if you want to save trees with flashggnames",
                         ),
             make_option("-f","--outputFileDir",

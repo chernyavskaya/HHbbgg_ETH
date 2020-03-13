@@ -10,11 +10,15 @@ ntup=ntuples_20192401/ntuples_${year}_20192401/
 #outTag=20191218_wo_Mjj_${year}
 #outTag=20191812_btag_upd_${year}
 #outTag=20191812_btag_wo_Mjj_upd_${year}
-outTag=20192401_wo_Mjj_leptonveto_flashgg_${year}
+#outTag=20191802_wo_Mjj_leptonveto_flashgg_${year}
+#outTag=20191802_wo_Mjj_leptonveto_flashgg_SMsignal_${year}
+outTag=test_output
+
+
 
 addHHTagger=0  #0 if you want to add it, 1 if it is already present
 #addHHTagger=1  #0 if you want to add it, 1 if it is already present
-flashggNames=1
+flashggNames=1 #if flashggnames
 
 training_year=0
 if [ $year -eq "2016" ]; then
