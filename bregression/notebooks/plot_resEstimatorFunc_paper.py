@@ -16,7 +16,7 @@ from ROOT import gROOT
 from ROOT import gStyle
 
 gROOT.SetBatch(True)
-gROOT.ProcessLineSync(".x /mnt/t3nfs01/data01/shome/nchernya/setTDRStyle.C")
+gROOT.ProcessLineSync(".x /work/nchernya/setTDRStyle.C")
 gROOT.ForceStyle()
 gStyle.SetPadTopMargin(0.06)
 gStyle.SetPadRightMargin(0.04)
@@ -62,7 +62,7 @@ for item in [pCMS2]:
 parser = OptionParser(option_list=[
     make_option("--training",type='string',dest="training",default='2018-04-06_job23_2016'),
     make_option("--inp-file",type='string',dest='inp_file',default='applied_res_ttbar_RegressionPerJet_heppy_energyRings3_forTesting.hd5'),
-    make_option("--inp-dir",type='string',dest="inp_dir",default='/scratch/nchernya/HHbbgg/paper/output_root/'),
+    make_option("--inp-dir",type='string',dest="inp_dir",default='/work/nchernya/HHbbgg_ETH_devel/bregression/output_files/NN_psi_training/paper/'),
     make_option("--sample-name",type='string',dest="samplename",default='ttbar'),
     make_option("--where",type='string',dest="where",default=''),
 ])
@@ -72,14 +72,14 @@ parser = OptionParser(option_list=[
 input_trainings = options.training.split(',')
 
 now = str(datetime.datetime.now()).split(' ')[0]
-scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/September20_2019/'
+savetag='March13_2020_CSBS'
+scratch_plots ='/work/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/March13_2020/'  #for paper
 #dirs=['',input_trainings[0],options.samplename]
 dirs=['',options.samplename]
 for i in range(len(dirs)):
   scratch_plots=scratch_plots+'/'+dirs[i]+'/'
   if not os.path.exists(scratch_plots):
     os.mkdir(scratch_plots)
-savetag='Feb25'
  
 
 # ## Read test data and model

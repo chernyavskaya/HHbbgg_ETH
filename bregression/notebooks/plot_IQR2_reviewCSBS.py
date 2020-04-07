@@ -1,5 +1,4 @@
 import numpy as np
-import keras.models
 import os
 import bregnn.io as io
 import bregnn.utils as utils
@@ -17,7 +16,7 @@ from ROOT import gStyle
 from ROOT import TLatex
 
 gROOT.SetBatch(True)
-gROOT.ProcessLineSync(".x /mnt/t3nfs01/data01/shome/nchernya/setTDRStyle.C")
+gROOT.ProcessLineSync(".x /work/nchernya/setTDRStyle.C")
 gROOT.ForceStyle()
 gStyle.SetPadTopMargin(0.06)
 gStyle.SetPadRightMargin(0.04)
@@ -26,16 +25,6 @@ gStyle.SetPadLeftMargin(0.19)
 
 right,top   = gStyle.GetPadRightMargin(),gStyle.GetPadTopMargin()
 left,bottom = gStyle.GetPadLeftMargin(),gStyle.GetPadBottomMargin()
-
-
-padd = ROOT.TPaveText(left*1.1,1.-top*4.,0.4,1.-top*3.8,"NDC") 
-padd.SetTextFont(42)
-padd.AddText("70 < p_{T} < 100 GeV")
-padd.SetTextSize(top*0.75)
-padd.SetTextAlign(12)
-padd.SetFillStyle(-1)
-padd.SetBorderSize(0)
-
 
 pCMS1 = ROOT.TPaveText(left*1.1,1.-top*4,0.4,1.,"NDC") #without Preliminary
 #pCMS1 = ROOT.TPaveText(left*1.1,1.-top*3.85,0.4,1.,"NDC") #with Preliminary
@@ -83,8 +72,8 @@ input_trainings = options.training.split(',')
 
 now = str(datetime.datetime.now()).split(' ')[0]
 #scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/2017JECv32/June05/'   #for studies
-savetag='April07_2020_CSBS'
-scratch_plots ='/work/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/April07_2020/'  #for paper
+savetag='March26_2020_CSBS'
+scratch_plots ='/work/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/March26_2020/'  #for paper
 dirs=['',input_trainings[0],options.samplename]
 dirs=['',options.samplename]
 for i in range(len(dirs)):
@@ -95,9 +84,7 @@ for i in range(len(dirs)):
 
 # ## Read test data and model
 # load data
-#data = io.read_data('%s%s'%(options.inp_dir,options.inp_file),columns=None).query('Jet_pt>20')  # Jet pt 20 GeV was added after the final discussion with ARC
-#data = io.read_data('%s%s'%(options.inp_dir,options.inp_file),columns=None).query('(Jet_pt>70) and (Jet_pt<100)')  
-data = io.read_data('%s%s'%(options.inp_dir,options.inp_file),columns=None).query('(Jet_mcPt>70) and (Jet_mcPt<100)')  
+data = io.read_data('%s%s'%(options.inp_dir,options.inp_file),columns=None).query('(Jet_pt>20) and (abs(Jet_eta)<0.5)')  # Jet pt 20 GeV was added after the final discussion with ARC
 data.describe()
 if options.where!='' : data = data.query(options.where)
 
@@ -106,9 +93,12 @@ file_regions = open('..//scripts/regionsPtEta.json')
 regions_summary = json.loads(file_regions.read())
 region_names = regions_summary['pt_regions']+regions_summary['eta_region_names']
 
-#y = (data['Jet_mcPt']/data['Jet_pt']).values.reshape(-1,1) # test
-y = (data['Jet_mcPt']/(data['Jet_pt_raw']*data['Jet_corr_JEC'])).values.reshape(-1,1)
+#y = (data['Jet_mcPt']/data['Jet_pt']).values.reshape(-1,1)
+y_gen = (data['Jet_mcPt']/(data['Jet_pt_raw']*data['Jet_corr_JEC'])).values.reshape(-1,1)
+#y = (data['Jet_mcPt']/(data['Jet_pt_raw']*data['Jet_corr_JEC'])).values.reshape(-1,1)
+y = ((data['Jet_pt_raw']*data['Jet_corr_JEC'])/data['Jet_mcPt']).values.reshape(-1,1)
 X_pt = (data['Jet_pt_raw']).values.reshape(-1,1) 
+#X_pt = (data['Jet_pt_raw']*data['Jet_corr_JEC']).values.reshape(-1,1) # test
 #X_pt = (data['Jet_mcPt']).values.reshape(-1,1)  # For D.H. test
 X_pt_jec = (data['Jet_pt_raw']*data['Jet_corr_JEC']).values.reshape(-1,1)
 X_pt_gen = (data['Jet_mcPt']).values.reshape(-1,1)
@@ -116,9 +106,9 @@ X_eta = (data['Jet_eta']).values.reshape(-1,1)
 X_rho = (data['rho']).values.reshape(-1,1)
 res = (data['Jet_resolution_NN_%s'%input_trainings[0]]).values.reshape(-1,1)
 y_pred = (data['Jet_pt_reg_NN_%s'%input_trainings[0]]) #bad name because it is actually a correction
-y_corr = (y[:,0]/y_pred).values.reshape(-1,1)
+y_corr = (y_gen[:,0]/y_pred).values.reshape(-1,1)
 # errors vector
-err = (y[:,0]-y_pred).values.reshape(-1,1)
+err = (y_gen[:,0]-y_pred).values.reshape(-1,1)
 
 linestyles = ['-.', '--','-', ':']
 where = (options.where).replace(' ','').replace('<','_').replace('>','_').replace('(','').replace(')','')
@@ -126,11 +116,11 @@ where = (options.where).replace(' ','').replace('<','_').replace('>','_').replac
 whats = ['p_T (GeV)','\eta','\\rho (GeV)']
 whats_root = ['p_{T} (GeV)','#eta','#rho (GeV)']
 #whats_root = ['p_{T}^{gen} (GeV)','#eta','#rho (GeV)'] # for D.H. test
-ranges = [[30,400],[-3,3],[0,50]]
+ranges = [[50,400],[-3,3],[0,50]]
 #ranges = [[150,400],[-3,3],[0,40]]  # gen for Phil
 binning =[50,10,20] #[50,20]
-for i in range(1,3):
-#for i in range(0,1):
+#for i in range(0,3):
+for i in range(0,1):
  if i==0 : X = X_pt
  elif i==1 : X = X_eta
  elif i==2 : X = X_rho
@@ -140,9 +130,6 @@ for i in range(1,3):
  if ('HHbbgg' in options.samplename) and ('p_T' in whats[i]) : 
       bins=int(binning[i]/3.)
       ranges[i] =  [50,400]
- if ('HHbbgg' in options.samplename) and ('rho' in whats[i]) : 
-      bins=int(binning[i]/2.)
- if ('ZHbbll' in options.samplename) and ('eta' in whats[i]) : ranges[i]=[-2.45,2.45]
  bins, y_mean_pt, y_std_pt, y_qt_pt = utils.profile(y,X,range=ranges[i],bins=bins,uniform=False,quantiles=np.array([0.25,0.4,0.5,0.75]))
  y_median_pt = y_qt_pt[2]
  y_25_pt,y_40_pt,y_75_pt = y_qt_pt[0],y_qt_pt[1],y_qt_pt[3]
@@ -155,6 +142,13 @@ for i in range(1,3):
  y_corr_iqr2_pt =  y_corr_qt_pt[0],y_corr_qt_pt[3]
  err_corr_iqr2 =  0.5*(y_corr_qt_pt[3]-y_corr_qt_pt[0])
 
+
+ _, _, _, y_qt_pt_gen = utils.profile(y,X_pt_gen,range=ranges[i],bins=bins,uniform=False,quantiles=np.array([0.25,0.4,0.5,0.75]))
+ err_iqr2_gen =  0.5*(y_qt_pt_gen[3]-y_qt_pt_gen[0])
+
+ _, _,_, y_corr_qt_pt_gen = utils.profile(y_corr,X_pt_gen,bins=bins,quantiles=np.array([0.25,0.4,0.5,0.75])) 
+ err_corr_iqr2_gen =  0.5*(y_corr_qt_pt_gen[3]-y_corr_qt_pt_gen[0])
+
  binc = 0.5*(bins[1:]+bins[:-1])
 ####Calculate the improvement on IQR/2 ###
  iqr2_improvement = 2*(np.array(err_iqr2)-np.array(err_corr_iqr2))/(np.array(err_iqr2)+np.array(err_corr_iqr2))
@@ -164,6 +158,10 @@ for i in range(1,3):
      binc[0] = -2.5
      binc[-1] = 2.5
     
+ gr_iqr2_corr = TGraph(len(binc),array('d',binc),array('d',err_corr_iqr2))
+ gr_iqr2 = TGraph(len(binc),array('d',binc),array('d',err_iqr2))
+ gr_iqr2_corr_gen = TGraph(len(binc),array('d',binc),array('d',err_corr_iqr2_gen))
+ gr_iqr2_gen = TGraph(len(binc),array('d',binc),array('d',err_iqr2_gen))
 
  plt.plot(binc,y_25_pt,label='baseline',linestyle=linestyles[0],color='b')
  gr25 = TGraph(len(binc),array('d',binc),array('d',y_25_pt))
@@ -195,114 +193,83 @@ for i in range(1,3):
  ymin, ymax = (plt.gca()).get_ylim()
  xmin, xmax = (plt.gca()).get_xlim()
  widths = [2,3,4,5]
- for num,item in enumerate([gr25,gr40,gr50,gr75]) :
-	item.SetLineStyle(5)
+ for num,item in enumerate([gr25,gr40,gr50,gr75,gr_iqr2_gen]) :
+	item.SetLineStyle(1)
 	item.SetLineWidth(3)
 	item.SetLineColor(ROOT.kBlue)
- for num,item in enumerate([grcorr25,grcorr40,grcorr50,grcorr75]) :
+ for num,item in enumerate([grcorr25,grcorr40,grcorr50,grcorr75,gr_iqr2_corr_gen]) :
 	item.SetLineStyle(1)
 	item.SetLineWidth(3)
 	item.SetLineColor(ROOT.kRed)
-# plt.text(xmin+abs(xmin)*0.05,ymax*0.98,'Quantiles : 0.25, 0.40, 0.50, 0.75', fontsize=30)
 
- samplename=options.samplename
- if options.samplename=='ttbar' : samplename='$t\\bar{t}$'
- if options.samplename=='ZHbbll' : samplename='$Z(\\to{bb})H(\\to{l^+l^-})$'
- if options.samplename=="HHbbggSM" : samplename='$H(\\to{bb})H(\\to{\gamma\gamma})$ SM'
- if options.samplename=="HHbbgg500" : samplename='$H(\\to{bb})H(\\to{\gamma\gamma})$ 500 GeV'
- if options.samplename=="HHbbgg700" : samplename='$H(\\to{bb})H(\\to{\gamma\gamma})$ 700 GeV'
- plt.text(xmin+abs(xmin)*0.05,ymax*0.96,'%s'%samplename, fontsize=30)
- 
- plt.xlabel('$%s$'%whats[i], fontsize=30)
- plt.ylabel('$p_{T}^{gen} / p_{T}^{reco}$', fontsize=30)
- plt.legend(loc='upper right',fontsize=30)
- savename='/quantiles_col_%s_%s_%s_%s'%(input_trainings[0],whats[i].replace('\\','').replace(' ','').replace(')','').replace('(','').replace('-','_'),options.samplename,where)
-# plt.savefig(scratch_plots+savename+savetag+'.png')
-# plt.savefig(scratch_plots+savename+savetag+'.pdf')
- plt.clf()
- 
+ for num,item in enumerate([gr_iqr2]) :
+	item.SetLineStyle(5)
+	item.SetLineWidth(3)
+	item.SetLineColor(ROOT.kAzure+6)
+ for num,item in enumerate([gr_iqr2_corr]) :
+	item.SetLineStyle(5)
+	item.SetLineWidth(3)
+	item.SetLineColor(ROOT.kOrange-3)
+
+ import csv
+ jetmet_x = []
+ jetmet_y = []
+ with open('/work/nchernya/HHbbgg_ETH_devel/bregression/inputs/JetMet_arx1107_4277_Fig34c_eta05.csv', 'rb') as csvfile :
+   spamreader = csv.reader(csvfile, delimiter=',')
+   for row in spamreader:
+     jetmet_x.append(float(row[0]))
+     jetmet_y.append(float(row[1]))
+
+ print jetmet_x,jetmet_y
+
+ gr_jetmet = TGraph(len(jetmet_x),array('d',jetmet_x),array('d',jetmet_y))
+ gr_jetmet.SetLineStyle(1)
+ gr_jetmet.SetLineWidth(3)
+ gr_jetmet.SetLineColor(ROOT.kGreen+1)
+
+
 ### plot with ROOT : 
- c2 = ROOT.TCanvas("canvas%d"%i,"canvas%d"%i,900,900)
- c2.cd()
- frame = ROOT.TH1F("frame%d"%i,"",1,xmin,xmax)
- frame.SetStats(0)
- frame.GetXaxis().SetLabelSize(0.04)
- frame.GetYaxis().SetLabelSize(0.04)
- frame.GetYaxis().SetTitle("p_{T}^{gen} / p_{T}^{reco}")
- frame.GetXaxis().SetTitle(whats_root[i])
- frame.GetYaxis().SetRangeUser(ymin,ymax*1.1)
- frame.GetYaxis().SetRangeUser(0.85,1.35) #without Preliminary
- #frame.GetYaxis().SetRangeUser(0.85,1.39) #with Preliminary
- if ('p_T') in whats[i] and 'HHbbgg' in options.samplename: frame.GetXaxis().SetLimits(30, 350)
- if ('p_T') in whats[i] and 'ttbar' in options.samplename: frame.GetXaxis().SetLimits(-20, 360)
-# if ('p_T') in whats[i] and 'ttbar' in options.samplename: frame.GetXaxis().SetLimits(120, 370)  # for D.H. gen Phil test
- if ('rho') in whats[i] and 'ttbar' in options.samplename: frame.GetXaxis().SetLimits(-4, 47)
- if ('eta') in whats[i] and 'ttbar' in options.samplename: frame.GetXaxis().SetLimits(-3.6, 3.6)
- frame.Draw()
- for item in [gr25,gr40,gr50,gr75,grcorr25,grcorr40,grcorr50,grcorr75]:
-# for item in [gr25,gr40,gr50,gr75,grcorr25,grcorr40,grcorr50,grcorr75,grmean,grcorrmean]:
-     item.Draw("Lsame")
-
+ savename_res='/resolution_IQR2_common_%s_%s_%s_%s'%(input_trainings[0],whats[i].replace('\\','').replace(' ','').replace(')','').replace('(','').replace('-','_'),options.samplename,where)
+ c3 = ROOT.TCanvas("canvas%d"%i,"canvas%d"%i,900,900)
+ c3.cd()
+ c3.SetLogx()
+ frame3 = ROOT.TH1F("frame3%d"%i,"",1,xmin,xmax)
+ frame3.SetStats(0)
+ frame3.GetXaxis().SetLabelSize(0.04)
+ frame3.GetYaxis().SetLabelSize(0.04)
+ frame3.GetYaxis().SetTitle("jet p_{T} resolution")
+ frame3.GetXaxis().SetTitle(whats_root[i])
+ frame3.GetYaxis().SetRangeUser(ymin,ymax*1.1)
+ frame3.GetYaxis().SetRangeUser(0.,0.2) #without Preliminary
+ frame3.GetXaxis().SetLimits(40, 500)
+ frame3.Draw()
+ gr_iqr2_corr_gen.Draw("Lsame")
+ gr_iqr2_gen.Draw("Lsame")
+ gr_iqr2_corr.Draw("Lsame")
+ gr_iqr2.Draw("Lsame")
+ gr_jetmet.Draw("Lsame")
  
- if i==0: pName.AddText("%s"%samplename)
-
  leg = TLegend()
- leg = ROOT.TLegend(0.75,0.75,0.9,0.9) #without Preliminary
- #leg = ROOT.TLegend(0.75,0.7,0.9,0.85) #with Preliminary
-# leg = ROOT.TLegend(0.6,0.75,0.9,0.9) # D.H. test
- leg.AddEntry(gr25,"Baseline" ,"L")
- leg.AddEntry(grcorr25,"DNN" ,"L")
-# leg.AddEntry(grmean,"Baseline average" ,"L") # D.H. test
-# leg.AddEntry(grcorrmean,"DNN average" ,"L") # D.H. test
+ leg = ROOT.TLegend(0.45,0.65,0.8,0.85) #without Preliminary
+ leg.AddEntry(gr_jetmet,"arx 1107.4277 PFJets, core fit" ,"L")
+ leg.AddEntry(gr_iqr2_gen,"Baseline in p_{T}^{gen} bins, IQR/2" ,"L")
+ leg.AddEntry(gr_iqr2_corr_gen,"DNN in p_{T}^{gen} bins, IQR/2" ,"L")
+ leg.AddEntry(gr_iqr2,"Baseline in in p_{T}^{reco} bins, IQR/2" ,"L")
+ leg.AddEntry(gr_iqr2_corr,"DNN in p_{T}^{reco} bins, IQR/2" ,"L")
  leg.SetFillStyle(-1)
  leg.SetBorderSize(0)
  leg.SetTextFont(42)
- leg.SetTextSize(0.04)
+ leg.SetTextSize(0.03)
  leg.Draw()
 
- if (i>0) : #for 70-100GeV bin
-   latex_posX_before = [-10,-3.45,-2.25]
-   latex_posY_before = [[0.875,0.935,0.98,1.13],[0.91,0.96,0.99,1.08],[0.92,0.96,0.988,1.07]]
-   latex_posX_after = [310.,2.65,40.5]
-   latex_posY_after = [[0.94,0.97,1.00,1.055],[.93,.985,1.02,1.121],[0.93,0.99,1.025,1.13]]
-
-# latex_posX_before = [-10,-3.45,-2.25]
-# latex_posY_before = [[0.875,0.935,0.98,1.13],[0.9,0.955,0.985,1.1],[0.91,0.958,0.985,1.082]]
-# latex_posX_after = [310.,2.65,40.5]
-# latex_posY_after = [[0.94,0.97,1.00,1.055],[.94,1.0,1.04,1.175],[0.94,1.0,1.042,1.18]]
-
-# latex_posX_before = [130,-3.,1.] #for D.H. test
-# latex_posY_before = [[0.96,1.,1.05,1.14],[0.9,0.955,0.99,1.11],[0.915,0.965,0.994,1.094]]# D.H test
-# latex_posX_after = [340.,2.6,40.] #D.H test 
-# latex_posY_after = [[0.97,1,1.03,1.1],[.95,1.01,1.05,1.20],[0.95,1.01,1.055,1.205]]# D.H. test
- latex = TLatex()
- latex.SetTextFont(72)
-# latex.SetTextFont(42)
- #latex.SetTextSize(0.028)
- latex.SetTextSize(0.04) #0.33
- latex.SetTextAlign(12)
- latex.SetTextColor(4)
- latex.DrawLatex(latex_posX_after[i],latex_posY_after[i][0],"25%")
- latex.DrawLatex(latex_posX_after[i],latex_posY_after[i][1],"40%")
- latex.DrawLatex(latex_posX_after[i],latex_posY_after[i][2],"50%")
- latex.DrawLatex(latex_posX_after[i],latex_posY_after[i][3],"75%")
- latex.SetTextColor(2)
- latex.DrawLatex(latex_posX_before[i],latex_posY_before[i][0],"25%")
- latex.DrawLatex(latex_posX_before[i],latex_posY_before[i][1],"40%")
- latex.DrawLatex(latex_posX_before[i],latex_posY_before[i][2],"50%")
- latex.DrawLatex(latex_posX_before[i],latex_posY_before[i][3],"75%")
-
- pCMS1.Draw()
- pCMS12.Draw()
+# pCMS1.Draw()
+# pCMS12.Draw()
  pCMS2.Draw()
- padd.Draw()
-# pCMSt.Draw()
- if options.samplename!='ttbar' : pName.Draw()
  ROOT.gPad.Update()
  ROOT.gPad.RedrawAxis()
- c2.SaveAs(scratch_plots+savename+savetag+"_root.C"  )
- c2.SaveAs(scratch_plots+savename+savetag+"_root.root"  )
- c2.SaveAs(scratch_plots+savename+savetag+"_root.pdf"  )
+ c3.SaveAs(scratch_plots+savename_res+savetag+"_root.C"  )
+ c3.SaveAs(scratch_plots+savename_res+savetag+"_root.root"  )
+ c3.SaveAs(scratch_plots+savename_res+savetag+"_root.pdf"  )
 
 
 

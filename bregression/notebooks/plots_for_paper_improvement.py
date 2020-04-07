@@ -19,7 +19,7 @@ from ROOT import gROOT
 from ROOT import gStyle
 
 gROOT.SetBatch(True)
-gROOT.ProcessLineSync(".x /mnt/t3nfs01/data01/shome/nchernya/setTDRStyle.C")
+gROOT.ProcessLineSync(".x /work/nchernya/setTDRStyle.C")
 gROOT.ForceStyle()
 gStyle.SetPadTopMargin(0.06)
 gStyle.SetPadRightMargin(0.04)
@@ -30,16 +30,26 @@ gStyle.SetPadLeftMargin(0.20)
 right,top   = gStyle.GetPadRightMargin(),gStyle.GetPadTopMargin()
 left,bottom = gStyle.GetPadLeftMargin(),gStyle.GetPadBottomMargin()
 
-#pCMS1 = ROOT.TPaveText(left*1.1,1.-top*4,0.4,1.,"NDC") #without Preliminary
-pCMS1 = ROOT.TPaveText(left*1.1,1.-top*3.85,0.4,1.,"NDC") #with Preliminary
+padd = ROOT.TPaveText(left*1.1,1.-top*4.,0.4,1.-top*3.8,"NDC") 
+padd.SetTextFont(42)
+padd.AddText("70 < p_{T} < 100 GeV")
+padd.SetTextSize(top*0.75)
+padd.SetTextAlign(12)
+padd.SetFillStyle(-1)
+padd.SetBorderSize(0)
+
+
+
+pCMS1 = ROOT.TPaveText(left*1.1,1.-top*4,0.4,1.,"NDC") #without Preliminary
+#pCMS1 = ROOT.TPaveText(left*1.1,1.-top*3.85,0.4,1.,"NDC") #with Preliminary
 pCMS1.SetTextFont(62)
 pCMS1.AddText("CMS")
 
 
 pCMS12 = ROOT.TPaveText(left*1.1+0.1,1.-top*4,0.57,1.,"NDC")
 pCMS12.SetTextFont(52)
-#pCMS12.AddText("Simulation")
-pCMS12.AddText("Simulation Preliminary")
+pCMS12.AddText("Simulation")
+#pCMS12.AddText("Simulation Preliminary")
 
 pCMS2 = ROOT.TPaveText(0.5,1.-top,1.-right*0.5,1.,"NDC")
 pCMS2.SetTextFont(42)
@@ -63,7 +73,7 @@ for item in [pCMS2]:
 parser = OptionParser(option_list=[
     make_option("--training",type='string',dest="training",default='2018-04-06_job23_2016'),
     make_option("--inp-file",type='string',dest='inp_file',default='applied_res_ttbar_RegressionPerJet_heppy_energyRings3_forTesting.hd5'),
-    make_option("--inp-dir",type='string',dest="inp_dir",default='/scratch/nchernya/HHbbgg/paper/output_root/'),
+    make_option("--inp-dir",type='string',dest="inp_dir",default='/work/nchernya/HHbbgg_ETH_devel/bregression/output_files/NN_psi_training/paper/'),
     make_option("--sample-name",type='string',dest="samplename",default='ttbar'),
     make_option("--labels",type='string',dest="labels",default=''),
     make_option("--where",type='string',dest="where",default=''),
@@ -76,9 +86,9 @@ input_files = options.inp_file.split(',')
 
 
 now = str(datetime.datetime.now()).split(' ')[0]
-savetag='August30'
+savetag='April07_2020_CSBS'
 #scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/2017JECv32/June05/'   #for studies
-scratch_plots ='/shome/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/September20_2019/' #for paper
+scratch_plots ='/work/nchernya/HHbbgg_ETH_devel/bregression/plots/paper/April07_2020/'  #for paper
 #dirs=['',input_trainings[0],options.samplename]
 dirs=['',options.samplename]
 for i in range(len(dirs)):
@@ -117,6 +127,8 @@ for i in range(0,1):  #for some reason code crashes if running all 3 together, I
     # ## Read test data and model
   # load data
     data = io.read_data('%s%s'%(options.inp_dir,input_files[ifile]),columns=None).query("Jet_pt>20")
+    #data = io.read_data('%s%s'%(options.inp_dir,input_files[ifile]),columns=None).query("(Jet_pt>70) and (Jet_pt<100)")
+    #data = io.read_data('%s%s'%(options.inp_dir,input_files[ifile]),columns=None).query("(Jet_mcPt>70) and (Jet_mcPt<100)")
     if options.where!='' : data = data.query(options.where)
     data.describe()
 
@@ -133,7 +145,9 @@ for i in range(0,1):  #for some reason code crashes if running all 3 together, I
 
     #print data['Jet_res_random']
 
+    y_gen = (data['Jet_mcPt']/(data['Jet_pt_raw']*data['Jet_corr_JEC'])).values.reshape(-1,1)
     y = (data['Jet_mcPt']/(data['Jet_pt_raw']*data['Jet_corr_JEC'])).values.reshape(-1,1)
+    y_reco_gen = ((data['Jet_pt_raw']*data['Jet_corr_JEC'])/data['Jet_mcPt']).values.reshape(-1,1)
  #   X_pt = (data['Jet_pt_raw']).values.reshape(-1,1)
  #   X_pt = (data['Jet_pt_raw']*data['Jet_corr_JEC']).values.reshape(-1,1)
     X_pt = (data['Jet_mcPt']).values.reshape(-1,1) #
@@ -143,7 +157,8 @@ for i in range(0,1):  #for some reason code crashes if running all 3 together, I
     X_eta = (abs(data['Jet_eta'])).values.reshape(-1,1)
     X_rho = (data['rho']).values.reshape(-1,1)
     y_pred = (data['Jet_pt_reg_NN_%s'%input_trainings[ifile]]) #bad name because it is actually a correction
-    y_corr = (y[:,0]/y_pred).values.reshape(-1,1)
+    y_corr = (y_gen[:,0]/y_pred).values.reshape(-1,1)
+    y_corr_reco_gen = (1./(y_gen[:,0]/y_pred)).values.reshape(-1,1)
 
     print 'Average pT : ',np.average(data['Jet_mcPt'])
 
@@ -250,7 +265,7 @@ for i in range(0,1):  #for some reason code crashes if running all 3 together, I
  xmin, xmax = (axes).get_xlim()
  if (i==2) : xmax = 47
  ymin=0.05
- #ymax=0.17 #without Preliminary
+# ymax=0.17 #without Preliminary
  ymax=0.18 #with preliminary
  samplename=options.samplename
  if options.samplename=='ttbar' : samplename='$t\\bar{t}$'
@@ -324,6 +339,7 @@ for i in range(0,1):  #for some reason code crashes if running all 3 together, I
     pCMS1.Draw()
     pCMS12.Draw()
     pCMS2.Draw()
+    #padd.Draw()
   #  pCMSt.Draw()
     gr_baseline.Draw("Psame")
     gr_corrected.Draw("Psame")
@@ -355,7 +371,7 @@ for i in range(0,1):  #for some reason code crashes if running all 3 together, I
          # frame2.GetYaxis().SetNDivisions()
     else : frame2.GetYaxis().SetRangeUser(-0.20,0.)
     frame2.GetYaxis().SetNdivisions(203)
-    frame2.GetYaxis().SetRangeUser(0.,0.2)  # added 
+    frame2.GetYaxis().SetRangeUser(0.,0.25)  # added 
     frame2.Draw()
     gr_improvement = TGraph(len(binc),array('d',binc),array('d',improvement))
     print 'max of ratio : ',np.max(improvement),'binc = ',binc[np.where(improvement==np.max(improvement))]
@@ -401,3 +417,55 @@ for i in range(0,1):  #for some reason code crashes if running all 3 together, I
               
  savename='/data_IQR_compare_%s_%s%s%s.csv'%(whats[i].replace('\\','').replace(' ','').replace(')','').replace('(','').replace('-','_'),options.samplename,where,savetag)
  data_csv.to_csv(scratch_plots+savename)
+
+
+
+bins=100
+xmin=0
+xmax=2
+hist = ROOT.TH1F("hist","hist",bins,xmin,xmax)
+hist2 = ROOT.TH1F("hist2","hist2",bins,xmin,xmax)
+
+hist.FillN(len(y_corr_reco_gen), array('d',y_corr_reco_gen),array('d',np.ones(len(y_corr_reco_gen)) ))
+hist2.FillN(len(y_corr), array('d',y_corr), array('d',np.ones(len(y_corr)) ))
+
+hist.Scale(1./hist.Integral())
+hist2.Scale(1./hist2.Integral())
+
+hist.SetLineWidth(2)
+hist.SetLineColor(42)
+hist.SetFillColor(42)
+hist.SetFillStyle(4050)
+
+hist2.SetLineWidth(2)
+hist2.SetLineStyle(2)
+hist2.SetLineColor(1)
+
+
+cnew = ROOT.TCanvas("cnewe","cnew",900,900)
+framenew = ROOT.TH1F("hframenew", "hframenew", 1000, xmin,xmax)
+framenew.SetStats(0)
+framenew.GetXaxis().SetLabelSize(0.04)
+#framenew.GetXaxis().SetTitle("p_{T}^{gen} / p_{T}^{reco}")
+#framenew.GetXaxis().SetTitle("p_{T}^{reco} / p_{T}^{gen}")
+framenew.GetXaxis().SetTitle("ratio")
+framenew.GetYaxis().SetTitle("A.U.")
+framenew.GetYaxis().SetLabelSize(0.04)
+
+
+framenew.GetYaxis().SetRangeUser(1e-03,hist.GetMaximum()*1.2) #target norm with preliminary
+framenew.Draw()
+ROOT.gPad.Update()
+
+leg = ROOT.TLegend(0.7,0.65,0.9,0.8)
+leg.AddEntry(hist,"p_{T}^{reco} / p_{T}^{gen}","LF")
+leg.AddEntry(hist2,"p_{T}^{gen} / p_{T}^{reco}","LF")
+leg.SetFillStyle(-1)
+leg.SetBorderSize(0)
+leg.SetTextFont(42)
+leg.SetTextSize(0.03)
+leg.Draw()
+
+hist.Draw("HISTsame")
+hist2.Draw("HISTsame")
+cnew.SaveAs('ratio_test.pdf')
