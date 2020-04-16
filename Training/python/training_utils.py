@@ -45,6 +45,10 @@ class IO:
     signalMixOfNodes = False
     signalWhichMixOfNodes = []
     signalMixOfNodesNormalizations = dict()
+    reweightVBFHH = False
+    vbfhh_cv = []
+    vbfhh_c2v = []
+    vbfhh_kl = []
     signalTreeName = []
     backgroundName = []
     bkgTreeName = []
@@ -72,7 +76,10 @@ class IO:
             IO.signalWhichMixOfNodes = whichNodes
             IO.signalMixOfNodesNormalizations = normalizations
 
-            
+    def reweight_vbfhh_to_nodes(cv,c2v,kl):
+        IO.vbfhh_cv = cv
+        IO.vbfhh_c2v = c2v
+        IO.vbfhh_kl = kl
    
     @staticmethod
     def add_signal(ntuples,sig, proc, treeName,year=0):
