@@ -49,6 +49,9 @@ class IO:
     vbfhh_cv = []
     vbfhh_c2v = []
     vbfhh_kl = []
+    reweightGGFHH = False
+    ggfhh_kl = []
+    ggfhh_kt = []
     signalTreeName = []
     backgroundName = []
     bkgTreeName = []
@@ -80,6 +83,10 @@ class IO:
         IO.vbfhh_cv = cv
         IO.vbfhh_c2v = c2v
         IO.vbfhh_kl = kl
+
+    def reweight_ggfhh_to_nodes(kl,kt):
+        IO.ggfhh_kl = kl    
+        IO.ggfhh_kt = kt
    
     @staticmethod
     def add_signal(ntuples,sig, proc, treeName,year=0):

@@ -399,17 +399,46 @@ def get_total_training_sample_event_num(x_sig,x_bkg,event_sig,event_bkg,sig_frac
     x_b = x_bkg[np.where(event_bkg%bkg_frac!=0)]
     return np.concatenate((x_s,x_b))
 
+def ggfhh_reweight_A(kl,kt):
+    rew =  0.172413793103448*kl**2*kt**2 - 1.28448275862069*kl*kt**3 + 2.11206896551724*kt**4 
+    return rew
 
+def ggfhh_reweight_B(kl,kt):
+    rew =  0.0980392156862745*kl**2*kt**2 - 0.338235294117647*kl*kt**3 + 0.240196078431373*kt**4
+    return rew
+
+def ggfhh_reweight_C(kl,kt):
+    rew =  -0.270453008789723*kl**2*kt**2 + 1.62271805273834*kl*kt**3 - 1.35226504394861*kt**4
+    return rew
+
+def ggfhh_reweight(sample_num,kl,kt):
+    if sample_num==0 : 
+        return ggfhh_reweight_A(kl,kt)
+    elif sample_num==1 : 
+        return ggfhh_reweight_B(kl,kt)   
+    elif sample_num==2 : 
+        return ggfhh_reweight_C(kl,kt)           
+    
+    
 
 def set_signals(branch_names,shuffle,cuts='event>=0'):
+    #samples with kl : 1,5,2.45. ! Order is extremely important
+    sigA_gghh = 0.02675
+    sigB_gghh = 0.07903
+    sigC_gghh = 0.01133
+    GGFHH_samples_xsec = []
+    GGFHH_samples_xsec.append(sigA_gghh)
+    GGFHH_samples_xsec.append(sigB_gghh)
+    GGFHH_samples_xsec.append(sigC_gghh)
+    ggfhh_signal_dataframes = []    
     for i in range(utils.IO.nSig):
         treeName = utils.IO.signalTreeName[i]
         print "using tree:"+treeName
-        if utils.IO.signalMixOfNodes==False :
+        if utils.IO.signalMixOfNodes==False and utils.IO.reweightGGFHH==False:
             utils.IO.signal_df.append((rpd.read_root(utils.IO.signalName[i],treeName, columns = branch_names)).query(cuts))
             define_process_weight(utils.IO.signal_df[i],utils.IO.sigProc[i],utils.IO.signalName[i],treeName)
             utils.IO.signal_df[i]['year'] = (np.ones_like(utils.IO.signal_df[i].index)*utils.IO.sigYear[i] ).astype(np.int8)
-        else : 
+        elif utils.IO.signalMixOfNodes==True: 
             node_df = rpd.read_root(utils.IO.signalName[i],treeName, columns = branch_names).query(cuts)
             year = ''
             if utils.IO.sigYear[i]==1 : year='2017'
@@ -427,10 +456,27 @@ def set_signals(branch_names,shuffle,cuts='event>=0'):
             
             define_process_weight(utils.IO.signal_df[i],utils.IO.sigProc[i],utils.IO.signalName[i],treeName)
             utils.IO.signal_df[i]['year'] = (np.ones_like(utils.IO.signal_df[i].index)*utils.IO.sigYear[i] ).astype(np.int8)
-        restore_normalization(utils.IO.signal_df[i],weight='weight',norm='btagReshapeWeight')
+        elif utils.IO.reweightGGFHH==True: 
+            ggfhh_signal_dataframes.append((rpd.read_root(utils.IO.signalName[i],treeName, columns = branch_names)).query(cuts))
+            ggfhh_signal_dataframes[i]['weight']*=GGFHH_samples_xsec[i] #multiply each sample with its own cross section
+            ggfhh_rew_sf = 0.
+            for num_coup in range(0,len(utils.IO.ggfhh_kl)) :
+                ggfhh_rew_sf+=ggfhh_reweight(i,utils.IO.ggfhh_kl[num_coup],utils.IO.ggfhh_kt[num_coup])
+
+            ggfhh_signal_dataframes[i]['weight']*=ggfhh_rew_sf            
+        #restore_normalization(utils.IO.signal_df[i],weight='weight',norm='btagReshapeWeight')
+        
+    if utils.IO.reweightGGFHH==True :
+        utils.IO.signal_df.append(pd.concat([ggfhh_signal_dataframes[i] for i in range(0,utils.IO.nSig)],ignore_index=True))
+        utils.IO.signal_df[0]['year'] = (np.ones_like(utils.IO.signal_df[0].index)*utils.IO.sigYear[0] ).astype(np.int8)
+        define_process_weight(utils.IO.signal_df[0],utils.IO.sigProc[0],utils.IO.signalName[0],treeName)
+        utils.IO.nSig = 1 #trick to only use 1 signal
+
+    for i in range(utils.IO.nSig):
         if shuffle:
             utils.IO.signal_df[i]['random_index'] = np.random.permutation(range(utils.IO.signal_df[i].index.size))
-            utils.IO.signal_df[i].sort_values(by='random_index',inplace=True)
+            utils.IO.signal_df[i].sort_values(by='random_index',inplace=True)           
+
             
 #         adjust_and_compress(utils.IO.signal_df[i]).to_hdf('/tmp/micheli/signal.hd5','sig',compression=9,complib='bzip2',mode='a')
 
@@ -444,7 +490,7 @@ def set_backgrounds(branch_names,shuffle,cuts='event>=0'):
         utils.IO.background_df.append((rpd.read_root(utils.IO.backgroundName[i],treeName, columns = branch_names)).query(cuts))
         define_process_weight(utils.IO.background_df[i],utils.IO.bkgProc[i],utils.IO.backgroundName[i],treeName)
         utils.IO.background_df[i]['year'] = (np.ones_like(utils.IO.background_df[i].index)*utils.IO.bkgYear[i] ).astype(np.int8)
-        restore_normalization(utils.IO.background_df[i],weight='weight',norm='btagReshapeWeight')
+      #  restore_normalization(utils.IO.background_df[i],weight='weight',norm='btagReshapeWeight')
 
         if shuffle:
             utils.IO.background_df[i]['random_index'] = np.random.permutation(range(utils.IO.background_df[i].index.size))
