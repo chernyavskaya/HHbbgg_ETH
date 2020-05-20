@@ -7,6 +7,67 @@ import matplotlib.pyplot as plt
 
 
 # ---------------------------------------------------------------------------------------------------
+def plot_classifier_output_on_top(Y_pred_sig_train,Y_pred_bkg_train,Y_pred_sig_test,Y_pred_bkg_test,weights_sig_train,weights_bkg_train,weights_sig_test,weights_bkg_test,outString=None):        
+
+    # This will be the min/max of our plots
+    c_max = max(np.max(d) for d in np.concatenate([Y_pred_sig_train,Y_pred_bkg_train,Y_pred_sig_test,Y_pred_bkg_test]))
+    c_min = min(np.min(d) for d in np.concatenate([Y_pred_sig_train,Y_pred_bkg_train,Y_pred_sig_test,Y_pred_bkg_test]))
+
+    # Get histograms of the classifiers
+    Histo_training_S = np.histogram(Y_pred_sig_train,bins=40,range=(c_min,c_max),weights=weights_sig_train,normed=1)
+    Histo_training_B = np.histogram(Y_pred_bkg_train,bins=40,range=(c_min,c_max),weights=weights_bkg_train,normed=1)
+    Histo_testing_S = np.histogram(Y_pred_sig_test,bins=40,range=(c_min,c_max),weights=weights_sig_test,normed=1)
+    Histo_testing_B = np.histogram(Y_pred_bkg_test,bins=40,range=(c_min,c_max),weights=weights_bkg_test,normed=1)
+
+    
+    # Lets get the min/max of the Histograms
+    AllHistos= [Histo_training_S,Histo_training_B,Histo_testing_S,Histo_testing_B]
+    h_max = max([histo[0].max() for histo in AllHistos])*1.2
+    h_min = min([histo[0].min() for histo in AllHistos])
+    
+    # Get the histogram properties (binning, widths, centers)
+    bin_edges = Histo_training_S[1]
+    bin_centers = ( bin_edges[:-1] + bin_edges[1:]  ) /2.
+    bin_widths = (bin_edges[1:] - bin_edges[:-1])
+    
+    # To make error bar plots for the data, take the Poisson uncertainty sqrt(N)
+    ErrorBar_testing_S = np.sqrt(Histo_testing_S[0]/Y_pred_sig_test.size)
+    ErrorBar_testing_B = np.sqrt(Histo_testing_B[0]/Y_pred_bkg_test.size)
+    
+    plt.clf() 
+    # Draw objects
+    ax1 = plt.subplot(111)
+    
+    # Draw solid histograms for the training data
+    ax1.bar(bin_centers,Histo_training_S[0],facecolor='blue',linewidth=0,width=bin_widths,label='S (Train)',alpha=0.5)
+    ax1.bar(bin_centers,Histo_training_B[0],facecolor='red',linewidth=0,width=bin_widths,label='B (Train)',alpha=0.5)
+    
+    # # Draw error-bar histograms for the testing data
+    ax1.errorbar(bin_centers, Histo_testing_S[0], yerr=ErrorBar_testing_S, xerr=None, ecolor='blue',c='blue',fmt='o',label='S (Test)')
+    ax1.errorbar(bin_centers, Histo_testing_B[0], yerr=ErrorBar_testing_B, xerr=None, ecolor='red',c='red',fmt='o',label='B (Test)')
+    
+    # Make a colorful backdrop to show the clasification regions in red and blue
+    ax1.axvspan(0.5, c_max, color='blue',alpha=0.08)
+    ax1.axvspan(c_min,0.5, color='red',alpha=0.08)
+
+    # Adjust the axis boundaries (just cosmetic)
+    ax1.axis([c_min, c_max, h_min, h_max])
+
+    # Make labels and title
+    plt.title("Classification with scikit-learn")
+    plt.xlabel("Classifier output")
+    plt.ylabel("Normalized Yields")
+    
+    # Make legend with smalll font
+    legend = ax1.legend(loc='upper center', shadow=True,ncol=2)
+    for alabel in legend.get_texts():
+        alabel.set_fontsize('small')
+
+    # Save the result to png
+    plt.savefig(utils.IO.plotFolder+"classifierOutputPlotFinal_"+str(outString)+".png")
+    plt.savefig(utils.IO.plotFolder+"classifierOutputPlotFinal_"+str(outString)+".pdf")
+
+
 def plot_classifier_output(clf,X_total_train,X_total_test,y_total_train,y_total_test,outString=None):
     
 

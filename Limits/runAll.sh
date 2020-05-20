@@ -12,7 +12,7 @@ ntup=ntuples_20192401/ntuples_${year}_20192401/
 #outTag=20191812_btag_wo_Mjj_upd_${year}
 #outTag=20191802_wo_Mjj_leptonveto_flashgg_${year}
 #outTag=20191802_wo_Mjj_leptonveto_flashgg_SMsignal_${year}
-outTag=test_output
+outTag=test_output_soumya
 
 
 

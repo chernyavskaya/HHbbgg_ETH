@@ -400,6 +400,7 @@ def get_total_training_sample_event_num(x_sig,x_bkg,event_sig,event_bkg,sig_frac
     return np.concatenate((x_s,x_b))
 
 def vbfhh_reweight(sample_num,cv,c2v,kl):
+    print sample_num,cv,c2v,kl
     if sample_num==0 : 
         return vbfhh_reweight_A(cv,c2v,kl)
     elif sample_num==1 : 
@@ -440,16 +441,16 @@ def vbfhh_reweight_F(CV,C2V,kl):
 
 
 def set_signals(branch_names,shuffle,cuts='event>=0'):
-    sigA = 0.0015929203539823008
-    sigB = 0.013923303834808259
-    sigC = 0.0012979351032448377
-    sigD = 0.004277286135693214
-    sigE = 0.010412979351032449
-    sigF = 0.06339233038348081
+    sigA = 0.001668
+    sigB = 0.01374
+    sigC = 0.001375
+    sigD = 0.004454
+    sigE = 0.01046
+    sigF = 0.0638
     VBFHH_samples_xsec = []
     VBFHH_samples_xsec.append(sigA)
     VBFHH_samples_xsec.append(sigB)
-    VBFHH_samples_xsec.append(sigB)
+    VBFHH_samples_xsec.append(sigC)
     VBFHH_samples_xsec.append(sigD)
     VBFHH_samples_xsec.append(sigE)
     VBFHH_samples_xsec.append(sigF)
@@ -460,9 +461,10 @@ def set_signals(branch_names,shuffle,cuts='event>=0'):
         if utils.IO.reweightVBFHH==True :
             vbfhh_signal_dataframes.append((rpd.read_root(utils.IO.signalName[i],treeName, columns = branch_names)).query(cuts))
             vbfhh_signal_dataframes[i]['weight']*=VBFHH_samples_xsec[i] #multiply each sample with its own cross section
+            print VBFHH_samples_xsec[i]
             vbfhh_rew_sf = 0.
-            for num_coup in range(0,len(utils.IO.vbfhh_cv)) :
-                vbfhh_rew_sf+=vbfhh_reweight(i,utils.IO.vbfhh_cv[num_coup],utils.IO.vbfhh_c2v[num_coup],utils.IO.vbfhh_kl[num_coup])
+            for num_coup in range(0,len(utils.IO.vbfhh_cv)):
+                    vbfhh_rew_sf+=vbfhh_reweight(i,utils.IO.vbfhh_cv[num_coup],utils.IO.vbfhh_c2v[num_coup],utils.IO.vbfhh_kl[num_coup])
 
             vbfhh_signal_dataframes[i]['weight']*=vbfhh_rew_sf
         elif utils.IO.signalMixOfNodes==False :
